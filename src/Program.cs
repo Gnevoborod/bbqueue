@@ -1,4 +1,5 @@
-namespace src
+using Models;
+namespace bbqueue
 {
     public class Program
     {
@@ -28,6 +29,9 @@ namespace src
 
 
             app.MapControllers();
+
+            //DBCONETXT SECTION
+            QueueContext queueContext= new QueueContext();
 
             app.Run();
         }

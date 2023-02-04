@@ -22,8 +22,8 @@ GET
 
 |Параметр|Тип|Обязательность|Комментарий|
 |--|--|--|--|
-|TicketNumber|string|yes|Номер|
-|WindowNumber|string|yes|Номер|
+|TicketNumber|string|yes|Номер талона|
+|WindowNumber|string|yes|Номер окна|
 
 
 ## Пригласить следующего посетителя
@@ -40,7 +40,7 @@ POST
 
 |Параметр|Тип|Обязательность|Комментарий|
 |--|--|--|--|
-|EmployeeCode|int|yes|Код сотрудника|
+|WindowNumber|string|yes|Номер окна|
 
 **Алгоритм**
 
@@ -68,7 +68,7 @@ POST
 
 |Параметр|Тип|Обязательность|Комментарий|
 |--|--|--|--|
-|EmployeeCode|int|yes|Код сотрудника|
+|WindowNumber|string|yes|Номер окна|
 |TicketNumber|string|yes|Номер талона|
 
 **Алгоритм**
@@ -83,7 +83,7 @@ ToDo
 
 **Адрес**
 
-/employee_work
+/window_work
 
 **Тип эндпоинта**
 
@@ -93,7 +93,7 @@ POST
 
 |Параметр|Тип|Обязательность|Комментарий|
 |--|--|--|--|
-|EmployeeCode|int|yes|Код сотрудника|
+|WindowNumber|string|yes|Номер окна|
 |Action|int|yes|Действие: 0 - приостановка работы, 1 - завершение работы|
 
 **Алгоритм**
