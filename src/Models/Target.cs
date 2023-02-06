@@ -1,22 +1,26 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Models
 {
+    [Table("target")]
     public class Target
     {
-        [JsonPropertyName("id")]
+        [Column("target_id")]
         public int Id { get; set; }
 
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
+        [Column("name")]
+        public string Name { get; set; } = null!;
 
-        [JsonPropertyName("description")]
-        public string Description { get; set; }
+        [Column("description")]
+        public string? Description { get; set; }
 
-        [JsonPropertyName("prefix")]
-        public string Prefix { get; set; }
+        [MaxLength(1)]
+        [Column("prefix")]
+        public string Prefix { get; set; } = null!;
 
-        [JsonPropertyName("groupLink")]
+        [Column("group_link_id")]
         public Group? GroupLink { get; set; }
     }
 }

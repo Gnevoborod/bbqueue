@@ -1,20 +1,22 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Models
 {
+    [Table("window")]
 	public class Window
 	{
-        [JsonPropertyName("id")]
+        [Column("window_id")]
         public int Id { get; set; }
 
-        [JsonPropertyName("number")]
-        public string Number { get; set; }
+        [Column("number")]
+        public string Number { get; set; } = null!;
 
-        [JsonPropertyName("description")]
-        public string Description { get; set; }
+        [Column("description")]
+        public string? Description { get; set; }
 
-        [JsonPropertyName("employee")]
-        public Employee Employee { get; set; }
+        [Column("employee_id")]
+        public Employee? Employee { get; set; }
 	}
 }

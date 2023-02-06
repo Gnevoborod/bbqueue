@@ -1,23 +1,25 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Models
 {
     public enum TicketState { Created, InProcess, Reopened, Closed }
+    [Table("ticket")]
     public class Ticket
     {
-        [JsonPropertyName("id")]
+        [Column("ticket_id")]
         public int Id { get; set; }
 
-        [JsonPropertyName("number")]
+        [Column("number")]
         public int Number { get; set; }
 
-        [JsonPropertyName("state")]
+        [Column("state")]
         public TicketState State { get; set; }
 
-        [JsonPropertyName("created")]
+        [Column("created")]
         public DateTime Created { get; set; }
 
-        [JsonPropertyName("closed")]
+        [Column("closed")]
         public DateTime Closed { get; set; }
     }
 }

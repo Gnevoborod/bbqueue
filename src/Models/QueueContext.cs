@@ -17,11 +17,22 @@ namespace Models
 
         public QueueContext()
         {
-            Database.EnsureCreated();
+           Database.EnsureDeleted();
+           Database.EnsureCreated();
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=bbqueue;Username=postgres;Password=qwerty");
         }
+
+        /*
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Window>().Property(u => u.Employee).HasColumnName("employee_id");
+        }
+
+        Вот такой кусок даёт ошибку
+        'The 'Employee' property 'Window.Employee' could not be mapped because the database provider does not support this type. 
+        */
     }
 }

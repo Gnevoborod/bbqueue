@@ -1,20 +1,22 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Models
 {
+    [Table("employee")]
     public class Employee
     {
-        [JsonPropertyName("id")]
+        [Column("employee_id")]
         public int Id { get; set; }
 
-        [JsonPropertyName("ExternalSystemIdentity")]
-        public string ExternalSystemIdentity { get; set; }
+        [Column("external_system_id")]
+        public string ExternalSystemIdentity { get; set; } = null!;
 
-        [JsonPropertyName("Name")]
-        public string Name { get; set; }
+        [Column("name")]
+        public string? Name { get; set; }
 
-        [JsonPropertyName("Active")]
+        [Column("active")]
         public bool Active { get; set; }
     }
 }

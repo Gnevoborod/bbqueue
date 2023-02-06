@@ -1,16 +1,20 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Models
 {
+    [Table("ticket_amount")]
     public class TicketAmount
     {
-        [JsonPropertyName("id")]
+        [Column("ticket_amount_id")]
         public int Id { get; set; }
 
-        [JsonPropertyName("number")]
+        [Column("number")]
         public int Number { get; set; }
 
-        [JsonPropertyName("prefix")]
-        public string Prefix { get; set; }
+        [MaxLength(1)]
+        [Column("prefix")]
+        public string Prefix { get; set; } = null!;
     }
 }

@@ -1,16 +1,18 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Models
 {
+    [Table("window_target")]
     public class WindowTarget
     {
-        [JsonPropertyName("id")]
+        [Column("window_target_id")]
         public int Id { get; set; }
 
-        [JsonPropertyName("window")]
-        public Window Window { get; set; }
+        [Column("window_id")]
+        public Window Window { get; set; } = null!;
 
-        [JsonPropertyName("target")]
-        public Target Target { get; set; }
+        [Column("target_id")]
+        public Target Target { get; set; } = null!;
     }
 }
