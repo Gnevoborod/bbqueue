@@ -1,4 +1,7 @@
-using Models;
+using bbqueue.Database;
+using bbqueue.Mapper;
+using System.Runtime.CompilerServices;
+
 namespace bbqueue
 {
     public class Program
@@ -29,10 +32,14 @@ namespace bbqueue
 
 
             app.MapControllers();
-
+            var config = new ConfigurationBuilder()
+                        .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                        .AddJsonFile("appsettings.json").Build();
+            string connectionString=config.GetValue("DatabaseConnectionString", "");
             //DBCONETXT SECTION
-            QueueContext queueContext= new QueueContext();
-
+            QueueContext queueContext= new QueueContext(connectionString);
+           
+            // test of extensions queueContext.FromEntitiesToModels(queueContext.EmployeeEntity.ToList());
             app.Run();
         }
     }

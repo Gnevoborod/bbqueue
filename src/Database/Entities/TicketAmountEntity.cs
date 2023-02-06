@@ -2,19 +2,18 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace Models
+namespace bbqueue.Database.Entities
 {
     [Table("ticket_amount")]
-    public class TicketAmount
+    internal sealed class TicketAmountEntity
     {
-        [Column("ticket_amount_id")]
-        public int Id { get; set; }
+        [Key, Column("ticket_amount_id")]
+        public long Id { get; set; }
 
         [Column("number")]
         public int Number { get; set; }
 
-        [MaxLength(1)]
         [Column("prefix")]
-        public string Prefix { get; set; } = null!;
+        public char Prefix { get; set; }
     }
 }
