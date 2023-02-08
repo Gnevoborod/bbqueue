@@ -21,9 +21,11 @@ namespace bbqueue.Database
         public QueueContext(string connectionString)
         {
             this.connectionString = connectionString;
-            Database.EnsureDeleted();
-            Database.EnsureCreated();
+            //Database.EnsureDeleted();
+            //Database.EnsureCreated();
+            Database.Migrate();
         }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             try

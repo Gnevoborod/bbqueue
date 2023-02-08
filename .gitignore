@@ -3,5 +3,15 @@
 ################################################################################
 
 /.vs
+/src/.vs
 /src/obj
 /src/bin/Debug/net6.0
+/src/.vs/bbqueue/DesignTimeBuild/.dtbcache.v2
+/src/.vs/bbqueue/FileContentIndex/1bce2115-6f81-42b5-9d36-7a90c0d7bbfb.vsidx
+/src/.vs/bbqueue/FileContentIndex/6def2393-660b-4607-b5c8-08f81b0d28c9.vsidx
+/src/.vs/bbqueue/FileContentIndex/f95c9bea-bde4-4f16-95f7-64ff6ff649c5.vsidx
+/src/.vs/bbqueue/FileContentIndex/c78d3db5-82a4-4e18-91b1-a82c7a774c66.vsidx
+/src/.vs/bbqueue/v17/.futdcache.v2
+/src/.vs/bbqueue/v17/.suo
+/src/.vs/ProjectEvaluation/bbqueue.metadata.v5.2
+/src/.vs/ProjectEvaluation/bbqueue.projects.v5.2
