@@ -5,7 +5,7 @@ namespace bbqueue.Mapper
 {
     internal static class TargetMapper
     {
-        public static Target? FromEntityToModel(this TargetEntity targetEntity)
+        public static Target? FromEntityToModel(this TargetEntity? targetEntity)
         {
             if (targetEntity == null)
                 return null;
@@ -27,7 +27,7 @@ namespace bbqueue.Mapper
             };
         }
 
-        public static TargetEntity? FromModelToEntity(this Target target)
+        public static TargetEntity? FromModelToEntity(this Target? target)
         {
             if (target == null)
                 return null;

@@ -5,7 +5,7 @@ namespace bbqueue.Mapper
 {
     internal static class EmployeeMapper
     {
-        public static Employee? FromEntityToModel(this EmployeeEntity employeeEntity)
+        public static Employee? FromEntityToModel(this EmployeeEntity? employeeEntity)
         {
             if (employeeEntity == null)
                 return null;
@@ -18,7 +18,7 @@ namespace bbqueue.Mapper
             };
         }
 
-        public static EmployeeEntity? FromModelToEntity(this Employee employee)
+        public static EmployeeEntity? FromModelToEntity(this Employee? employee)
         {
             if (employee == null)
                 return null;

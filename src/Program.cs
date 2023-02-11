@@ -35,7 +35,7 @@ namespace bbqueue
             var config = new ConfigurationBuilder()
                         .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                         .AddJsonFile("appsettings.json").Build();
-            string connectionString=config.GetSection("ConnectionStrings").GetValue("DatabaseConnectionString", "");
+            string connectionString = config.GetConnectionString("DatabaseConnectionString") ?? "";
             //DBCONETXT SECTION
             QueueContext queueContext= new QueueContext(connectionString);
            

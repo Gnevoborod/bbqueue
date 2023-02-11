@@ -4,7 +4,7 @@ namespace bbqueue.Mapper
 {
     internal static class WindowMapper
     {
-        public static Window? FromEntityToModel(this WindowEntity windowEntity)
+        public static Window? FromEntityToModel(this WindowEntity? windowEntity)
         {
             if (windowEntity == null)
                 return null;
@@ -24,7 +24,7 @@ namespace bbqueue.Mapper
             };
         }
 
-        public static WindowEntity? FromModelToEntity(this Window window)
+        public static WindowEntity? FromModelToEntity(this Window? window)
         {
             if (window == null)
                 return null;

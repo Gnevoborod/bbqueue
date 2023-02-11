@@ -5,7 +5,7 @@ namespace bbqueue.Mapper
 {
     internal static class GroupMapper
     {
-        public static Group? FromEntityToModel(GroupEntity groupEntity)
+        public static Group? FromEntityToModel(this GroupEntity? groupEntity)
         {
             if (groupEntity == null)
                 return null;
@@ -14,12 +14,12 @@ namespace bbqueue.Mapper
                 Id = groupEntity.Id,
                 Name = groupEntity.Name,
                 Description = groupEntity.Description,
-                GroupLinkId = groupEntity.GroupLinkId,
-                GroupLink = FromEntityToModel(groupEntity.GroupLink) /* Мы так можем делать? */
+                GroupLinkId = groupEntity.GroupLinkId,//вероятно не нужно
+                GroupLink = FromEntityToModel(groupEntity.GroupLink) /* Мы так можем делать? ParentGroup*/
             };
         }
 
-        public static GroupEntity? FromModelToEntity(Group group)
+        public static GroupEntity? FromModelToEntity(this Group? group)
         {
             if (group == null)
                 return null;

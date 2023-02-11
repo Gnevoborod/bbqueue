@@ -4,7 +4,7 @@ namespace bbqueue.Mapper
 {
     internal static class TicketAmountMapper
     {
-        public static TicketAmount? FromEntityToModel(this TicketAmountEntity ticketAmountEntity)
+        public static TicketAmount? FromEntityToModel(this TicketAmountEntity? ticketAmountEntity)
         {
             if (ticketAmountEntity == null)
                 return null;
@@ -16,7 +16,7 @@ namespace bbqueue.Mapper
             };
         }
 
-        public static TicketAmountEntity? FromModelToEntity(this TicketAmount ticketAmount)
+        public static TicketAmountEntity? FromModelToEntity(this TicketAmount? ticketAmount)
         {
             if (ticketAmount == null)
                 return null;

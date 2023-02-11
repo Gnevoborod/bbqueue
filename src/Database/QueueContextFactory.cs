@@ -16,7 +16,7 @@ namespace bbqueue.Database
             IConfigurationRoot config = builder.Build();
 
             // получаем строку подключения из файла appsettings.json
-            string connectionString = config.GetConnectionString("DatabaseConnectionString");
+            string connectionString = config.GetConnectionString("DatabaseConnectionString")??"";
             return new QueueContext(connectionString);
         }
     }

@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
+	  <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
@@ -17,9 +18,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Domain\Interfaces\Repositories\" />
+    <Folder Include="Domain\Interfaces\Services\" />
     <Folder Include="Domain\Models\" />
-    <Folder Include="Domain\Interfaces\" />
-    <Folder Include="Domain\Dtos\" />
+    <Folder Include="Controllers\Dtos\" />
+    <Folder Include="Infrastructure\Repositories\" />
+    <Folder Include="Infrastructure\Services\" />
   </ItemGroup>
 
 </Project>

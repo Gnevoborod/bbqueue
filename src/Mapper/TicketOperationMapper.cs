@@ -4,7 +4,7 @@ namespace bbqueue.Mapper
 {
     internal static class TicketOperationMapper
     {
-        public static TicketOperation? FromEntityToModel(this TicketOperationEntity ticketOperationEntity)
+        public static TicketOperation? FromEntityToModel(this TicketOperationEntity? ticketOperationEntity)
         {
             if (ticketOperationEntity == null)
                 return null;
@@ -48,7 +48,7 @@ namespace bbqueue.Mapper
             };
         }
 
-        public static TicketOperationEntity? FromModelToEntity(this TicketOperation ticketOperation)
+        public static TicketOperationEntity? FromModelToEntity(this TicketOperation? ticketOperation)
         {
             if (ticketOperation == null)
                 return null;
