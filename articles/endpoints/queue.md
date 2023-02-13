@@ -133,6 +133,10 @@ DeleteTicketFromQueue
 
 GET
 
+**Метод**
+
+ListenForCustomerCame
+
 **Входные параметры**
 
 |Параметр|Тип|Обязательность|Комментарий|

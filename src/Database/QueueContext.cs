@@ -1,6 +1,7 @@
 ﻿using bbqueue.Database.Entities;
 using bbqueue.Mapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Diagnostics;
 
 namespace bbqueue.Database
