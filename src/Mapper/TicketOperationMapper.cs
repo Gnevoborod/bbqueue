@@ -6,9 +6,7 @@ namespace bbqueue.Mapper
     {
         public static TicketOperation? FromEntityToModel(this TicketOperationEntity? ticketOperationEntity)
         {
-            if (ticketOperationEntity == null)
-                return null;
-            return new TicketOperation
+            return ticketOperationEntity != null ? new TicketOperation
             {
                 Id = ticketOperationEntity.Id,
                 TicketId = ticketOperationEntity.TicketId,
@@ -26,13 +24,14 @@ namespace bbqueue.Mapper
                     Id = ticketOperationEntity.Window.Id,
                     Number = ticketOperationEntity.Window.Number,
                     Description = ticketOperationEntity.Window.Description,
-                    EmployeeId = ticketOperationEntity.Window.EmployeeId,
+                    EmployeeId = ticketOperationEntity.Window.EmployeeId ?? throw new NullReferenceException("The value of 'ticketOperationEntity.Window.EmployeeId' should not be null"),
                     Employee = ticketOperationEntity.Window.Employee != null ? new Employee
                     {
                         Id = ticketOperationEntity.Window.Employee.Id,
                         ExternalSystemIdentity = ticketOperationEntity.Window.Employee.ExternalSystemIdentity,
                         Name = ticketOperationEntity.Window.Employee.Name,
-                        Active = ticketOperationEntity.Window.Employee.Active
+                        Active = ticketOperationEntity.Window.Employee.Active,
+                        Role = ticketOperationEntity.Window.Employee.Role
                     } : null
                 } : null,
                 EmployeeId = ticketOperationEntity.EmployeeId,
@@ -41,18 +40,17 @@ namespace bbqueue.Mapper
                     Id = ticketOperationEntity.Employee.Id,
                     ExternalSystemIdentity = ticketOperationEntity.Employee.ExternalSystemIdentity,
                     Name = ticketOperationEntity.Employee.Name,
-                    Active = ticketOperationEntity.Employee.Active
+                    Active = ticketOperationEntity.Employee.Active,
+                    Role = ticketOperationEntity.Employee.Role
                 } : null,
                 State = ticketOperationEntity.State,
                 Processed = ticketOperationEntity.Processed
-            };
+            } : null;
         }
 
         public static TicketOperationEntity? FromModelToEntity(this TicketOperation? ticketOperation)
         {
-            if (ticketOperation == null)
-                return null;
-            return new TicketOperationEntity
+            return ticketOperation != null ? new TicketOperationEntity
             {
                 Id = ticketOperation.Id,
                 TicketId = ticketOperation.TicketId,
@@ -76,7 +74,8 @@ namespace bbqueue.Mapper
                         Id = ticketOperation.Window.Employee.Id,
                         ExternalSystemIdentity = ticketOperation.Window.Employee.ExternalSystemIdentity,
                         Name = ticketOperation.Window.Employee.Name,
-                        Active = ticketOperation.Window.Employee.Active
+                        Active = ticketOperation.Window.Employee.Active,
+                        Role = ticketOperation.Window.Employee.Role
                     } : null
                 } : null,
                 EmployeeId = ticketOperation.EmployeeId,
@@ -85,11 +84,12 @@ namespace bbqueue.Mapper
                     Id = ticketOperation.Employee.Id,
                     ExternalSystemIdentity = ticketOperation.Employee.ExternalSystemIdentity,
                     Name = ticketOperation.Employee.Name,
-                    Active = ticketOperation.Employee.Active
+                    Active = ticketOperation.Employee.Active,
+                    Role = ticketOperation.Employee.Role
                 } : null,
                 State = ticketOperation.State,
                 Processed = ticketOperation.Processed
-            };
+            } : null;
         }
     }
 }

@@ -6,9 +6,7 @@ namespace bbqueue.Mapper
     {
         public static WindowTarget? FromEntityToModel(this WindowTargetEntity? windowTargetEntity)
         {
-            if (windowTargetEntity == null)
-                return null;
-            return new WindowTarget
+            return windowTargetEntity != null ? new WindowTarget
             {
                 Id = windowTargetEntity.Id,
                 WindowId = windowTargetEntity.WindowId,
@@ -17,13 +15,14 @@ namespace bbqueue.Mapper
                     Id = windowTargetEntity.Window.Id,
                     Number = windowTargetEntity.Window.Number,
                     Description = windowTargetEntity.Window.Description,
-                    EmployeeId = windowTargetEntity.Window.EmployeeId,
+                    EmployeeId = windowTargetEntity.Window.EmployeeId ?? throw new NullReferenceException("The value of 'windowTargetEntity.Window.EmployeeId' should not be null"),
                     Employee = windowTargetEntity.Window.Employee != null ? new Employee
                     {
                         Id = windowTargetEntity.Window.Employee.Id,
                         ExternalSystemIdentity = windowTargetEntity.Window.Employee.ExternalSystemIdentity,
                         Name = windowTargetEntity.Window.Employee.Name,
-                        Active = windowTargetEntity.Window.Employee.Active
+                        Active = windowTargetEntity.Window.Employee.Active,
+                        Role = windowTargetEntity.Window.Employee.Role
                     } : null
                 },
                 TargetId = windowTargetEntity.TargetId,
@@ -40,10 +39,10 @@ namespace bbqueue.Mapper
                         Name = windowTargetEntity.Target.GroupLink.Name,
                         Description = windowTargetEntity.Target.GroupLink.Description,
                         GroupLinkId = windowTargetEntity.Target.GroupLink.GroupLinkId,
-                        GroupLink = null /* Вынужденная заглушка, иначе так и будем маппить до потери сознания */
+                        GroupLink = null /* Stop recursive mapping */
                     } : null
                 }
-            };
+            } : null;
         }
 
         public static WindowTargetEntity? FromModelToEntity(this WindowTarget? windowTarget)

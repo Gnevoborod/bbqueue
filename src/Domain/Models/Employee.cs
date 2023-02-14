@@ -2,6 +2,7 @@
 
 namespace bbqueue.Domain.Models
 {
+    public enum EmployeeRole { Employee, Manager};
     internal sealed class Employee
     {
         public long Id { get; set; }
@@ -13,5 +14,7 @@ namespace bbqueue.Domain.Models
         public string? Name { get; set; }
 
         public bool Active { get; set; }
+
+        public EmployeeRole Role { get; set; }
     }
 }

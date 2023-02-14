@@ -16,7 +16,7 @@ namespace bbqueue.Database.Entities
         public string? Description { get; set; }
 
         [Column("employee_id")]
-        public long EmployeeId { get; set; }
+        public long? EmployeeId { get; set; }
 
         [ForeignKey(nameof(EmployeeId))]
         public EmployeeEntity? Employee { get; set; }

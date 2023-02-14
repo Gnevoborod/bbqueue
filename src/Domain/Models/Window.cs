@@ -12,7 +12,7 @@ namespace bbqueue.Domain.Models
         [MaxLength(256)]
         public string? Description { get; set; }
 
-        public long EmployeeId { get; set; }
+        public long? EmployeeId { get; set; }
 
         public Employee? Employee { get; set; }
     }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using bbqueue.Domain.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace bbqueue.Database.Entities
@@ -17,5 +18,7 @@ namespace bbqueue.Database.Entities
 
         [Column("active")]
         public bool Active { get; set; }
+
+        public EmployeeRole Role { get; set; }
     }
 }
