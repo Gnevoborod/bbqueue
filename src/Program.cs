@@ -1,5 +1,6 @@
 using bbqueue.Database;
 using bbqueue.Mapper;
+using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 
 namespace bbqueue
@@ -37,7 +38,10 @@ namespace bbqueue
                         .AddJsonFile("appsettings.json").Build();
             string connectionString = config.GetConnectionString("DatabaseConnectionString") ?? "";
             //DBCONETXT SECTION
-            QueueContext queueContext= new QueueContext(connectionString);
+            using (QueueContext queueContext = new QueueContext(connectionString))
+            {
+                queueContext.Database.Migrate();
+            }
            
             // test of extensions queueContext.FromEntitiesToModels(queueContext.EmployeeEntity.ToList());
             app.Run();

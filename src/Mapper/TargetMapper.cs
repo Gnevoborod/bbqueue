@@ -1,5 +1,7 @@
 ﻿using bbqueue.Database.Entities;
 using bbqueue.Domain.Models;
+using System.Runtime.CompilerServices;
+using bbqueue.Controllers.Dtos.Target;
 
 namespace bbqueue.Mapper
 {
@@ -47,6 +49,19 @@ namespace bbqueue.Mapper
                     GroupLink = null /* Вынужденная заглушка, иначе так и будем маппить до потери сознания */
                 } : null
             };
+        }
+
+
+        public static TargetDto? FromModelToDto(this Target? target)
+        {
+            return target != null ? new TargetDto
+            {
+                Id = target.Id,
+                Name = target.Name,
+                Description = target.Description,
+                Prefix = target.Prefix,
+                GroupLinkId = target.GroupLinkId
+            } : null;
         }
     }
 }

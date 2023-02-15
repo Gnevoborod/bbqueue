@@ -1,6 +1,8 @@
 ﻿using bbqueue.Database.Entities;
 using bbqueue.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using bbqueue.Controllers.Dtos.Group;
+
 namespace bbqueue.Mapper
 {
     internal static class GroupMapper
@@ -30,6 +32,17 @@ namespace bbqueue.Mapper
                 Description = group.Description,
                 GroupLinkId = group.GroupLinkId,
                 GroupLink = FromModelToEntity(group.GroupLink) /* Мы так можем делать? */
+            };
+        }
+
+        public static GroupDto? FromModelToDto(this Group group)
+        {
+            return new GroupDto
+            {
+                Id = group.Id,
+                Name = group.Name,
+                Description = group.Description??"",
+                GroupLinkId = group.GroupLinkId
             };
         }
     }

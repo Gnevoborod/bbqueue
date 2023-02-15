@@ -18,14 +18,20 @@ namespace bbqueue.Database
         public DbSet<TargetEntity>? TargetEntity { get; set; }
 
         public DbSet<EmployeeEntity>? EmployeeEntity { get; set; }
-        private readonly string connectionString;
-        public QueueContext(string connectionString)
+        private static string? connectionString;
+        public QueueContext(string _connectionString)
         {
-            this.connectionString = connectionString;
+            connectionString = _connectionString;
             //Database.EnsureDeleted();
             //Database.EnsureCreated();
-            Database.Migrate();
         }
+
+        public QueueContext() 
+        {
+            if (connectionString == null)
+                throw new NullReferenceException();
+        }
+        
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

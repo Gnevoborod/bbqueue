@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace bbqueue.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/window")]
     [ApiController]
     public class WindowController : ControllerBase
     {
+       
         [HttpPost]
         [Route("work_state")]
         public IActionResult ChangeWindowWorkState()
@@ -14,6 +15,7 @@ namespace bbqueue.Controllers
             return Ok("Скоро тут будет реализация");//Заглушка
         }
 
+        
         [HttpGet]
         [Route("windows")]
         public IActionResult GetWindows()

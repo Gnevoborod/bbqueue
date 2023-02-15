@@ -2,6 +2,7 @@
 
 namespace bbqueue.Domain.Models
 {
+    public enum WindowWorkState { Opened, Suspended, Closed}
     internal sealed class Window
     {
         public long Id { get; set; }

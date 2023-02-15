@@ -21,9 +21,6 @@
     <Folder Include="Domain\Interfaces\Repositories\" />
     <Folder Include="Domain\Interfaces\Services\" />
     <Folder Include="Domain\Models\" />
-    <Folder Include="Controllers\Dtos\" />
-    <Folder Include="Infrastructure\Repositories\" />
-    <Folder Include="Infrastructure\Services\" />
   </ItemGroup>
 
 </Project>
