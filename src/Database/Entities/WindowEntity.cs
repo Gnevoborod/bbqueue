@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using bbqueue.Domain.Models;
 
 namespace bbqueue.Database.Entities
 {
@@ -20,5 +21,8 @@ namespace bbqueue.Database.Entities
 
         [ForeignKey(nameof(EmployeeId))]
         public EmployeeEntity? Employee { get; set; }
+
+        [Column("window_work_state")]
+        public WindowWorkState WindowWorkState { get; set; }
     }
 }

@@ -1,16 +1,18 @@
 ﻿using bbqueue.Domain.Models;
+using bbqueue.Infrastructure.Repositories;
+
 namespace bbqueue.Infrastructure.Services
 {
     internal sealed class WindowService
     {
         public List<Window> GetWindows()
         {
-            return new List<Window>();//
+            return new WindowRepository().GetWindows();
         }
 
-        public bool ChangeWindowWorkState(string windowNumber, WindowWorkState windowWorkState)
+        public bool ChangeWindowWorkState(Window window)
         {
-            throw new NotImplementedException();
+            return new WindowRepository().ChangeWindowWorkState(window);
         }
 
         public bool SetEmployeeToWindow(int employeeId, int windowId)

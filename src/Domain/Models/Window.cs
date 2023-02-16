@@ -16,5 +16,7 @@ namespace bbqueue.Domain.Models
         public long? EmployeeId { get; set; }
 
         public Employee? Employee { get; set; }
+
+        public WindowWorkState WindowWorkState { get; set;}
     }
 }

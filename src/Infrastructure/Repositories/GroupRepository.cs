@@ -11,7 +11,7 @@ namespace bbqueue.Infrastructure.Repositories
         {
             using (QueueContext queueContext = new QueueContext())
             {
-                var groupEntity = queueContext.GroupEntity;
+                var groupEntity = queueContext?.GroupEntity?.OrderByDescending(g=>g.GroupLinkId);
                 if (groupEntity == null)
                     return new List<Group>();
                 List<Group> groups = new List<Group>(groupEntity.Count());

@@ -10,7 +10,7 @@ namespace bbqueue.Infrastructure.Repositories
         {
             using (QueueContext queueContext = new QueueContext())
             {
-                var targetEntity = queueContext.TargetEntity;
+                var targetEntity = queueContext?.TargetEntity?.OrderByDescending(g => g.GroupLinkId);
                 if (targetEntity == null)
                     return new List<Target>();
                 List<Target> targets = new List<Target>(targetEntity.Count());

@@ -1,5 +1,6 @@
 ﻿using bbqueue.Database.Entities;
 using bbqueue.Domain.Models;
+using bbqueue.Controllers.Dtos.Window;
 namespace bbqueue.Mapper
 {
     internal static class WindowMapper
@@ -11,7 +12,7 @@ namespace bbqueue.Mapper
                 Id = windowEntity.Id,
                 Number = windowEntity.Number,
                 Description = windowEntity.Description,
-                EmployeeId = windowEntity.EmployeeId ?? throw new NullReferenceException("The value of 'windowEntity.EmployeeId' should not be null"),
+                EmployeeId = windowEntity.EmployeeId,
                 Employee = windowEntity.Employee != null ? new Employee
                 {
                     Id = windowEntity.Employee.Id,
@@ -19,7 +20,8 @@ namespace bbqueue.Mapper
                     Name = windowEntity.Employee.Name,
                     Active = windowEntity.Employee.Active,
                     Role = windowEntity.Employee.Role
-                } : null
+                } : null,
+                WindowWorkState = windowEntity.WindowWorkState
             } : null;
         }
 
@@ -38,7 +40,27 @@ namespace bbqueue.Mapper
                     Name = window.Employee.Name,
                     Active = window.Employee.Active,
                     Role = window.Employee.Role
-                } : null
+                } : null,
+                WindowWorkState = window.WindowWorkState
+            } : null;
+        }
+
+        public static WindowDto? FromModelToDto(this Window? window)
+        {
+            return window != null ? new WindowDto
+            {
+                Id = window.Id,
+                Number = window.Number,
+                Description = window.Description
+            } : null;
+        }
+
+        public static Window? FromChangeStateDtoToModel(this ChangeWindowWorkStateDto? dto)
+        {
+            return dto != null ? new Window
+            {
+                Number = dto.Number,
+                WindowWorkState = dto.WindowWorkState
             } : null;
         }
     }

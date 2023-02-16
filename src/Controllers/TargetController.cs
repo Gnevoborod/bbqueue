@@ -10,7 +10,7 @@ namespace bbqueue.Controllers
 {
     [Route("api/target")]
     [ApiController]
-    public class TargetController : ControllerBase
+    public sealed class TargetController : ControllerBase
     {
         [HttpGet]
         [Route("targets")]

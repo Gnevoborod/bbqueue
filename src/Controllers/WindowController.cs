@@ -1,18 +1,28 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using bbqueue.Controllers.Dtos.Target;
+using bbqueue.Controllers.Dtos.Window;
+using bbqueue.Domain.Models;
+using bbqueue.Infrastructure.Services;
+using bbqueue.Mapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bbqueue.Controllers
 {
     [Route("api/window")]
     [ApiController]
-    public class WindowController : ControllerBase
+    public sealed class WindowController : ControllerBase
     {
-       
         [HttpPost]
         [Route("work_state")]
-        public IActionResult ChangeWindowWorkState()
+        public IActionResult ChangeWindowWorkState([FromBody] ChangeWindowWorkStateDto dto)
         {
-            return Ok("Скоро тут будет реализация");//Заглушка
+            var window = dto.FromChangeStateDtoToModel();
+            if(window != null) { 
+            var result=new WindowService().ChangeWindowWorkState(window);
+            if (result) 
+                return Ok();
+            }
+            return BadRequest();//тут по-хорошему надо что-то внятное возвращать
         }
 
         
@@ -20,7 +30,13 @@ namespace bbqueue.Controllers
         [Route("windows")]
         public IActionResult GetWindows()
         {
-            return Ok("Скоро тут будет реализация");//Заглушка
+            var windows=new WindowService().GetWindows();
+            WindowListDto windowListDto = new WindowListDto(windows.Count());
+            foreach(var window in windows)
+            {
+                windowListDto?.Windows?.Add(window.FromModelToDto()!);
+            }
+            return Ok(windowListDto);
         }
     }
 }
