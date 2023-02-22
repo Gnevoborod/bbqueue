@@ -2,36 +2,38 @@
 using bbqueue.Database;
 using bbqueue.Domain.Models;
 using bbqueue.Mapper;
+using Microsoft.EntityFrameworkCore;
+using bbqueue.Domain.Interfaces.Repositories;
+
 namespace bbqueue.Infrastructure.Repositories
 {
-    internal sealed class WindowRepository
+    internal sealed class WindowRepository : IWindowRepository
     {
-        public List<Window> GetWindows()
+        IServiceProvider serviceProvider;
+        public WindowRepository(IServiceProvider _serviceProvider)
         {
-            using (QueueContext queueContext = new QueueContext())
-            {
-                var windowEntity = queueContext?.WindowEntity?.OrderBy(w=>w.Number);
-                if (windowEntity == null)
-                    return new List<Window>();
-                List<Window> window = new List<Window>(windowEntity.Count());
-                foreach (WindowEntity ge in windowEntity)
-                {
-                    window.Add(ge.FromEntityToModel()!);
-                }
-                return window;
-            }
+            serviceProvider = _serviceProvider;
+        }
+        public async Task<List<Window>> GetWindowsAsync(CancellationToken cancellationToken)
+        {
+            var queueContext = serviceProvider.GetService<QueueContext>();
+            cancellationToken.ThrowIfCancellationRequested();
+            return await queueContext?.WindowEntity?.OrderBy(w => w.Number)
+                .Select(w => w.FromEntityToModel()!)
+                .ToListAsync()!;
+
+
         }
 
-        public bool ChangeWindowWorkState(Window window)
+        public async Task<bool> ChangeWindowWorkStateAsync(Window window, CancellationToken cancellationToken)
         {
-            using (QueueContext queueContext = new QueueContext())
-            {
-                var windowEntity =queueContext?.WindowEntity?.SingleOrDefault(we=>we.Number== window.Number);
-                if(windowEntity == null) return false;
-                windowEntity.WindowWorkState = window.WindowWorkState;
-                queueContext?.SaveChanges();
-                return true;
-            }
+            var queueContext = serviceProvider.GetService<QueueContext>();
+            var windowEntity = await queueContext?.WindowEntity?.SingleOrDefaultAsync(we => we.Number == window.Number)!;
+            if (windowEntity == null) return false;
+            windowEntity.WindowWorkState = window.WindowWorkState;
+            await queueContext?.SaveChangesAsync(cancellationToken)!;
+            return true;
+
         }
     }
 }

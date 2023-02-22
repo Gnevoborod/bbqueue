@@ -1,9 +1,6 @@
-﻿using bbqueue.Controllers.Dtos.Target;
-using bbqueue.Controllers.Dtos.Window;
-using bbqueue.Domain.Models;
-using bbqueue.Infrastructure.Services;
+﻿using bbqueue.Controllers.Dtos.Window;
+using bbqueue.Domain.Interfaces.Services;
 using bbqueue.Mapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bbqueue.Controllers
@@ -12,30 +9,37 @@ namespace bbqueue.Controllers
     [ApiController]
     public sealed class WindowController : ControllerBase
     {
+        IServiceProvider serviceProvider;
+
+        public WindowController(IServiceProvider serviceProvider)
+        {
+            this.serviceProvider = serviceProvider;
+        }
+
         [HttpPost]
         [Route("work_state")]
-        public IActionResult ChangeWindowWorkState([FromBody] ChangeWindowWorkStateDto dto)
+        public async Task<IActionResult> ChangeWindowWorkStateAsync([FromBody] ChangeWindowWorkStateDto dto, CancellationToken cancellationToken)
         {
             var window = dto.FromChangeStateDtoToModel();
             if(window != null) { 
-            var result=new WindowService().ChangeWindowWorkState(window);
+            var result= await serviceProvider.GetService<IWindowService>()?.ChangeWindowWorkStateAsync(window, cancellationToken)!;
             if (result) 
                 return Ok();
             }
             return BadRequest();//тут по-хорошему надо что-то внятное возвращать
         }
 
-        
+
         [HttpGet]
         [Route("windows")]
-        public IActionResult GetWindows()
+        public async Task<IActionResult> GetWindowsAsync(CancellationToken cancellationToken)
         {
-            var windows=new WindowService().GetWindows();
-            WindowListDto windowListDto = new WindowListDto(windows.Count());
-            foreach(var window in windows)
+            var windows = await serviceProvider.GetService<IWindowService>()?.GetWindowsAsync(cancellationToken)!;
+            cancellationToken.ThrowIfCancellationRequested();
+            WindowListDto windowListDto = new()
             {
-                windowListDto?.Windows?.Add(window.FromModelToDto()!);
-            }
+                Windows = windows?.Select(w => w.FromModelToDto()!).ToList()
+            };
             return Ok(windowListDto);
         }
     }

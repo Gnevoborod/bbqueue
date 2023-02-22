@@ -4,8 +4,8 @@
     {
         public long Id { get; set; }
         public long WindowId { get; set; }
-        public Window Window { get; set; } = null!;
+        public Window Window { get; set; } = default!;
         public long TargetId { get; set; }
-        public Target Target { get; set; } = null!;
+        public Target Target { get; set; } = default!;
     }
 }

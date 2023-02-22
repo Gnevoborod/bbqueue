@@ -11,7 +11,7 @@ namespace bbqueue.Database.Entities
         public long Id { get; set; }
 
         [Column("external_system_id"), MaxLength(16)]
-        public string ExternalSystemIdentity { get; set; } = null!;
+        public string ExternalSystemIdentity { get; set; } = default!;
 
         [Column("name"), MaxLength(100)]
         public string? Name { get; set; }

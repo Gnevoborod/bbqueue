@@ -15,7 +15,7 @@ namespace bbqueue.Mapper
                     Id = windowTargetEntity.Window.Id,
                     Number = windowTargetEntity.Window.Number,
                     Description = windowTargetEntity.Window.Description,
-                    EmployeeId = windowTargetEntity.Window.EmployeeId ?? throw new NullReferenceException("The value of 'windowTargetEntity.Window.EmployeeId' should not be null"),
+                    EmployeeId = windowTargetEntity.Window.EmployeeId,
                     Employee = windowTargetEntity.Window.Employee != null ? new Employee
                     {
                         Id = windowTargetEntity.Window.Employee.Id,
@@ -23,7 +23,8 @@ namespace bbqueue.Mapper
                         Name = windowTargetEntity.Window.Employee.Name,
                         Active = windowTargetEntity.Window.Employee.Active,
                         Role = windowTargetEntity.Window.Employee.Role
-                    } : null
+                    } : null,
+                    WindowWorkState = windowTargetEntity.Window.WindowWorkState
                 },
                 TargetId = windowTargetEntity.TargetId,
                 Target = new Target

@@ -8,7 +8,7 @@ namespace bbqueue.Domain.Models
         public long Id { get; set; }
 
         [MaxLength(6)]
-        public string Number { get; set; } = null!;
+        public string Number { get; set; } = default!;
 
         [MaxLength(256)]
         public string? Description { get; set; }

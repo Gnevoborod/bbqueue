@@ -1,13 +1,19 @@
-﻿using bbqueue.Domain.Models;
-using bbqueue.Infrastructure.Repositories;
+﻿using bbqueue.Domain.Interfaces.Repositories;
+using bbqueue.Domain.Interfaces.Services;
+using bbqueue.Domain.Models;
 
 namespace bbqueue.Infrastructure.Services
 {
-    internal sealed class GroupService
+    internal sealed class GroupService : IGroupService
     {
-        public List<Group> GetGroups()
+        private readonly IServiceProvider serviceProvider;
+        public GroupService(IServiceProvider _serviceProvider)
         {
-            return new GroupRepository().GetGroups();
+            serviceProvider = _serviceProvider;
+        }
+        public async Task<List<Group>>? GetGroupsAsync(CancellationToken cancellationToken)
+        {
+            return await serviceProvider.GetService<IGroupRepository>()?.GetGroupsAsync(cancellationToken)!;
         }
     }
 }

@@ -11,7 +11,7 @@ namespace bbqueue.Database.Entities
         public long Id { get; set; }
 
         [Column("number"), MaxLength(6)]
-        public string Number { get; set; } = null!;
+        public string Number { get; set; } = default!;
 
         [Column("description"), MaxLength(256)]
         public string? Description { get; set; }

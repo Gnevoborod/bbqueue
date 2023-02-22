@@ -1,7 +1,8 @@
 using bbqueue.Database;
-using bbqueue.Mapper;
-using Microsoft.EntityFrameworkCore;
-using System.Runtime.CompilerServices;
+using bbqueue.Domain.Interfaces.Repositories;
+using bbqueue.Domain.Interfaces.Services;
+using bbqueue.Infrastructure.Repositories;
+using bbqueue.Infrastructure.Services;
 
 namespace bbqueue
 {
@@ -18,8 +19,18 @@ namespace bbqueue
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            var app = builder.Build();
+            builder.Services.AddScoped<QueueContext>();
+            builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+            builder.Services.AddScoped<IGroupService, GroupService>();
+            
+            builder.Services.AddScoped<ITargetRepository,TargetRepository>();
+            builder.Services.AddScoped<ITargetService,TargetService>();
 
+            builder.Services.AddScoped<IWindowRepository, WindowRepository>();
+            builder.Services.AddScoped<IWindowService, WindowService>();
+
+            var app = builder.Build();
+            
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -33,17 +44,7 @@ namespace bbqueue
 
 
             app.MapControllers();
-            var config = new ConfigurationBuilder()
-                        .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                        .AddJsonFile("appsettings.json").Build();
-            string connectionString = config.GetConnectionString("DatabaseConnectionString") ?? "";
-            //DBCONETXT SECTION
-            using (QueueContext queueContext = new QueueContext(connectionString))
-            {
-                queueContext.Database.Migrate();
-            }
-           
-            // test of extensions queueContext.FromEntitiesToModels(queueContext.EmployeeEntity.ToList());
+        
             app.Run();
         }
     }

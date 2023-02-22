@@ -5,7 +5,7 @@
 
         public long Id { get; set; }
 
-        public string Number { get; set; } = null!;
+        public string Number { get; set; } = default!;
 
         public string? Description { get; set; }
 

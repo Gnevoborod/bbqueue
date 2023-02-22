@@ -1,25 +1,26 @@
 ﻿using bbqueue.Database;
-using bbqueue.Database.Entities;
+using bbqueue.Domain.Interfaces.Repositories;
 using bbqueue.Domain.Models;
 using bbqueue.Mapper;
+using Microsoft.EntityFrameworkCore;
+
 namespace bbqueue.Infrastructure.Repositories
 {
-    internal sealed class TargetRepository
+    internal sealed class TargetRepository : ITargetRepository
     {
-        public List<Target> GetTargets()
+        IServiceProvider serviceProvider;
+        public TargetRepository(IServiceProvider _serviceProvider)
         {
-            using (QueueContext queueContext = new QueueContext())
-            {
-                var targetEntity = queueContext?.TargetEntity?.OrderByDescending(g => g.GroupLinkId);
-                if (targetEntity == null)
-                    return new List<Target>();
-                List<Target> targets = new List<Target>(targetEntity.Count());
-                foreach(TargetEntity te in targetEntity)
-                {
-                    targets.Add(te.FromEntityToModel()!);
-                }
-                return targets;
-            }
+            serviceProvider = _serviceProvider;
+        }
+        public async Task<List<Target>> GetTargetsAsync(CancellationToken cancellationToken)
+        {
+            var queueContext = serviceProvider.GetService<QueueContext>();
+            return await queueContext?
+                .TargetEntity?
+                .OrderByDescending(g => g.GroupLinkId)
+                .Select(t => t.FromEntityToModel()!)
+                .ToListAsync()!;
         }
     }
 }

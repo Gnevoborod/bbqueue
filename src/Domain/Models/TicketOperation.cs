@@ -5,7 +5,7 @@
         public long Id { get; set; }
 
         public long TicketId { get; set; }
-        public Ticket Ticket { get; set; } = null!;
+        public Ticket Ticket { get; set; } = default!;
 
         public long? WindowId { get; set; }
 

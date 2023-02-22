@@ -24,7 +24,7 @@ namespace bbqueue.Mapper
                     Id = ticketOperationEntity.Window.Id,
                     Number = ticketOperationEntity.Window.Number,
                     Description = ticketOperationEntity.Window.Description,
-                    EmployeeId = ticketOperationEntity.Window.EmployeeId ?? throw new NullReferenceException("The value of 'ticketOperationEntity.Window.EmployeeId' should not be null"),
+                    EmployeeId = ticketOperationEntity.Window.EmployeeId,
                     Employee = ticketOperationEntity.Window.Employee != null ? new Employee
                     {
                         Id = ticketOperationEntity.Window.Employee.Id,
@@ -32,7 +32,8 @@ namespace bbqueue.Mapper
                         Name = ticketOperationEntity.Window.Employee.Name,
                         Active = ticketOperationEntity.Window.Employee.Active,
                         Role = ticketOperationEntity.Window.Employee.Role
-                    } : null
+                    } : null,
+                    WindowWorkState = ticketOperationEntity.Window.WindowWorkState
                 } : null,
                 EmployeeId = ticketOperationEntity.EmployeeId,
                 Employee = ticketOperationEntity.Employee != null ? new Employee

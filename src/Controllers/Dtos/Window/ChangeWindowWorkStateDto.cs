@@ -1,16 +1,14 @@
 ﻿using bbqueue.Domain.Models;
+using bbqueue.Infrastructure.Validators;
+using System.ComponentModel.DataAnnotations;
 
 namespace bbqueue.Controllers.Dtos.Window
 {
     public sealed class ChangeWindowWorkStateDto
     {
-        public string Number { get; set; }
+        [Required, MaxLength(6)]
+        public string Number { get; set; } = default!;
+        [Required, MinValue((int)WindowWorkState.Opened), MaxValue((int)WindowWorkState.Closed)]
         public WindowWorkState WindowWorkState { get; set; }
-
-        public ChangeWindowWorkStateDto(string number, WindowWorkState windowWorkState)
-        {
-            Number= number;
-            WindowWorkState= windowWorkState;
-        }
     }
 }

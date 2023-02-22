@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using bbqueue.Infrastructure.Services;
 using bbqueue.Mapper;
 using bbqueue.Controllers.Dtos.Target;
 using bbqueue.Controllers.Dtos.Group;
-using Microsoft.AspNetCore.Authorization;
+using bbqueue.Domain.Interfaces.Services;
 
 namespace bbqueue.Controllers
 {
@@ -12,36 +11,52 @@ namespace bbqueue.Controllers
     [ApiController]
     public sealed class TargetController : ControllerBase
     {
-        [HttpGet]
-        [Route("targets")]
-        public IActionResult GetTargets() 
+        private readonly IServiceProvider serviceProvider;
+
+        public TargetController(IServiceProvider _serviceProvider)
         {
-            var targets = new TargetService().GetTargets();
-            TargetListDto targetListDto = new TargetListDto(targets.Count());
-            foreach(var target in targets)
+            serviceProvider = _serviceProvider;
+        }
+
+        [HttpGet("targets")]
+        public async Task<IActionResult> GetTargets(CancellationToken cancellationToken) 
+        {
+            var targets = await serviceProvider.GetService<ITargetService>()?.GetTargetsAsync(cancellationToken)!;
+            cancellationToken.ThrowIfCancellationRequested();//решил ставить проверку на отмену в контроллере после основных манипуляций и в репозитории перед обращением в БД
+            TargetListDto targetListDto = new()
             {
-                targetListDto?.Targets?.Add(target.FromModelToDto()!);
-            }
+                Targets = targets.Select(t => t.FromModelToDto()!).ToList()
+            };
             return Ok(targetListDto);
         }
 
-
+        /// <summary>
+        /// Обновлённый метод возвращающий список подразделов и целей
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpGet("hierarchy")]
+        public async Task<IActionResult> GetHierarchyAsync(CancellationToken cancellationToken)
+        {
+            var hierarchy = await new TargetService(serviceProvider).GetHierarchyAsync(cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            return Ok(hierarchy);
+        }
 
         /// <summary>
         /// Получаем список разделов\подразделов.
         /// На фронте для выстраивания дерева страниц потребуется вызов и /targets и /groups
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
-        [Route("groups")]
-        public IActionResult GetGroups()
+        [HttpGet("groups")]
+        public async Task<IActionResult> GetGroupsAsync(CancellationToken cancellationToken)
         {
-            var groups = new GroupService().GetGroups();
-            GroupListDto groupListDto=new GroupListDto(groups.Count());
-            foreach(var group in groups)
+            var groups = await serviceProvider.GetService<IGroupService>()?.GetGroupsAsync(cancellationToken)!;
+            cancellationToken.ThrowIfCancellationRequested();
+            GroupListDto groupListDto = new()
             {
-                groupListDto?.Groups?.Add(group.FromModelToDto()!);
-            }
+                Groups = groups.Select(gld => gld.FromModelToDto()!).ToList()
+            };
             return Ok(groupListDto);
         }
     }

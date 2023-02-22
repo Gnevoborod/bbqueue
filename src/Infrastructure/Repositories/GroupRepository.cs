@@ -2,25 +2,27 @@
 using bbqueue.Database;
 using bbqueue.Domain.Models;
 using bbqueue.Mapper;
+using bbqueue.Domain.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
+using bbqueue.Controllers.Dtos.Group;
 
 namespace bbqueue.Infrastructure.Repositories
 {
-    internal sealed class GroupRepository
+    internal sealed class GroupRepository : IGroupRepository
     {
-        public List<Group> GetGroups()
+        IServiceProvider serviceProvider;
+        public GroupRepository(IServiceProvider _serviceProvider)
         {
-            using (QueueContext queueContext = new QueueContext())
-            {
-                var groupEntity = queueContext?.GroupEntity?.OrderByDescending(g=>g.GroupLinkId);
-                if (groupEntity == null)
-                    return new List<Group>();
-                List<Group> groups = new List<Group>(groupEntity.Count());
-                foreach (GroupEntity ge in groupEntity)
-                {
-                    groups.Add(ge.FromEntityToModel()!);
-                }
-                return groups;
-            }
+            serviceProvider = _serviceProvider;
+        }
+        public async Task<List<Group>>? GetGroupsAsync(CancellationToken cancellationToken)
+        {
+            var queueContext=serviceProvider.GetService<QueueContext>();
+            return await queueContext?.GroupEntity?
+                    .OrderByDescending(g => g.GroupLinkId)
+                    .Select(g=> g.FromEntityToModel()!)
+                    .ToListAsync()!;
+            
         }
     }
 }

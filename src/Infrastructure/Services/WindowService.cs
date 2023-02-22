@@ -1,21 +1,29 @@
-﻿using bbqueue.Domain.Models;
+﻿using bbqueue.Domain.Interfaces.Services;
+
+using bbqueue.Domain.Interfaces.Repositories;
+using bbqueue.Domain.Models;
 using bbqueue.Infrastructure.Repositories;
 
 namespace bbqueue.Infrastructure.Services
 {
-    internal sealed class WindowService
+    internal sealed class WindowService : IWindowService
     {
-        public List<Window> GetWindows()
+        IServiceProvider serviceProvider;
+        public WindowService(IServiceProvider serviceProvider)
         {
-            return new WindowRepository().GetWindows();
+            this.serviceProvider = serviceProvider;
+        }
+        public async Task<List<Window>> GetWindowsAsync(CancellationToken cancellationToken)
+        {
+            return await serviceProvider.GetService<IWindowRepository>()?.GetWindowsAsync(cancellationToken)!;
         }
 
-        public bool ChangeWindowWorkState(Window window)
+        public async Task<bool> ChangeWindowWorkStateAsync(Window window, CancellationToken cancellationToken)
         {
-            return new WindowRepository().ChangeWindowWorkState(window);
+            return await serviceProvider.GetService<IWindowRepository>()?.ChangeWindowWorkStateAsync(window, cancellationToken)!;
         }
 
-        public bool SetEmployeeToWindow(int employeeId, int windowId)
+        public bool SetEmployeeToWindowAsync(int employeeId, int windowId, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

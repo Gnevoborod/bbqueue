@@ -19,17 +19,19 @@ namespace bbqueue.Database
 
         public DbSet<EmployeeEntity>? EmployeeEntity { get; set; }
         private static string? connectionString;
-        public QueueContext(string _connectionString)
+
+        private void SetConnectionString()
         {
-            connectionString = _connectionString;
-            //Database.EnsureDeleted();
-            //Database.EnsureCreated();
+            var config = new ConfigurationBuilder()
+                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                    .AddJsonFile("appsettings.json").Build();
+            connectionString = config.GetConnectionString("DatabaseConnectionString") ?? throw new NullReferenceException("Невозможно получить путь к базе");
         }
 
         public QueueContext() 
         {
             if (connectionString == null)
-                throw new NullReferenceException();
+                SetConnectionString();
         }
         
 

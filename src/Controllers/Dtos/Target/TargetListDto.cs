@@ -2,10 +2,6 @@
 {
     internal sealed class TargetListDto
     {
-        public List<TargetDto>? Targets { get; private set; }
-        public TargetListDto(int count)
-        {
-            Targets = new List<TargetDto>(count);
-        }
+        public List<TargetDto>? Targets { get; set; }
     }
 }

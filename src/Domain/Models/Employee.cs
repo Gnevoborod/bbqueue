@@ -8,7 +8,7 @@ namespace bbqueue.Domain.Models
         public long Id { get; set; }
 
         [MaxLength(16)]
-        public string ExternalSystemIdentity { get; set; } = null!;
+        public string ExternalSystemIdentity { get; set; } = default!;
 
         [MaxLength(100)]
         public string? Name { get; set; }

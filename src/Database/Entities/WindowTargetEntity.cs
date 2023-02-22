@@ -13,12 +13,12 @@ namespace bbqueue.Database.Entities
         public long WindowId { get; set; }
 
         [ForeignKey(nameof(WindowId))]
-        public WindowEntity Window { get; set; } = null!;
+        public WindowEntity Window { get; set; } = default!;
 
         [Column("target_id")]
         public long TargetId { get; set; }
 
         [ForeignKey(nameof(TargetId))]
-        public TargetEntity Target { get; set; } = null!;
+        public TargetEntity Target { get; set; } = default!;
     }
 }
