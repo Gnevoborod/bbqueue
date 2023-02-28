@@ -1,8 +1,11 @@
 using bbqueue.Database;
 using bbqueue.Domain.Interfaces.Repositories;
 using bbqueue.Domain.Interfaces.Services;
+using bbqueue.Infrastructure;
 using bbqueue.Infrastructure.Repositories;
 using bbqueue.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 namespace bbqueue
 {
@@ -29,6 +32,29 @@ namespace bbqueue
             builder.Services.AddScoped<IWindowRepository, WindowRepository>();
             builder.Services.AddScoped<IWindowService, WindowService>();
 
+            builder.Services.AddScoped<ITicketRepository,TicketRepository>();
+            builder.Services.AddScoped<ITicketService,TicketService>();
+
+            builder.Services.AddScoped<IQueueService,QueueService>();
+
+            builder.Services.AddAuthorization();
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(
+                options=>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = AuthOptions.ISSUER,
+                        ValidateAudience = true,
+                        ValidAudience = AuthOptions.AUDIENCE,
+                        ValidateLifetime = true,
+                        IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                        ValidateIssuerSigningKey = true
+                    };
+                }
+                );
+
             var app = builder.Build();
             
             // Configure the HTTP request pipeline.
@@ -40,6 +66,7 @@ namespace bbqueue
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

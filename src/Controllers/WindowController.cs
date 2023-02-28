@@ -1,6 +1,7 @@
 ﻿using bbqueue.Controllers.Dtos.Window;
 using bbqueue.Domain.Interfaces.Services;
 using bbqueue.Mapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bbqueue.Controllers
@@ -16,8 +17,8 @@ namespace bbqueue.Controllers
             this.serviceProvider = serviceProvider;
         }
 
-        [HttpPost]
-        [Route("work_state")]
+        [Authorize]
+        [HttpPost("work_state")]
         public async Task<IActionResult> ChangeWindowWorkStateAsync([FromBody] ChangeWindowWorkStateDto dto, CancellationToken cancellationToken)
         {
             var window = dto.FromChangeStateDtoToModel();
@@ -30,8 +31,7 @@ namespace bbqueue.Controllers
         }
 
 
-        [HttpGet]
-        [Route("windows")]
+        [HttpGet("windows")]
         public async Task<IActionResult> GetWindowsAsync(CancellationToken cancellationToken)
         {
             var windows = await serviceProvider.GetService<IWindowService>()?.GetWindowsAsync(cancellationToken)!;
