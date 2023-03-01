@@ -1,11 +1,6 @@
-﻿using bbqueue.Infrastructure;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using bbqueue.Controllers.Dtos;
-using System.Security.Claims;
-using System;
+﻿using Microsoft.AspNetCore.Mvc;
 using bbqueue.Controllers.Dtos.Employee;
+using bbqueue.Domain.Interfaces.Services;
 
 namespace bbqueue.Controllers
 {
@@ -13,32 +8,26 @@ namespace bbqueue.Controllers
     [Route("api/employee")]
     public class EmployeeController : Controller
     {
-        [HttpGet("jwt")]
-        public async Task<IActionResult> GetJWT([FromQuery] string employeeExternalId)
+        IServiceProvider serviceProvider;
+
+        public EmployeeController(IServiceProvider serviceProvider)
         {
-            //пока метод-заглушка, чисто получить jwt и с ним дальше работать
-            //тут вот будем асинхронно получать данные по пользователю и т.д.
-            await Task.Run(() => Thread.Sleep(10));
+            this.serviceProvider = serviceProvider;
+        }
 
-
-
-            var claims = new List<Claim> {
-               new Claim(ClaimTypes.Role,"employee"),
-               new Claim(ClaimTypes.PrimarySid,"1")//сюда надо будет пробрасывать идентификатор пользователя
-            };
-            var jwt = new JwtSecurityToken(
-            issuer: AuthOptions.ISSUER,
-            audience: AuthOptions.AUDIENCE,
-            claims: claims,
-            expires: DateTime.UtcNow.Add(TimeSpan.FromHours(24)),
-            signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-            JwtDto result = new()
-            {
-                Token = encodedJwt
-            };
-            return Ok(result);
+        /* Авторизация - тонкий момент. По идее вначале должен идти запрос во внешнюю систему, где лежат учётные данные пользователей.
+         * В той системе происходить авторизация и аутентификация, после чего в нашу систему будет прилетать просто идентификатор пользователя
+         * во внешней системе, и на основании этого идентификатора будет выпускаться jwt. Но нам бы ещё сюда прикрутить подтверждение валидности ключа и перепыпуск ключа
+         */
+        [HttpGet("jwt")]
+        public async Task<IActionResult> GetJWT([FromQuery] string employeeExternalId, CancellationToken cancellationToken)
+        {
+            return Ok(new JwtDto
+                {
+                Token = await serviceProvider
+                        .GetService<IEmployeeService>()?
+                        .GetJwtAsync(employeeExternalId,cancellationToken)!
+                });
         }
     }
 }

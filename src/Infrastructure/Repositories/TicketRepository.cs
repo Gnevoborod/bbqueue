@@ -21,7 +21,7 @@ namespace bbqueue.Infrastructure.Repositories
             await Task.Run(() => { Thread.Sleep(100); });//просто заглушка чтоб студия не ругалась на async
             return true;
         }
-        public async Task<List<Ticket>> LoadTicketsFromDbAsync(bool loadOnlyProcessedTickets, CancellationToken cancellationToken)//загружаем или все талоны или только обработанные
+        public async Task<List<Ticket>> LoadTicketsFromDbAsync(bool loadOnlyProcessedTickets, CancellationToken cancellationToken)//true грузим обработанные талоны false необработанные талоны
         {
             await Task.Run(() => { Thread.Sleep(100); });//просто заглушка чтоб студия не ругалась на async
             return new();

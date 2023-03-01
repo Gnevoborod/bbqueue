@@ -7,30 +7,28 @@ namespace bbqueue.Mapper
     {
         public static Ticket? FromEntityToModel(this TicketEntity? ticketEntity)
         {
-            if (ticketEntity == null)
-                return null;
-            return new Ticket
+            return ticketEntity != null ? new Ticket
             {
-                Id=ticketEntity.Id,
-                Number= ticketEntity.Number,
+                Id = ticketEntity.Id,
+                Number = ticketEntity.Number,
+                PublicNumber = ticketEntity.PublicNumber,
+                State = ticketEntity.State,
                 Created = ticketEntity.Created,
-                Closed= ticketEntity.Closed,
-                State= ticketEntity.State
-            };
+                Closed = ticketEntity.Closed
+            } : null;
         }
 
         public static TicketEntity? FromModelToEntity(this Ticket? ticket)
         {
-            if (ticket == null)
-                return null;
-            return new TicketEntity
+            return ticket != null ? new TicketEntity
             {
                 Id = ticket.Id,
                 Number = ticket.Number,
+                PublicNumber = ticket.PublicNumber,
+                State = ticket.State,
                 Created = ticket.Created,
-                Closed = ticket.Closed,
-                State = ticket.State
-            };
+                Closed = ticket.Closed
+            } : null;
         }
     }
 }

@@ -23,6 +23,7 @@ namespace bbqueue
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddScoped<QueueContext>();
+            builder.Services.AddSingleton<Queue>();
             builder.Services.AddScoped<IGroupRepository, GroupRepository>();
             builder.Services.AddScoped<IGroupService, GroupService>();
             
@@ -36,6 +37,9 @@ namespace bbqueue
             builder.Services.AddScoped<ITicketService,TicketService>();
 
             builder.Services.AddScoped<IQueueService,QueueService>();
+
+            builder.Services.AddScoped<IEmployeeService,EmployeeService>();
+            builder.Services.AddScoped<IEmployeeRepository,EmployeeRepository>();
 
             builder.Services.AddAuthorization();
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

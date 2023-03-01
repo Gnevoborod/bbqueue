@@ -12,6 +12,9 @@ namespace bbqueue.Database.Entities
         [Column("number")]
         public int Number { get; set; }
 
+        [Column("public_number")]
+        public string PublicNumber { get; set; } = default!;
+
         [Column("state")]
         public TicketState State { get; set; }
 

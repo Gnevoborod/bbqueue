@@ -8,5 +8,6 @@ namespace bbqueue.Domain.Interfaces.Services
         public Task<bool> SaveTicketAsync(TicketEntity ticketEntity, CancellationToken cancellationToken);
         public Task<bool> ChangeTicketTarget(long ticketNumber, long targetCode, CancellationToken cancellationToken);
         public Task<List<Ticket>> LoadTicketsAsync(bool loadOnlyProcessedTickets, CancellationToken cancellationToken);
+
     }
 }
