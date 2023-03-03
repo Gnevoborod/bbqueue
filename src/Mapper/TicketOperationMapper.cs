@@ -14,10 +14,13 @@ namespace bbqueue.Mapper
                 {
                     Id = ticketOperationEntity.Ticket.Id,
                     Number = ticketOperationEntity.Ticket.Number,
+                    PublicNumber = ticketOperationEntity.Ticket.PublicNumber,
                     State = ticketOperationEntity.Ticket.State,
                     Created = ticketOperationEntity.Ticket.Created,
                     Closed = ticketOperationEntity.Ticket.Closed
                 },
+                TargetId = ticketOperationEntity.TargetId,
+                Target = ticketOperationEntity.Target,
                 WindowId = ticketOperationEntity.WindowId,
                 Window = ticketOperationEntity.Window != null ? new Window
                 {
@@ -59,10 +62,13 @@ namespace bbqueue.Mapper
                 {
                     Id = ticketOperation.Ticket.Id,
                     Number = ticketOperation.Ticket.Number,
+                    PublicNumber = ticketOperation.Ticket.PublicNumber,
                     State = ticketOperation.Ticket.State,
                     Created = ticketOperation.Ticket.Created,
                     Closed = ticketOperation.Ticket.Closed
                 },
+                TargetId = ticketOperation.TargetId,
+                Target = ticketOperation.Target,
                 WindowId = ticketOperation.WindowId,
                 Window = ticketOperation.Window != null ? new WindowEntity
                 {
@@ -77,7 +83,8 @@ namespace bbqueue.Mapper
                         Name = ticketOperation.Window.Employee.Name,
                         Active = ticketOperation.Window.Employee.Active,
                         Role = ticketOperation.Window.Employee.Role
-                    } : null
+                    } : null,
+                    WindowWorkState = ticketOperation.Window.WindowWorkState
                 } : null,
                 EmployeeId = ticketOperation.EmployeeId,
                 Employee = ticketOperation.Employee != null ? new EmployeeEntity

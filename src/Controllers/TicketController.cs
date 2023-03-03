@@ -1,5 +1,6 @@
 ﻿using bbqueue.Controllers.Dtos.Ticket;
 using bbqueue.Domain.Interfaces.Services;
+using bbqueue.Mapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bbqueue.Controllers
@@ -19,8 +20,8 @@ namespace bbqueue.Controllers
         [HttpGet("ticket")]
         public async Task<IActionResult> GetTicketAsync([FromQuery]long TargetCode, CancellationToken cancellationToken)
         {
-            await Task.Run(() => { Thread.Sleep(100);});//просто заглушка чтоб студия не ругалась на async
-            throw new NotImplementedException();
+            var ticket = await serviceProvider.GetService<ITicketService>()?.CreateTicketAsync(TargetCode, cancellationToken)!;
+            return Ok(ticket.FromModelToDto());
         }
 
         [HttpPost("redirect")]

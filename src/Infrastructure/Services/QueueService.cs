@@ -12,11 +12,6 @@ namespace bbqueue.Infrastructure.Services
         {
             this.serviceProvider = serviceProvider;
         }
-        public async Task<bool> AddTicket(Ticket ticket, CancellationToken cancellationToken)
-        { 
-            //тут ещё добавляем в саму очередь талон
-            return await serviceProvider.GetService<ITicketService>()?.SaveTicketAsync(ticket.FromModelToEntity()!,cancellationToken)!;
-        }
         public async Task<bool> ReturnTicketToQueue(Ticket ticket, CancellationToken cancellationToken) 
         { 
             await Task.Run(() => { Thread.Sleep(100); });
@@ -34,10 +29,11 @@ namespace bbqueue.Infrastructure.Services
             await Task.Run(() => { Thread.Sleep(100); }); 
         }
 
-        public async Task<Ticket> GetTicketNextTicketFromQueue(long windowId, CancellationToken cancellationToken) 
-        { 
-            await Task.Run(() => { Thread.Sleep(100); });
-            return new();
+        public async Task<Ticket?> GetTicketNextTicketFromQueue(long windowId, CancellationToken cancellationToken) 
+        {
+            return await serviceProvider
+                .GetService<Queue>()?
+                .GetNextTicketFromQueueAsync(windowId, cancellationToken)!; // получаем талон
         }
 
         public async Task<Ticket> GetNextSpecificTicketFromQueue(long ticketNumber, CancellationToken cancellationToken)

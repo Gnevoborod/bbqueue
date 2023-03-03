@@ -7,6 +7,9 @@
         public long TicketId { get; set; }
         public Ticket Ticket { get; set; } = default!;
 
+        public long? TargetId { get; set; }
+        public Target? Target { get; set; }
+
         public long? WindowId { get; set; }
 
         public Window? Window { get; set; }

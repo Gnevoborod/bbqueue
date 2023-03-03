@@ -14,6 +14,11 @@ namespace bbqueue.Database.Entities
         [ForeignKey(nameof(TicketId))]
         public TicketEntity Ticket { get; set; } = default!;
 
+        [Column("target_id")]
+        public long? TargetId { get; set; }
+        [ForeignKey(nameof(TargetId))]
+        public Target? Target { get; set; }
+
         [Column("window_id")]
         public long? WindowId { get; set; }
 

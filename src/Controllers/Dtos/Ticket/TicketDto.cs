@@ -1,7 +1,4 @@
-﻿using bbqueue.Domain.Models;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace bbqueue.Controllers.Dtos.Ticket
+﻿namespace bbqueue.Controllers.Dtos.Ticket
 {
     public class TicketDto
     {
@@ -9,6 +6,7 @@ namespace bbqueue.Controllers.Dtos.Ticket
 
         public int Number { get; set; }
 
+        public string PublicNumber { get; set; } = default!;
         public DateTime Created { get; set; }
     }
 }

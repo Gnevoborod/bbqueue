@@ -1,4 +1,5 @@
-﻿using bbqueue.Database.Entities;
+﻿using bbqueue.Controllers.Dtos.Ticket;
+using bbqueue.Database.Entities;
 using bbqueue.Domain.Models;
 
 namespace bbqueue.Mapper
@@ -28,6 +29,17 @@ namespace bbqueue.Mapper
                 State = ticket.State,
                 Created = ticket.Created,
                 Closed = ticket.Closed
+            } : null;
+        }
+
+        public static TicketDto? FromModelToDto(this Ticket? ticket)
+        {
+            return ticket != null ? new TicketDto
+            {
+                Id = ticket.Id,
+                Number = ticket.Number,
+                PublicNumber = ticket.PublicNumber,
+                Created = ticket.Created
             } : null;
         }
     }

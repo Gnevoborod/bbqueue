@@ -1,11 +1,14 @@
-﻿using bbqueue.Domain.Interfaces.Services;
+﻿using bbqueue.Domain.Interfaces.Repositories;
+using bbqueue.Domain.Interfaces.Services;
 using bbqueue.Domain.Models;
+using System.Collections.Generic;
 
 namespace bbqueue.Infrastructure
 {
     internal sealed class Queue
     {
         List<Ticket> TicketList = new List<Ticket>();
+        Dictionary<char, int> TicketAmountList = new Dictionary<char, int>();//коллекция префиксов и максимальных значений у талонов, в разрезе префиксов
         private readonly object obj = new object();
         IServiceProvider serviceProvider;
         public Queue(IServiceProvider serviceProvider)
@@ -13,19 +16,36 @@ namespace bbqueue.Infrastructure
             this.serviceProvider = serviceProvider;
         }
 
-        public bool AddTicket(Ticket ticket)
+        private int AddTicketAmount(char prefix)
         {
+            int nextNumber = -1;
+            if(TicketAmountList.ContainsKey(prefix))
+            {
+                nextNumber = ++TicketAmountList[prefix];
+            }
+            else
+            {
+                nextNumber = 1;
+                TicketAmountList.Add(prefix, nextNumber);
+            }
+            return nextNumber;
+        }
+
+        public int AddTicket(Ticket ticket, char prefix)
+        {
+            int nextNumber = -1;
             try
             {
                 lock (obj)
                 {
                     TicketList.Add(ticket);
+                    nextNumber = AddTicketAmount(prefix);
                 }
-                return true;
+                return nextNumber;
             }
             catch
             {
-                return false;
+                return nextNumber;
             }
         }
 
@@ -114,19 +134,55 @@ namespace bbqueue.Infrastructure
             }
         }
 
-        public Ticket? GetNextTicketFromQueue(long windowId)
+        public async Task<Ticket?> GetNextTicketFromQueueAsync(long windowId, CancellationToken cancellationToken)
         {
+            //Получаем данные об операциях совершённых с талонами. Нам нужно талоны, доступные для опр.окна
+            var tickets = await GetListOfTicketsAsync(windowId);
+            Ticket? nextTicket;
             lock (obj)
             {
-                //тут нужно проработать логику поиска всех талонов которые может обрабатывать конкретное окно
-                //потребуется отбирать через target + window_target и по префиксу искать, или иначе как-то.
+                //тут надо будет глянуть что в итоге выходит, какой список талонов. возможно потребуется подпилить сортировку, чтобы выдавало по-справедливости.
+                nextTicket = (from ticketList in TicketList
+                             join ticket in tickets
+                             on ticketList.Id equals ticket
+                             select ticketList).FirstOrDefault();
+                if(nextTicket== null)
+                    return null;
+                cancellationToken.ThrowIfCancellationRequested();
+                //меняем состояние талона, назначем ему окно (меняем прямо тут, так как это критично - получить и изменить состояние талона при заблокированной очереди
+                serviceProvider
+                    .GetService<ITicketService>()?
+                    .TakeTicketToWork(nextTicket!, windowId);
             }
-            return new();
+            return nextTicket;
         }
 
-        private List<Ticket> ListOfTicketsForSpecificWindow(long windowId)
+        private async Task<List<Ticket?>> ListOfTicketsForSpecificWindow(long windowId)
         {
-            return new();
+            var tickets = await GetListOfTicketsAsync(windowId);
+            List<Ticket?> ticketListForWindow;
+            lock (obj)
+            {
+                ticketListForWindow = (from ticketList in TicketList
+                          join ticket in tickets
+                          on ticketList.Id equals ticket
+                          select ticketList).ToList();
+            }
+            return ticketListForWindow;
+        }
+
+
+        private async Task<List<long>> GetListOfTicketsAsync(long windowId)
+        {
+            var ticketOperations = await serviceProvider
+                           .GetService<ITicketRepository>()?
+                           .GetTicketOperationByWindowPlusTargetAsync(windowId)!;
+            List<long> tickets = new();
+            foreach (var to in ticketOperations)
+            {
+                tickets.Add((long)to.TicketId!);
+            }
+            return tickets;
         }
     }
 }

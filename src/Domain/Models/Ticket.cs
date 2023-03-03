@@ -15,5 +15,6 @@
         public DateTime Created { get; set; }
 
         public DateTime Closed { get; set; }
+
     }
 }
