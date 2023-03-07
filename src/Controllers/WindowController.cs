@@ -10,32 +10,29 @@ namespace bbqueue.Controllers
     [ApiController]
     public sealed class WindowController : ControllerBase
     {
-        IServiceProvider serviceProvider;
+        private readonly IWindowService windowService;
 
-        public WindowController(IServiceProvider serviceProvider)
+        public WindowController(IWindowService windowService)
         {
-            this.serviceProvider = serviceProvider;
+            this.windowService = windowService;
         }
 
         [Authorize]
         [HttpPost("work_state")]
-        public async Task<IActionResult> ChangeWindowWorkStateAsync([FromBody] ChangeWindowWorkStateDto dto, CancellationToken cancellationToken)
+        public async Task<IActionResult> ChangeWindowWorkStateAsync([FromBody] ChangeWindowWorkStateDto dto)
         {
+            CancellationToken cancellationToken = HttpContext.RequestAborted;
             var window = dto.FromChangeStateDtoToModel();
-            if(window != null) { 
-            var result= await serviceProvider.GetService<IWindowService>()?.ChangeWindowWorkStateAsync(window, cancellationToken)!;
-            if (result) 
-                return Ok();
-            }
-            return BadRequest();//тут по-хорошему надо что-то внятное возвращать
+            await windowService.ChangeWindowWorkStateAsync(window, cancellationToken)!;
+            return Ok();
         }
 
 
         [HttpGet("windows")]
-        public async Task<IActionResult> GetWindowsAsync(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetWindowsAsync()
         {
-            var windows = await serviceProvider.GetService<IWindowService>()?.GetWindowsAsync(cancellationToken)!;
-            cancellationToken.ThrowIfCancellationRequested();
+            CancellationToken cancellationToken = HttpContext.RequestAborted;
+            var windows = await windowService.GetWindowsAsync(cancellationToken)!;
             WindowListDto windowListDto = new()
             {
                 Windows = windows?.Select(w => w.FromModelToDto()!).ToList()

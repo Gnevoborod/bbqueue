@@ -5,28 +5,32 @@ namespace bbqueue.Mapper
 {
     internal static class EmployeeMapper
     {
-        public static Employee? FromEntityToModel(this EmployeeEntity? employeeEntity)
+        public static Employee? FromEntityToModel(this EmployeeEntity employeeEntity)
         {
-            return employeeEntity != null ? new Employee
+            if (employeeEntity == null)
+                return null;
+            return new Employee
             {
                 Id = employeeEntity.Id,
                 ExternalSystemIdentity = employeeEntity.ExternalSystemIdentity,
                 Name = employeeEntity.Name,
                 Active = employeeEntity.Active,
                 Role = employeeEntity.Role
-            } : null;
+            };
         }
 
-        public static EmployeeEntity? FromModelToEntity(this Employee? employee)
+        public static EmployeeEntity? FromModelToEntity(this Employee employee)
         {
-            return employee != null ? new EmployeeEntity
+            if (employee == null)
+                return null;
+            return new EmployeeEntity
             {
                 Id = employee.Id,
                 ExternalSystemIdentity = employee.ExternalSystemIdentity,
                 Name = employee.Name,
                 Active = employee.Active,
                 Role = employee.Role
-            } : null;
+            };
         }
     }
 }

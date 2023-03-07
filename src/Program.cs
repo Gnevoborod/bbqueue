@@ -22,7 +22,8 @@ namespace bbqueue
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddScoped<QueueContext>();
+            //builder.Services.AddScoped<QueueContext>();
+            builder.Services.AddDbContext<QueueContext>();
             builder.Services.AddSingleton<Queue>();
             builder.Services.AddScoped<IGroupRepository, GroupRepository>();
             builder.Services.AddScoped<IGroupService, GroupService>();

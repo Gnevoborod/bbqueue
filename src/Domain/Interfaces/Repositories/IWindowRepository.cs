@@ -2,7 +2,7 @@
 
 namespace bbqueue.Domain.Interfaces.Repositories
 {
-    internal interface IWindowRepository
+    public interface IWindowRepository
     {
         Task<bool> ChangeWindowWorkStateAsync(Window window, CancellationToken cancellationToken);
         Task<List<Window>> GetWindowsAsync(CancellationToken cancellationToken);

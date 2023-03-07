@@ -8,11 +8,11 @@ namespace bbqueue.Controllers
     [Route("api/employee")]
     public class EmployeeController : Controller
     {
-        IServiceProvider serviceProvider;
+        private readonly IEmployeeService employeeService;
 
-        public EmployeeController(IServiceProvider serviceProvider)
+        public EmployeeController(IEmployeeService employeeService)
         {
-            this.serviceProvider = serviceProvider;
+            this.employeeService = employeeService;
         }
 
         /* Авторизация - тонкий момент. По идее вначале должен идти запрос во внешнюю систему, где лежат учётные данные пользователей.
@@ -20,12 +20,12 @@ namespace bbqueue.Controllers
          * во внешней системе, и на основании этого идентификатора будет выпускаться jwt. Но нам бы ещё сюда прикрутить подтверждение валидности ключа и перепыпуск ключа
          */
         [HttpGet("jwt")]
-        public async Task<IActionResult> GetJWT([FromQuery] string employeeExternalId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetJWT([FromQuery] string employeeExternalId)
         {
+            CancellationToken cancellationToken = HttpContext.RequestAborted;
             return Ok(new JwtDto
                 {
-                Token = await serviceProvider
-                        .GetService<IEmployeeService>()?
+                Token = await employeeService
                         .GetJwtAsync(employeeExternalId,cancellationToken)!
                 });
         }

@@ -7,26 +7,26 @@ using System.Diagnostics;
 
 namespace bbqueue.Infrastructure.Services
 {
-    internal sealed class TargetService : ITargetService
+    public sealed class TargetService : ITargetService
     {
-        private readonly IServiceProvider serviceProvider;
+        private readonly IGroupRepository groupRepository;
+        private readonly ITargetRepository targetRepository;
 
-        public TargetService(IServiceProvider serviceProvider)
+        public TargetService(IGroupRepository groupRepository, ITargetRepository targetRepository)
         {
-            this.serviceProvider = serviceProvider;
+            this.groupRepository = groupRepository;
+            this.targetRepository = targetRepository;
         }
         public async Task<List<Target>>? GetTargetsAsync(CancellationToken cancellationToken)
         {
-            return await serviceProvider.GetService<ITargetRepository>()?.GetTargetsAsync(cancellationToken)!;
+            return await targetRepository.GetTargetsAsync(cancellationToken)!;
         }
 
 
         public async Task<GroupHierarchyDto> GetHierarchyAsync(CancellationToken cancellationToken)
         {
-            var Groups = await serviceProvider.GetService<IGroupRepository>()?.GetGroupsAsync(cancellationToken)!;
+            var Groups = await groupRepository.GetGroupsAsync(cancellationToken)!;
             var Targets = await GetTargetsAsync(cancellationToken)!;
-            //тут ставим проверку на отмену потому что маппинг может занять время
-            cancellationToken.ThrowIfCancellationRequested();
             var result= Groups?.FromModelToHierarchyDto(Targets)!;
             return result;
         }

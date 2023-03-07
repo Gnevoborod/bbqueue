@@ -4,16 +4,16 @@ using bbqueue.Domain.Models;
 
 namespace bbqueue.Infrastructure.Services
 {
-    internal sealed class GroupService : IGroupService
+    public sealed class GroupService : IGroupService
     {
-        private readonly IServiceProvider serviceProvider;
-        public GroupService(IServiceProvider _serviceProvider)
+        private readonly IGroupRepository groupRepository;
+        public GroupService(IGroupRepository groupRepository)
         {
-            serviceProvider = _serviceProvider;
+            this.groupRepository = groupRepository;
         }
-        public async Task<List<Group>>? GetGroupsAsync(CancellationToken cancellationToken)
+        public async Task<List<Group>> GetGroupsAsync(CancellationToken cancellationToken)
         {
-            return await serviceProvider.GetService<IGroupRepository>()?.GetGroupsAsync(cancellationToken)!;
+            return await groupRepository.GetGroupsAsync(cancellationToken)!;
         }
     }
 }

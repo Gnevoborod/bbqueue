@@ -4,7 +4,7 @@ using bbqueue.Domain.Models;
 namespace bbqueue.Database.Entities
 {
     [Table("ticket")]
-    internal sealed class TicketEntity
+    public sealed class TicketEntity
     {
         [Key, Column("ticket_id")]
         public long Id { get; set; }

@@ -3,9 +3,9 @@ using bbqueue.Domain.Models;
 
 namespace bbqueue.Domain.Interfaces.Services
 {
-    internal interface ITargetService
+    public interface ITargetService
     {
-        Task<GroupHierarchyDto>? GetHierarchyAsync(CancellationToken cancellationToken);
-        Task<List<Target>>? GetTargetsAsync(CancellationToken cancellationToken);
+        public Task<GroupHierarchyDto>? GetHierarchyAsync(CancellationToken cancellationToken);
+        public Task<List<Target>>? GetTargetsAsync(CancellationToken cancellationToken);
     }
 }

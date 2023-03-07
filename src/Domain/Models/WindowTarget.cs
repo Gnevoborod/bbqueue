@@ -1,6 +1,6 @@
 ﻿namespace bbqueue.Domain.Models
 {
-    internal sealed class WindowTarget
+    public sealed class WindowTarget
     {
         public long Id { get; set; }
         public long WindowId { get; set; }

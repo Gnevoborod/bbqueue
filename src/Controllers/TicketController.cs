@@ -9,37 +9,35 @@ namespace bbqueue.Controllers
     [ApiController]
     public class TicketController : Controller
     {
+        private readonly ITicketService ticketService;
 
-        IServiceProvider serviceProvider;
-
-        public TicketController(IServiceProvider serviceProvider)
+        public TicketController(ITicketService ticketService)
         {
-            this.serviceProvider = serviceProvider;
+            this.ticketService = ticketService;
         }
 
         [HttpGet("ticket")]
-        public async Task<IActionResult> GetTicketAsync([FromQuery]long TargetCode, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetTicketAsync([FromQuery]long TargetCode)
         {
-            var ticket = await serviceProvider.GetService<ITicketService>()?.CreateTicketAsync(TargetCode, cancellationToken)!;
+            CancellationToken cancellationToken = HttpContext.RequestAborted;
+            var ticket = await ticketService.CreateTicketAsync(TargetCode, cancellationToken)!;
             return Ok(ticket.FromModelToDto());
         }
 
         [HttpPost("redirect")]
-        public async Task<IActionResult> RedirectTicketToAnotherWindowAsync([FromBody] TicketRedirectDto ticketRedirectDto, CancellationToken cancellationToken)
+        public async Task<IActionResult> RedirectTicketToAnotherWindowAsync([FromBody] TicketRedirectDto ticketRedirectDto)
         {
-            bool result = await serviceProvider.GetService<ITicketService>()?.ChangeTicketTarget(ticketRedirectDto.TicketNumber, ticketRedirectDto.TargetCode, cancellationToken)!;
-            if (result)
-                return Ok();
-            return BadRequest();//пока заглушка
+            CancellationToken cancellationToken = HttpContext.RequestAborted;
+            await ticketService.ChangeTicketTarget(ticketRedirectDto.TicketNumber, ticketRedirectDto.TargetCode, cancellationToken)!;
+            return Ok();
         }
 
         [HttpGet("list")]
-        public async Task<IActionResult> GetTicketListAsync([FromQuery] long EmployeeCode, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetTicketListAsync([FromQuery] long EmployeeCode)
         {
-            var result = await serviceProvider.GetService<ITicketService>()?.LoadTicketsAsync(false, cancellationToken)!;
-            if(result.Count>0)
-                return Ok(result);
-            return BadRequest();
+            CancellationToken cancellationToken = HttpContext.RequestAborted;
+            var result = await ticketService.LoadTicketsAsync(false, cancellationToken)!;
+            return Ok(result);
         }
 
     }

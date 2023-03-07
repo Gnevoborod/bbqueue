@@ -6,21 +6,21 @@ using bbqueue.Infrastructure.Repositories;
 
 namespace bbqueue.Infrastructure.Services
 {
-    internal sealed class WindowService : IWindowService
+    public sealed class WindowService : IWindowService
     {
-        IServiceProvider serviceProvider;
-        public WindowService(IServiceProvider serviceProvider)
+        private readonly IWindowRepository windowRepository;
+        public WindowService(IWindowRepository windowRepository)
         {
-            this.serviceProvider = serviceProvider;
+            this.windowRepository = windowRepository;
         }
         public async Task<List<Window>> GetWindowsAsync(CancellationToken cancellationToken)
         {
-            return await serviceProvider.GetService<IWindowRepository>()?.GetWindowsAsync(cancellationToken)!;
+            return await windowRepository.GetWindowsAsync(cancellationToken)!;
         }
 
-        public async Task<bool> ChangeWindowWorkStateAsync(Window window, CancellationToken cancellationToken)
+        public async Task ChangeWindowWorkStateAsync(Window window, CancellationToken cancellationToken)
         {
-            return await serviceProvider.GetService<IWindowRepository>()?.ChangeWindowWorkStateAsync(window, cancellationToken)!;
+            await windowRepository.ChangeWindowWorkStateAsync(window, cancellationToken)!;
         }
 
         public bool SetEmployeeToWindowAsync(int employeeId, int windowId, CancellationToken cancellationToken)

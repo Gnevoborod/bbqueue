@@ -4,7 +4,7 @@ using bbqueue.Mapper;
 
 namespace bbqueue.Infrastructure.Services
 {
-    internal class QueueService:IQueueService
+    public class QueueService:IQueueService
     {
         IServiceProvider serviceProvider;
 
@@ -12,16 +12,14 @@ namespace bbqueue.Infrastructure.Services
         {
             this.serviceProvider = serviceProvider;
         }
-        public async Task<bool> ReturnTicketToQueue(Ticket ticket, CancellationToken cancellationToken) 
+        public async Task ReturnTicketToQueue(Ticket ticket, CancellationToken cancellationToken) 
         { 
             await Task.Run(() => { Thread.Sleep(100); });
-            return true;
         }
 
-        public async Task<bool> RemoveTicket(Ticket ticket, CancellationToken cancellationToken) 
+        public async Task RemoveTicket(Ticket ticket, CancellationToken cancellationToken) 
         { 
             await Task.Run(() => { Thread.Sleep(100); });
-            return true;
         }
 
         public async Task ClearQueue(CancellationToken cancellationToken) 

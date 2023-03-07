@@ -3,7 +3,7 @@
 namespace bbqueue.Domain.Models
 {
 
-    internal sealed class Target
+    public sealed class Target
     {
         public long Id { get; set; }
 

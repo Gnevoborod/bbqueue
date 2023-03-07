@@ -1,13 +1,16 @@
 ﻿using bbqueue.Domain.Interfaces.Repositories;
 using bbqueue.Domain.Interfaces.Services;
 using bbqueue.Domain.Models;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace bbqueue.Infrastructure
 {
     internal sealed class Queue
     {
-        List<Ticket> TicketList = new List<Ticket>();
+
+       // ConcurrentBag<Ticket> TicketList = new ConcurrentBag<Ticket>();
+       List<Ticket> TicketList = new List<Ticket>();
         Dictionary<char, int> TicketAmountList = new Dictionary<char, int>();//коллекция префиксов и максимальных значений у талонов, в разрезе префиксов
         private readonly object obj = new object();
         IServiceProvider serviceProvider;
@@ -104,6 +107,7 @@ namespace bbqueue.Infrastructure
             }
         }
 
+        /*
         public bool RestoreQueue(CancellationToken cancellationToken)
         {
             try
@@ -121,7 +125,7 @@ namespace bbqueue.Infrastructure
                 return false;
             }
         }
-
+        */
         public Ticket? GetNextSpecificTicketFromQueue(string ticketNumber)
         {
             lock(obj)
@@ -148,7 +152,6 @@ namespace bbqueue.Infrastructure
                              select ticketList).FirstOrDefault();
                 if(nextTicket== null)
                     return null;
-                cancellationToken.ThrowIfCancellationRequested();
                 //меняем состояние талона, назначем ему окно (меняем прямо тут, так как это критично - получить и изменить состояние талона при заблокированной очереди
                 serviceProvider
                     .GetService<ITicketService>()?

@@ -8,20 +8,19 @@ using bbqueue.Controllers.Dtos.Group;
 
 namespace bbqueue.Infrastructure.Repositories
 {
-    internal sealed class GroupRepository : IGroupRepository
+    public sealed class GroupRepository : IGroupRepository
     {
-        IServiceProvider serviceProvider;
-        public GroupRepository(IServiceProvider _serviceProvider)
+        private readonly QueueContext queueContext;
+        public GroupRepository(QueueContext queueContext)
         {
-            serviceProvider = _serviceProvider;
+            this.queueContext = queueContext;
         }
-        public async Task<List<Group>>? GetGroupsAsync(CancellationToken cancellationToken)
+        public async Task<List<Group>> GetGroupsAsync(CancellationToken cancellationToken)
         {
-            var queueContext=serviceProvider.GetService<QueueContext>();
-            return await queueContext?.GroupEntity?
+            return await queueContext.GroupEntity?
                     .OrderByDescending(g => g.GroupLinkId)
                     .Select(g=> g.FromEntityToModel()!)
-                    .ToListAsync()!;
+                    .ToListAsync(cancellationToken)!;
             
         }
     }

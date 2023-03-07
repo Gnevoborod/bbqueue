@@ -11,18 +11,20 @@ namespace bbqueue.Controllers
     [ApiController]
     public sealed class TargetController : ControllerBase
     {
-        private readonly IServiceProvider serviceProvider;
+        private readonly ITargetService targetService;
+        private readonly IGroupService groupService;
 
-        public TargetController(IServiceProvider _serviceProvider)
+        public TargetController(ITargetService targetService, IGroupService groupService)
         {
-            serviceProvider = _serviceProvider;
+            this.targetService = targetService;
+            this.groupService = groupService;
         }
 
         [HttpGet("targets")]
-        public async Task<IActionResult> GetTargets(CancellationToken cancellationToken) 
+        public async Task<IActionResult> GetTargets() 
         {
-            var targets = await serviceProvider.GetService<ITargetService>()?.GetTargetsAsync(cancellationToken)!;
-            cancellationToken.ThrowIfCancellationRequested();//решил ставить проверку на отмену в контроллере после основных манипуляций и в репозитории перед обращением в БД
+            CancellationToken cancellationToken = HttpContext.RequestAborted;
+            var targets = await targetService.GetTargetsAsync(cancellationToken)!;
             TargetListDto targetListDto = new()
             {
                 Targets = targets.Select(t => t.FromModelToDto()!).ToList()
@@ -36,10 +38,10 @@ namespace bbqueue.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet("hierarchy")]
-        public async Task<IActionResult> GetHierarchyAsync(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetHierarchyAsync()
         {
-            var hierarchy = await new TargetService(serviceProvider).GetHierarchyAsync(cancellationToken);
-            cancellationToken.ThrowIfCancellationRequested();
+            CancellationToken cancellationToken = HttpContext.RequestAborted;
+            var hierarchy = await targetService.GetHierarchyAsync(cancellationToken)!;
             return Ok(hierarchy);
         }
 
@@ -51,8 +53,7 @@ namespace bbqueue.Controllers
         [HttpGet("groups")]
         public async Task<IActionResult> GetGroupsAsync(CancellationToken cancellationToken)
         {
-            var groups = await serviceProvider.GetService<IGroupService>()?.GetGroupsAsync(cancellationToken)!;
-            cancellationToken.ThrowIfCancellationRequested();
+            var groups = await groupService.GetGroupsAsync(cancellationToken)!;
             GroupListDto groupListDto = new()
             {
                 Groups = groups.Select(gld => gld.FromModelToDto()!).ToList()

@@ -55,13 +55,13 @@ namespace bbqueue.Mapper
             } : null;
         }
 
-        public static Window? FromChangeStateDtoToModel(this ChangeWindowWorkStateDto? dto)
+        public static Window FromChangeStateDtoToModel(this ChangeWindowWorkStateDto dto)
         {
-            return dto != null ? new Window
+            return new Window
             {
                 Number = dto.Number,
                 WindowWorkState = dto.WindowWorkState
-            } : null;
+            };
         }
     }
 }

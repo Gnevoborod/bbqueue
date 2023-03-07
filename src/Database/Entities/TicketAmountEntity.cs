@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace bbqueue.Database.Entities
 {
     [Table("ticket_amount")]
-    internal sealed class TicketAmountEntity
+    public sealed class TicketAmountEntity
     {
         [Key, Column("ticket_amount_id")]
         public long Id { get; set; }

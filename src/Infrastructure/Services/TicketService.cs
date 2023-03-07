@@ -7,19 +7,24 @@ using System.Threading;
 
 namespace bbqueue.Infrastructure.Services
 {
-    internal class TicketService: ITicketService
+    public class TicketService: ITicketService
     {
+        private readonly ITicketRepository ticketRepository;
+        //TODELETE serviceProvider
         IServiceProvider serviceProvider;
-        public TicketService(IServiceProvider _serviceProvider) 
+        public TicketService(IServiceProvider _serviceProvider, ITicketRepository ticketRepository) 
         {
             serviceProvider = _serviceProvider;
+            this.ticketRepository = ticketRepository;
         }
 
         public async Task<Ticket> CreateTicketAsync(long targetId, CancellationToken cancellationToken)
         {
-            var provider = serviceProvider.GetService<ITicketRepository>();
-            var ticketAmount = await provider?.GetTicketAmountAsync(targetId)!;
-
+            var ticketAmount = await ticketRepository.GetTicketAmountAsync(targetId)!;
+            if(ticketAmount == null )
+            {
+                throw new Exception("Для указанной цели отсутствует префикс");//пока так, потом надо будет припилить собственный экспешн
+            }
             Ticket ticket = new()
             {
                 State = TicketState.Created,
@@ -29,27 +34,27 @@ namespace bbqueue.Infrastructure.Services
             int nextNumber = (int)serviceProvider.GetService<Queue>()?.AddTicket(ticket, prefix)!;
             ticket.Number = nextNumber;
             ticket.PublicNumber = prefix + nextNumber.ToString();
-            ticket.Id = await provider?.SaveTicketToDbAsync(ticket.FromModelToEntity()!, cancellationToken)!;
+            ticket.Id = await ticketRepository.SaveTicketToDbAsync(ticket.FromModelToEntity()!, cancellationToken)!;
             return ticket;
         }
-        public async Task<bool> ChangeTicketTarget(long ticketNumber, long targetCode, CancellationToken cancellationToken)
+        public async Task ChangeTicketTarget(long ticketNumber, long targetCode, CancellationToken cancellationToken)
         {
             await Task.Run(() => { Thread.Sleep(100); });//просто заглушка чтоб студия не ругалась на async
-            return new();
         }
         public async Task<List<Ticket>> LoadTicketsAsync(bool loadOnlyProcessedTickets, CancellationToken cancellationToken)
         {
-            return await serviceProvider.GetService<ITicketRepository>()?.LoadTicketsFromDbAsync(loadOnlyProcessedTickets, cancellationToken)!;
+            return await ticketRepository.LoadTicketsFromDbAsync(loadOnlyProcessedTickets, cancellationToken)!;
         }
 
         public bool TakeTicketToWork(Ticket ticket, long windowId)
         {
             ticket.State = TicketState.InProcess;
-            var provider = serviceProvider.GetService<ITicketRepository>();
-            var ticketOperation = provider?.GetTicketOperationByTicket(ticket.Id);
-            ticketOperation!.WindowId = windowId;
-            var result = provider?.UpdateTicketOperationToDbAsync(ticketOperation.FromModelToEntity()!)!;
-            return result.Result;
+            var ticketOperation = ticketRepository.GetTicketOperationByTicket(ticket.Id);
+            if (ticketOperation == null)
+                return false;
+            ticketOperation.WindowId = windowId;
+            var result = ticketRepository.UpdateTicketOperationToDbAsync(ticketOperation.FromModelToEntity()!);
+            return result == null ? false : result.Result;
         }
     }
 }

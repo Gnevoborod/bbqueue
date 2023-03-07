@@ -3,7 +3,7 @@
 
 namespace bbqueue.Domain.Models
 {
-    internal sealed class Group
+    public sealed class Group
     {
         public long Id { get; set; }
 

@@ -7,41 +7,36 @@ using System.Security.Claims;
 
 namespace bbqueue.Infrastructure.Services
 {
-    internal sealed class EmployeeService: IEmployeeService
+    public sealed class EmployeeService: IEmployeeService
     {
-        IServiceProvider serviceProvider;
+        private readonly IEmployeeRepository employeeRepository;
 
-        public EmployeeService(IServiceProvider serviceProvider)
+        public EmployeeService(IEmployeeRepository employeeRepository)
         {
-            this.serviceProvider = serviceProvider;
+            this.employeeRepository = employeeRepository;
         }
-        public async Task<bool> AddEmployeeAsync(Employee employee, CancellationToken cancellationToken)
+        public async Task AddEmployeeAsync(Employee employee, CancellationToken cancellationToken)
         {
             await Task.Run(() => Thread.Sleep(100));
-            return true;
         }
-        public async Task<bool> SetRoleToEmployeeAsync(long employeeId, EmployeeRole role, CancellationToken cancellationToken)
+        public async Task SetRoleToEmployeeAsync(long employeeId, EmployeeRole role, CancellationToken cancellationToken)
         {
             await Task.Run(() => Thread.Sleep(100));
-            return true;
         }
 
-        public async Task<bool> AddEmployeeToWindowAsync(Employee employee, Window window, CancellationToken cancellationToken)
+        public async Task AddEmployeeToWindowAsync(Employee employee, Window window, CancellationToken cancellationToken)
         {
             await Task.Run(() => Thread.Sleep(100));
-            return true;
         }
 
-        public async Task<Employee> GetEmployeeInfoAsync(string externalNumber, CancellationToken cancellationToken)
+        public async Task<Employee?> GetEmployeeInfoAsync(string externalNumber, CancellationToken cancellationToken)
         {
-            return await serviceProvider
-                .GetService<IEmployeeRepository>()?
+            return await employeeRepository
                 .GetEmployeeInfoAsync(externalNumber, cancellationToken)!;
         }
-        public async Task<Employee> GetEmployeeInfoAsync(long employeeId, CancellationToken cancellationToken)
+        public async Task<Employee?> GetEmployeeInfoAsync(long employeeId, CancellationToken cancellationToken)
         {
-            return await serviceProvider
-                .GetService<IEmployeeRepository>()?
+            return await employeeRepository
                 .GetEmployeeInfoAsync(employeeId, cancellationToken)!;
         }
 
@@ -54,7 +49,6 @@ namespace bbqueue.Infrastructure.Services
         public async Task<string?> GetJwtAsync(string employeeId, CancellationToken cancellationToken)
         {
             var employee = await GetEmployeeInfoAsync(employeeId, cancellationToken)!;
-            cancellationToken.ThrowIfCancellationRequested();
             if (employee == null)
             {
                 return null;

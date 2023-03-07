@@ -1,6 +1,6 @@
 ﻿namespace bbqueue.Domain.Models
 {
-    internal sealed class TicketOperation
+    public sealed class TicketOperation
     {
         public long Id { get; set; }
 

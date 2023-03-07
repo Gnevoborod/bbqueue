@@ -1,6 +1,6 @@
 ﻿namespace bbqueue.Controllers.Dtos.Target
 {
-    internal sealed class TargetDto
+    public sealed class TargetDto
     {
         public long Id { get; set; }
 

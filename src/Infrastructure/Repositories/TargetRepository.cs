@@ -6,21 +6,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace bbqueue.Infrastructure.Repositories
 {
-    internal sealed class TargetRepository : ITargetRepository
+    public sealed class TargetRepository : ITargetRepository
     {
-        IServiceProvider serviceProvider;
-        public TargetRepository(IServiceProvider _serviceProvider)
+        private readonly QueueContext queueContext;
+        public TargetRepository(QueueContext queueContext)
         {
-            serviceProvider = _serviceProvider;
+            this.queueContext = queueContext;
         }
         public async Task<List<Target>> GetTargetsAsync(CancellationToken cancellationToken)
         {
-            var queueContext = serviceProvider.GetService<QueueContext>();
-            return await queueContext?
+            return await queueContext
                 .TargetEntity?
                 .OrderByDescending(g => g.GroupLinkId)
                 .Select(t => t.FromEntityToModel()!)
-                .ToListAsync()!;
+                .ToListAsync(cancellationToken)!;
         }
     }
 }

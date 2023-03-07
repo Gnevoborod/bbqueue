@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace bbqueue.Database.Entities
 {
     [Table("window_target")]
-    internal sealed class WindowTargetEntity
+    public sealed class WindowTargetEntity
     {
         [Key, Column("window_target_id")]
         public long Id { get; set; }

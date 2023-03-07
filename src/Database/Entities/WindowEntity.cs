@@ -5,7 +5,7 @@ using bbqueue.Domain.Models;
 namespace bbqueue.Database.Entities
 {
     [Table("window")]
-    internal sealed class WindowEntity
+    public sealed class WindowEntity
     {
         [Key, Column("window_id")]
         public long Id { get; set; }

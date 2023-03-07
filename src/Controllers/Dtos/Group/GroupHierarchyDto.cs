@@ -2,7 +2,7 @@
 
 namespace bbqueue.Controllers.Dtos.Group
 {
-    internal sealed class GroupHierarchyDto
+    public sealed class GroupHierarchyDto
     {
         public long Id { get; set; }
 

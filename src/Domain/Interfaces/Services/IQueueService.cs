@@ -2,11 +2,11 @@
 
 namespace bbqueue.Domain.Interfaces.Services
 {
-    internal interface IQueueService
+    public interface IQueueService
     {
-        public Task<bool> ReturnTicketToQueue(Ticket ticket, CancellationToken cancellationToken);
+        public Task ReturnTicketToQueue(Ticket ticket, CancellationToken cancellationToken);
 
-        public Task<bool> RemoveTicket(Ticket ticket, CancellationToken cancellationToken);
+        public Task RemoveTicket(Ticket ticket, CancellationToken cancellationToken);
 
         public Task ClearQueue(CancellationToken cancellationToken);
 

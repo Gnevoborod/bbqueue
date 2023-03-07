@@ -2,8 +2,8 @@
 
 namespace bbqueue.Domain.Interfaces.Repositories
 {
-    internal interface IGroupRepository
+    public interface IGroupRepository
     {
-        Task<List<Group>>? GetGroupsAsync(CancellationToken cancellationToken);
+        public Task<List<Group>> GetGroupsAsync(CancellationToken cancellationToken);//
     }
 }

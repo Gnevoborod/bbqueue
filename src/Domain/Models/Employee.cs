@@ -3,7 +3,7 @@
 namespace bbqueue.Domain.Models
 {
     public enum EmployeeRole { Employee, Manager};
-    internal sealed class Employee
+    public sealed class Employee
     {
         public long Id { get; set; }
 

@@ -2,7 +2,7 @@
 {
     public enum TicketState { Created, InProcess, Returned, Reopened, Closed }
 
-    internal sealed class Ticket
+    public sealed class Ticket
     {
         public long Id { get; set; }
 

@@ -7,44 +7,39 @@ using Microsoft.EntityFrameworkCore;
 
 namespace bbqueue.Infrastructure.Repositories
 {
-    internal sealed class EmployeeRepository : IEmployeeRepository
+    public sealed class EmployeeRepository : IEmployeeRepository
     {
-        IServiceProvider serviceProvider;
-        public EmployeeRepository(IServiceProvider serviceProvider)
+        private readonly QueueContext queueContext;
+        public EmployeeRepository(QueueContext queueContext)
         {
-            this.serviceProvider = serviceProvider;
+            this.queueContext = queueContext;
         }
-        public async Task<bool> AddEmployeeAsync(EmployeeEntity employeeEntity, CancellationToken cancellationToken)
+        public async Task AddEmployeeAsync(EmployeeEntity employeeEntity, CancellationToken cancellationToken)
         {
             await Task.Run(() => Thread.Sleep(100));
-            return true;
         }
-        public async Task<bool> SetRoleToEmployeeAsync(long employeeId, EmployeeRole role, CancellationToken cancellationToken)
+        public async Task SetRoleToEmployeeAsync(long employeeId, EmployeeRole role, CancellationToken cancellationToken)
         {
             await Task.Run(() => Thread.Sleep(100));
-            return true;
         }
-        public async Task<bool> AddEmployeeToWindowAsync(EmployeeEntity employeeEntity, WindowEntity windowEntity, CancellationToken cancellationToken)
+        public async Task AddEmployeeToWindowAsync(EmployeeEntity employeeEntity, WindowEntity windowEntity, CancellationToken cancellationToken)
         {
             await Task.Run(() => Thread.Sleep(100));
-            return true;
         }
 
-        public async Task<Employee> GetEmployeeInfoAsync(string externalNumber, CancellationToken cancellationToken)
+        public async Task<Employee?> GetEmployeeInfoAsync(string externalNumber, CancellationToken cancellationToken)
         {
-            var employee = await serviceProvider
-                        .GetService<QueueContext>()?
-                        .EmployeeEntity?
-                        .SingleOrDefaultAsync(e => e.ExternalSystemIdentity == externalNumber)!;
-            return employee.FromEntityToModel()!;
+            var employee = await queueContext
+                        .EmployeeEntity
+                        .SingleOrDefaultAsync(e => e.ExternalSystemIdentity == externalNumber, cancellationToken);
+            return employee?.FromEntityToModel();
         }
-        public async Task<Employee> GetEmployeeInfoAsync(long employeeId, CancellationToken cancellationToken)
+        public async Task<Employee?> GetEmployeeInfoAsync(long employeeId, CancellationToken cancellationToken)
         {
-			var employee = await serviceProvider
-                        .GetService<QueueContext>()?
+			var employee = await queueContext
                         .EmployeeEntity?
-                        .SingleOrDefaultAsync(e => e.Id == employeeId)!;
-            return employee.FromEntityToModel()!;
+                        .SingleOrDefaultAsync(e => e.Id == employeeId, cancellationToken)!;
+            return employee?.FromEntityToModel();
         }
 
         public async Task<List<Employee>> GetEmployeeListAsync(CancellationToken cancellationToken)

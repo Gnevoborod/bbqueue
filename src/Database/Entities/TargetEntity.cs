@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace bbqueue.Database.Entities
 {
     [Table("target")]
-    internal sealed class TargetEntity
+    public sealed class TargetEntity
     {
         [Key, Column("target_id")]
         public long Id { get; set; }

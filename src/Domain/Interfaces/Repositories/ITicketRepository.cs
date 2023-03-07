@@ -3,7 +3,7 @@ using bbqueue.Database.Entities;
 
 namespace bbqueue.Domain.Interfaces.Repositories
 {
-    internal interface ITicketRepository
+    public interface ITicketRepository
     {
         public Task<long> SaveTicketToDbAsync(TicketEntity ticketEntity, CancellationToken cancellationToken);
         public Task<bool> UpdateTicketInDbAsync(TicketEntity ticketEntity, CancellationToken cancellationToken);
@@ -15,6 +15,6 @@ namespace bbqueue.Domain.Interfaces.Repositories
         public TicketOperation? GetTicketOperationByTicket(long ticketId);
         public Task SaveTicketOperationToDbAsync(TicketOperationEntity ticketOperationEntity);
         public Task<bool> UpdateTicketOperationToDbAsync(TicketOperationEntity ticketOperationEntity);
-        public Task<TicketAmount> GetTicketAmountAsync(long targetId);
+        public Task<TicketAmount?> GetTicketAmountAsync(long targetId);
     }
 }

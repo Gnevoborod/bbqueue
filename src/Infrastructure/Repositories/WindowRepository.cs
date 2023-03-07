@@ -7,7 +7,7 @@ using bbqueue.Domain.Interfaces.Repositories;
 
 namespace bbqueue.Infrastructure.Repositories
 {
-    internal sealed class WindowRepository : IWindowRepository
+    public sealed class WindowRepository : IWindowRepository
     {
         IServiceProvider serviceProvider;
         public WindowRepository(IServiceProvider _serviceProvider)
@@ -17,8 +17,6 @@ namespace bbqueue.Infrastructure.Repositories
         public async Task<List<Window>> GetWindowsAsync(CancellationToken cancellationToken)
         {
             var queueContext = serviceProvider.GetService<QueueContext>();
-            cancellationToken.ThrowIfCancellationRequested();
-            cancellationToken.ThrowIfCancellationRequested();
             return await queueContext?.WindowEntity?.OrderBy(w => w.Number)
                 .Select(w => w.FromEntityToModel()!)
                 .ToListAsync()!;
@@ -29,7 +27,6 @@ namespace bbqueue.Infrastructure.Repositories
         public async Task<bool> ChangeWindowWorkStateAsync(Window window, CancellationToken cancellationToken)
         {
             var queueContext = serviceProvider.GetService<QueueContext>();
-            cancellationToken.ThrowIfCancellationRequested();
             var windowEntity = await queueContext?.WindowEntity?.SingleOrDefaultAsync(we => we.Number == window.Number)!;
             if (windowEntity == null) return false;
             windowEntity.WindowWorkState = window.WindowWorkState;

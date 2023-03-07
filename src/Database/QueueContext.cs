@@ -6,18 +6,18 @@ using System.Diagnostics;
 
 namespace bbqueue.Database
 {
-    internal sealed class QueueContext : DbContext
+    public sealed class QueueContext : DbContext
     {
-        public DbSet<WindowEntity>? WindowEntity { get; set; }
-        public DbSet<WindowTargetEntity>? WindowTargetEntity { get; set; }
+        public DbSet<WindowEntity> WindowEntity { get; set; } = default!;
+        public DbSet<WindowTargetEntity> WindowTargetEntity { get; set; } = default!;
 
-        public DbSet<TicketEntity>? TicketEntity { get; set; }
-        public DbSet<TicketAmountEntity>? TicketAmountEntity { get; set; }
-        public DbSet<TicketOperationEntity>? TicketOperationEntity { get; set; }
-        public DbSet<GroupEntity>? GroupEntity { get; set; }
-        public DbSet<TargetEntity>? TargetEntity { get; set; }
+        public DbSet<TicketEntity> TicketEntity { get; set; } = default!;
+        public DbSet<TicketAmountEntity> TicketAmountEntity { get; set; } = default!;
+        public DbSet<TicketOperationEntity> TicketOperationEntity { get; set; } = default!;
+        public DbSet<GroupEntity> GroupEntity { get; set; } = default!;
+        public DbSet<TargetEntity> TargetEntity { get; set; } = default!;
 
-        public DbSet<EmployeeEntity>? EmployeeEntity { get; set; }
+        public DbSet<EmployeeEntity> EmployeeEntity { get; set; } = default!;
         private static string? connectionString;
 
         private void SetConnectionString()
