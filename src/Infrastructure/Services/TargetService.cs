@@ -17,17 +17,17 @@ namespace bbqueue.Infrastructure.Services
             this.groupRepository = groupRepository;
             this.targetRepository = targetRepository;
         }
-        public async Task<List<Target>>? GetTargetsAsync(CancellationToken cancellationToken)
+        public async Task<List<Target>> GetTargetsAsync(CancellationToken cancellationToken)
         {
-            return await targetRepository.GetTargetsAsync(cancellationToken)!;
+            return await targetRepository.GetTargetsAsync(cancellationToken);
         }
 
 
         public async Task<GroupHierarchyDto> GetHierarchyAsync(CancellationToken cancellationToken)
         {
-            var Groups = await groupRepository.GetGroupsAsync(cancellationToken)!;
-            var Targets = await GetTargetsAsync(cancellationToken)!;
-            var result= Groups?.FromModelToHierarchyDto(Targets)!;
+            var Groups = await groupRepository.GetGroupsAsync(cancellationToken);
+            var Targets = await GetTargetsAsync(cancellationToken);
+            var result= Groups.FromModelToHierarchyDto(Targets);
             return result;
         }
     }

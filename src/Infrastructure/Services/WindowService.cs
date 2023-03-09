@@ -15,12 +15,12 @@ namespace bbqueue.Infrastructure.Services
         }
         public async Task<List<Window>> GetWindowsAsync(CancellationToken cancellationToken)
         {
-            return await windowRepository.GetWindowsAsync(cancellationToken)!;
+            return await windowRepository.GetWindowsAsync(cancellationToken);
         }
 
         public async Task ChangeWindowWorkStateAsync(Window window, CancellationToken cancellationToken)
         {
-            await windowRepository.ChangeWindowWorkStateAsync(window, cancellationToken)!;
+            await windowRepository.ChangeWindowWorkStateAsync(window, cancellationToken);
         }
 
         public bool SetEmployeeToWindowAsync(int employeeId, int windowId, CancellationToken cancellationToken)

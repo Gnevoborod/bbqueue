@@ -4,6 +4,7 @@ using bbqueue.Domain.Interfaces.Repositories;
 using bbqueue.Domain.Models;
 using bbqueue.Mapper;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 
 namespace bbqueue.Infrastructure.Repositories
 {
@@ -14,16 +15,16 @@ namespace bbqueue.Infrastructure.Repositories
         {
             this.queueContext = queueContext;
         }
-        public async Task<long> SaveTicketToDbAsync(TicketEntity ticketEntity, CancellationToken cancellationToken)
+        public async Task<long> SaveTicketToDbAsync(TicketEntity ticketEntity, char prefix, CancellationToken cancellationToken)
         {
             queueContext.TicketEntity.Add(ticketEntity);
+            await SaveLastTicketNumberAsync(ticketEntity.Number, prefix, cancellationToken);
             await queueContext.SaveChangesAsync(cancellationToken);
             return ticketEntity.Id;
         }
-        public async Task<bool> UpdateTicketInDbAsync(TicketEntity ticketEntity, CancellationToken cancellationToken)
+        public async Task UpdateTicketInDbAsync(TicketEntity ticketEntity, CancellationToken cancellationToken)
         {
             await Task.Run(() => { Thread.Sleep(100); });//просто заглушка чтоб студия не ругалась на async
-            return true;
         }
         public async Task<List<Ticket>> LoadTicketsFromDbAsync(bool loadOnlyProcessedTickets, CancellationToken cancellationToken)//true грузим обработанные талоны false необработанные талоны
         {
@@ -31,19 +32,19 @@ namespace bbqueue.Infrastructure.Repositories
             return new();
         }
 
-        public async Task <bool> SaveLastTicketNumberAsync(int number, string prefix, CancellationToken cancellationToken)
+        public async Task SaveLastTicketNumberAsync(int number, char prefix, CancellationToken cancellationToken)
         {
-            await Task.Run(() => { Thread.Sleep(100); });//просто заглушка чтоб студия не ругалась на async
-            return true;
+            var ticketAmount = await queueContext.TicketAmountEntity.SingleOrDefaultAsync(tae=>tae.Prefix==prefix && tae.Number == number-1, cancellationToken);
+            if(ticketAmount == null)
+            {
+                await CreateTicketAmountRecordAsync(prefix, cancellationToken);
+                return;
+            }
+            ticketAmount.Number = number;
+            await queueContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<int> GetLastTicketNumberAsync(string prefix, CancellationToken cancellationToken)
-        {
-            await Task.Run(() => { Thread.Sleep(100); });//просто заглушка чтоб студия не ругалась на async
-            return 0;
-        }
-
-        public async Task<List<TicketOperation>> GetTicketOperationByWindowPlusTargetAsync(long windowId)
+        public async Task<List<TicketOperation>> GetTicketOperationByWindowPlusTargetAsync(long windowId, CancellationToken cancellationToken)
         {
 
             var ticketOperations = from ticketOperation in queueContext.TicketOperationEntity
@@ -52,60 +53,62 @@ namespace bbqueue.Infrastructure.Repositories
                                    where windowTarget.WindowId == windowId
                                    select ticketOperation.FromEntityToModel();
 
-            return await ticketOperations.ToListAsync();
+            return await ticketOperations.ToListAsync(cancellationToken);
         }
 
-        public async Task<TicketOperation?> GetTicketOperationByTicketAsync(long ticketId)
+        public async Task<TicketOperation> GetTicketOperationByTicketAsync(long ticketId, CancellationToken cancellationToken)
         {
-            var ticketOperationEntity = await queueContext.TicketOperationEntity.FirstOrDefaultAsync(to => to.TicketId == ticketId);
-            return ticketOperationEntity.FromEntityToModel();
+            var ticketOperationEntity = await queueContext.TicketOperationEntity.FirstOrDefaultAsync(to => to.TicketId == ticketId, cancellationToken);
+            return ticketOperationEntity == null? default! : ticketOperationEntity.FromEntityToModel();
         }
 
-        public TicketOperation? GetTicketOperationByTicket(long ticketId)
+        public async Task<TicketOperation> GetTicketOperationByTicket(long ticketId, CancellationToken cancellationToken)
         {
-            var ticketOperationEntity = queueContext.TicketOperationEntity.FirstOrDefault(to => to.TicketId == ticketId);
-            return ticketOperationEntity.FromEntityToModel();
+            var ticketOperationEntity = await queueContext.TicketOperationEntity.FirstOrDefaultAsync(to => to.TicketId == ticketId, cancellationToken);
+            return ticketOperationEntity == null ? default! : ticketOperationEntity.FromEntityToModel();
         }
 
-        public async Task SaveTicketOperationToDbAsync(TicketOperationEntity ticketOperationEntity)
+        public async Task SaveTicketOperationToDbAsync(TicketOperationEntity ticketOperationEntity, CancellationToken cancellationToken)
         {
             queueContext.TicketOperationEntity.Add(ticketOperationEntity);
-            await queueContext.SaveChangesAsync();
+            await queueContext.SaveChangesAsync(cancellationToken);
         }
-        public async Task<bool> UpdateTicketOperationToDbAsync(TicketOperationEntity ticketOperationEntity)
+        public async Task UpdateTicketOperationToDbAsync(TicketOperationEntity ticketOperationEntity, CancellationToken cancellationToken)
         {
             var ticketOperationEntityInDb = await queueContext.TicketOperationEntity.FirstOrDefaultAsync(toe=>toe.TicketId==ticketOperationEntity.TicketId);
-            if(ticketOperationEntityInDb != null)
-            {
-                ticketOperationEntityInDb = ticketOperationEntity;
-                await queueContext.SaveChangesAsync();
-                return true;
-            }
-            return false;
+            if (ticketOperationEntityInDb == null)
+                throw new Exception("Не найдено записи по операции с талоном для обновления");//Тут нужен норм эксепшн
+            
+            ticketOperationEntityInDb = ticketOperationEntity;
+            await queueContext.SaveChangesAsync(cancellationToken);
+            
+            
         }
 
-        public async Task<TicketAmount?> GetTicketAmountAsync(long targetId)
+        public async Task<TicketAmount> GetTicketAmountAsync(long targetId, CancellationToken cancellationToken)
         {
             var target = await queueContext.TargetEntity.SingleOrDefaultAsync(t => t.Id == targetId);
+            if (target == null)
+                return default!;
             var ticketAmount = await queueContext
                         .TicketAmountEntity
-                        .SingleOrDefaultAsync(ta => ta.Prefix == target!.Prefix);
+                        .SingleOrDefaultAsync(ta => ta.Prefix == target.Prefix, cancellationToken);
             if(ticketAmount == null)
             {
-                ticketAmount = await CreateTicketAmountRecordAsync(target!.Prefix);
+                ticketAmount = await CreateTicketAmountRecordAsync(target.Prefix, cancellationToken);
             }
             return ticketAmount.FromEntityToModel();
         }
 
-        private async Task<TicketAmountEntity> CreateTicketAmountRecordAsync(char prefix)
+        private async Task<TicketAmountEntity> CreateTicketAmountRecordAsync(char prefix, CancellationToken cancellationToken)
         {
             TicketAmountEntity ticketAmountEntity = new TicketAmountEntity()
             {
                 Prefix = prefix,
-                Number = 1
+                Number = 0
             };
             queueContext.TicketAmountEntity.Add(ticketAmountEntity);
-            await queueContext.SaveChangesAsync();
+            await queueContext.SaveChangesAsync(cancellationToken);
             return ticketAmountEntity;
         }
     }

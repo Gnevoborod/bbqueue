@@ -16,10 +16,10 @@ namespace bbqueue.Infrastructure.Repositories
         public async Task<List<Target>> GetTargetsAsync(CancellationToken cancellationToken)
         {
             return await queueContext
-                .TargetEntity?
+                .TargetEntity
                 .OrderByDescending(g => g.GroupLinkId)
-                .Select(t => t.FromEntityToModel()!)
-                .ToListAsync(cancellationToken)!;
+                .Select(t => t.FromEntityToModel())
+                .ToListAsync(cancellationToken);
         }
     }
 }

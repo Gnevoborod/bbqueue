@@ -9,30 +9,29 @@ namespace bbqueue.Infrastructure.Repositories
 {
     public sealed class WindowRepository : IWindowRepository
     {
-        IServiceProvider serviceProvider;
-        public WindowRepository(IServiceProvider _serviceProvider)
+        private readonly QueueContext queueContext;
+        public WindowRepository(QueueContext queueContext)
         {
-            serviceProvider = _serviceProvider;
+            this.queueContext = queueContext;
         }
         public async Task<List<Window>> GetWindowsAsync(CancellationToken cancellationToken)
         {
-            var queueContext = serviceProvider.GetService<QueueContext>();
-            return await queueContext?.WindowEntity?.OrderBy(w => w.Number)
-                .Select(w => w.FromEntityToModel()!)
-                .ToListAsync()!;
+            return await queueContext.WindowEntity.OrderBy(w => w.Number)
+                .Select(w => w.FromEntityToModel())
+                .ToListAsync(cancellationToken);
 
 
         }
 
-        public async Task<bool> ChangeWindowWorkStateAsync(Window window, CancellationToken cancellationToken)
+        public async Task ChangeWindowWorkStateAsync(Window window, CancellationToken cancellationToken)
         {
-            var queueContext = serviceProvider.GetService<QueueContext>();
-            var windowEntity = await queueContext?.WindowEntity?.SingleOrDefaultAsync(we => we.Number == window.Number)!;
-            if (windowEntity == null) return false;
+            var windowEntity = await queueContext
+                                    .WindowEntity
+                                    .SingleOrDefaultAsync(we => we.Number == window.Number);
+            if (windowEntity == null)
+                throw new Exception("Не удалось найти окно по номеру"); //Тут нужен свой эксепшн
             windowEntity.WindowWorkState = window.WindowWorkState;
-            await queueContext?.SaveChangesAsync(cancellationToken)!;
-            return true;
-
+            await queueContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

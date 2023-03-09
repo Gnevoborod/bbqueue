@@ -27,19 +27,19 @@ namespace bbqueue.Infrastructure.Repositories
             await Task.Run(() => Thread.Sleep(100));
         }
 
-        public async Task<Employee?> GetEmployeeInfoAsync(string externalNumber, CancellationToken cancellationToken)
+        public async Task<Employee> GetEmployeeInfoAsync(string externalNumber, CancellationToken cancellationToken)
         {
             var employee = await queueContext
                         .EmployeeEntity
                         .SingleOrDefaultAsync(e => e.ExternalSystemIdentity == externalNumber, cancellationToken);
-            return employee?.FromEntityToModel();
+            return employee == null ? default! : employee.FromEntityToModel();
         }
-        public async Task<Employee?> GetEmployeeInfoAsync(long employeeId, CancellationToken cancellationToken)
+        public async Task<Employee> GetEmployeeInfoAsync(long employeeId, CancellationToken cancellationToken)
         {
 			var employee = await queueContext
-                        .EmployeeEntity?
-                        .SingleOrDefaultAsync(e => e.Id == employeeId, cancellationToken)!;
-            return employee?.FromEntityToModel();
+                        .EmployeeEntity
+                        .SingleOrDefaultAsync(e => e.Id == employeeId, cancellationToken);
+            return employee == null? default! : employee.FromEntityToModel();
         }
 
         public async Task<List<Employee>> GetEmployeeListAsync(CancellationToken cancellationToken)

@@ -46,29 +46,5 @@ namespace bbqueue.Infrastructure.Services
             return new();
         }
 
-        public async Task<string?> GetJwtAsync(string employeeId, CancellationToken cancellationToken)
-        {
-            var employee = await GetEmployeeInfoAsync(employeeId, cancellationToken)!;
-            if (employee == null)
-            {
-                return null;
-            }
-
-            var claims = new List<Claim>
-            {
-               new Claim(ClaimTypes.Role,employee!.Role.ToString()),
-               new Claim(ClaimTypes.PrimarySid, employee!.Id.ToString())
-            };
-
-            var jwt = new JwtSecurityToken(
-                    issuer: AuthOptions.ISSUER,
-                    audience: AuthOptions.AUDIENCE,
-                    claims: claims,
-                    expires: DateTime.UtcNow.Add(TimeSpan.FromHours(24)),
-                    signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-
-            return new JwtSecurityTokenHandler().WriteToken(jwt);
-
-        }
     }
 }

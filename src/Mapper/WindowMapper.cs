@@ -5,9 +5,11 @@ namespace bbqueue.Mapper
 {
     internal static class WindowMapper
     {
-        public static Window? FromEntityToModel(this WindowEntity? windowEntity)
+        public static Window FromEntityToModel(this WindowEntity windowEntity)
         {
-            return windowEntity != null ? new Window
+            if (windowEntity == null)
+                return default!;
+            return new Window
             {
                 Id = windowEntity.Id,
                 Number = windowEntity.Number,
@@ -22,12 +24,14 @@ namespace bbqueue.Mapper
                     Role = windowEntity.Employee.Role
                 } : null,
                 WindowWorkState = windowEntity.WindowWorkState
-            } : null;
+            };
         }
 
-        public static WindowEntity? FromModelToEntity(this Window? window)
+        public static WindowEntity FromModelToEntity(this Window window)
         {
-            return window != null ? new WindowEntity
+            if (window == null)
+                return default!;
+            return new WindowEntity
             {
                 Id = window.Id,
                 Number = window.Number,
@@ -42,25 +46,35 @@ namespace bbqueue.Mapper
                     Role = window.Employee.Role
                 } : null,
                 WindowWorkState = window.WindowWorkState
-            } : null;
+            };
         }
 
-        public static WindowDto? FromModelToDto(this Window? window)
+        public static WindowDto FromModelToDto(this Window window)
         {
-            return window != null ? new WindowDto
+            if (window == null)
+                return default!;
+            return new WindowDto
             {
                 Id = window.Id,
                 Number = window.Number,
                 Description = window.Description
-            } : null;
+            };
         }
 
         public static Window FromChangeStateDtoToModel(this ChangeWindowWorkStateDto dto)
         {
+            var enumItems = Enum.GetNames(typeof(WindowWorkState));
+            var enumItemsIndexes = Enum.GetValues(typeof(WindowWorkState));
+            WindowWorkState? windowWorkState=default;
+            for(int i =0; i < enumItems.Length;i++)
+            {
+                if (enumItems[i].ToLower() == dto.WindowWorkState.ToLower())
+                    windowWorkState = (WindowWorkState?)enumItemsIndexes.GetValue(i);
+            }
             return new Window
             {
                 Number = dto.Number,
-                WindowWorkState = dto.WindowWorkState
+                WindowWorkState = windowWorkState != null ? (WindowWorkState) windowWorkState:default
             };
         }
     }

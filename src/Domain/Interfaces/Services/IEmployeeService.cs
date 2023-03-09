@@ -14,6 +14,5 @@ namespace bbqueue.Domain.Interfaces.Services
 
         public Task<List<Employee>> GetEmployeeListAsync(CancellationToken cancellationToken);
 
-        public Task<string?> GetJwtAsync(string employeeId, CancellationToken cancellationToken);
     }
 }

@@ -5,10 +5,10 @@ namespace bbqueue.Mapper
 {
     internal static class EmployeeMapper
     {
-        public static Employee? FromEntityToModel(this EmployeeEntity employeeEntity)
+        public static Employee FromEntityToModel(this EmployeeEntity employeeEntity)
         {
             if (employeeEntity == null)
-                return null;
+                return default!;
             return new Employee
             {
                 Id = employeeEntity.Id,
@@ -19,10 +19,10 @@ namespace bbqueue.Mapper
             };
         }
 
-        public static EmployeeEntity? FromModelToEntity(this Employee employee)
+        public static EmployeeEntity FromModelToEntity(this Employee employee)
         {
             if (employee == null)
-                return null;
+                return default!;
             return new EmployeeEntity
             {
                 Id = employee.Id,

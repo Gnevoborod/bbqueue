@@ -8,7 +8,8 @@ namespace bbqueue.Controllers.Dtos.Window
     {
         [Required, MaxLength(6)]
         public string Number { get; set; } = default!;
-        [Required, MinValue((int)WindowWorkState.Opened), MaxValue((int)WindowWorkState.Closed)]
-        public WindowWorkState WindowWorkState { get; set; }
+        [Required]
+        [StringValueScope("Opened","Closed","Suspended")]
+        public string WindowWorkState { get; set; } = default!;
     }
 }

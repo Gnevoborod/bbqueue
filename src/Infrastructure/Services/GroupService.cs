@@ -13,7 +13,7 @@ namespace bbqueue.Infrastructure.Services
         }
         public async Task<List<Group>> GetGroupsAsync(CancellationToken cancellationToken)
         {
-            return await groupRepository.GetGroupsAsync(cancellationToken)!;
+            return await groupRepository.GetGroupsAsync(cancellationToken);
         }
     }
 }

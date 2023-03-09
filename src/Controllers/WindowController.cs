@@ -23,7 +23,7 @@ namespace bbqueue.Controllers
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
             var window = dto.FromChangeStateDtoToModel();
-            await windowService.ChangeWindowWorkStateAsync(window, cancellationToken)!;
+            await windowService.ChangeWindowWorkStateAsync(window, cancellationToken);
             return Ok();
         }
 
@@ -32,10 +32,10 @@ namespace bbqueue.Controllers
         public async Task<IActionResult> GetWindowsAsync()
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
-            var windows = await windowService.GetWindowsAsync(cancellationToken)!;
+            var windows = await windowService.GetWindowsAsync(cancellationToken);
             WindowListDto windowListDto = new()
             {
-                Windows = windows?.Select(w => w.FromModelToDto()!).ToList()
+                Windows = windows.Select(w => w.FromModelToDto()).ToList()
             };
             return Ok(windowListDto);
         }

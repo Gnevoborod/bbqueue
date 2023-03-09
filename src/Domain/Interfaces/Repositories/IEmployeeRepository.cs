@@ -11,8 +11,8 @@ namespace bbqueue.Domain.Interfaces.Repositories
 
         public Task AddEmployeeToWindowAsync(EmployeeEntity employeeEntity, WindowEntity windowEntity, CancellationToken cancellationToken);
 
-        public Task<Employee?> GetEmployeeInfoAsync(string externalNumber, CancellationToken cancellationToken);
-        public Task<Employee?> GetEmployeeInfoAsync(long employeeId, CancellationToken cancellationToken);
+        public Task<Employee> GetEmployeeInfoAsync(string externalNumber, CancellationToken cancellationToken);
+        public Task<Employee> GetEmployeeInfoAsync(long employeeId, CancellationToken cancellationToken);
 
         public Task<List<Employee>> GetEmployeeListAsync(CancellationToken cancellationToken);
     }

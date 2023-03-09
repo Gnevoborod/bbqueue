@@ -4,9 +4,11 @@ namespace bbqueue.Mapper
 {
     internal static class TicketOperationMapper
     {
-        public static TicketOperation? FromEntityToModel(this TicketOperationEntity? ticketOperationEntity)
+        public static TicketOperation FromEntityToModel(this TicketOperationEntity ticketOperationEntity)
         {
-            return ticketOperationEntity != null ? new TicketOperation
+            if (ticketOperationEntity == null)
+                return default!;
+            return new TicketOperation
             {
                 Id = ticketOperationEntity.Id,
                 TicketId = ticketOperationEntity.TicketId,
@@ -49,12 +51,14 @@ namespace bbqueue.Mapper
                 } : null,
                 State = ticketOperationEntity.State,
                 Processed = ticketOperationEntity.Processed
-            } : null;
+            };
         }
 
-        public static TicketOperationEntity? FromModelToEntity(this TicketOperation? ticketOperation)
+        public static TicketOperationEntity FromModelToEntity(this TicketOperation ticketOperation)
         {
-            return ticketOperation != null ? new TicketOperationEntity
+            if (ticketOperation == null)
+                return default!;
+            return new TicketOperationEntity
             {
                 Id = ticketOperation.Id,
                 TicketId = ticketOperation.TicketId,
@@ -97,7 +101,7 @@ namespace bbqueue.Mapper
                 } : null,
                 State = ticketOperation.State,
                 Processed = ticketOperation.Processed
-            } : null;
+            };
         }
     }
 }

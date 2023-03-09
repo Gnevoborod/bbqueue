@@ -4,16 +4,18 @@ namespace bbqueue.Domain.Interfaces.Services
 {
     public interface IQueueService
     {
-        public Task ReturnTicketToQueue(Ticket ticket, CancellationToken cancellationToken);
+        public Task AddTicketToQueueAsync(Ticket ticket);
+        public Task ReturnTicketToQueueAsync(Ticket ticket, CancellationToken cancellationToken);
 
-        public Task RemoveTicket(Ticket ticket, CancellationToken cancellationToken);
+        public Task RemoveTicketAsync(Ticket ticket, CancellationToken cancellationToken);
 
-        public Task ClearQueue(CancellationToken cancellationToken);
+        public Task ClearQueueAsync(CancellationToken cancellationToken);
 
-        public Task<Ticket?> GetTicketNextTicketFromQueue(long windowId, CancellationToken cancellationToken);
+        public Task<Ticket> GetTicketNextTicketFromQueueAsync(long windowId, CancellationToken cancellationToken);
 
-        public Task<Ticket> GetNextSpecificTicketFromQueue(long ticketNumber, CancellationToken cancellationToken);
+        public Task<Ticket> GetNextSpecificTicketFromQueueAsync(long ticketNumber, CancellationToken cancellationToken);
 
-        public Task RestoreQueue(CancellationToken cancellationToken);
+        public Task RestoreQueueAsync(CancellationToken cancellationToken);
+
     }
 }

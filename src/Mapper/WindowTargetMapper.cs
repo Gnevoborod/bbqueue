@@ -4,9 +4,11 @@ namespace bbqueue.Mapper
 {
     internal static class WindowTargetMapper
     {
-        public static WindowTarget? FromEntityToModel(this WindowTargetEntity? windowTargetEntity)
+        public static WindowTarget FromEntityToModel(this WindowTargetEntity windowTargetEntity)
         {
-            return windowTargetEntity != null ? new WindowTarget
+            if (windowTargetEntity == null)
+                return default!;
+            return new WindowTarget
             {
                 Id = windowTargetEntity.Id,
                 WindowId = windowTargetEntity.WindowId,
@@ -40,16 +42,16 @@ namespace bbqueue.Mapper
                         Name = windowTargetEntity.Target.GroupLink.Name,
                         Description = windowTargetEntity.Target.GroupLink.Description,
                         GroupLinkId = windowTargetEntity.Target.GroupLink.GroupLinkId,
-                        GroupLink = null /* Stop recursive mapping */
+                        GroupLink =null /* Stop recursive mapping */
                     } : null
                 }
-            } : null;
+            };
         }
 
-        public static WindowTargetEntity? FromModelToEntity(this WindowTarget? windowTarget)
+        public static WindowTargetEntity FromModelToEntity(this WindowTarget windowTarget)
         {
             if (windowTarget == null)
-                return null;
+                return default!;
             return new WindowTargetEntity
             {
                 Id = windowTarget.Id,
@@ -65,8 +67,10 @@ namespace bbqueue.Mapper
                         Id = windowTarget.Window.Employee.Id,
                         ExternalSystemIdentity = windowTarget.Window.Employee.ExternalSystemIdentity,
                         Name = windowTarget.Window.Employee.Name,
-                        Active = windowTarget.Window.Employee.Active
-                    } : null
+                        Active = windowTarget.Window.Employee.Active,
+                        Role = windowTarget.Window.Employee.Role
+                    } : null,
+                    WindowWorkState = windowTarget.Window.WindowWorkState
                 },
                 TargetId = windowTarget.TargetId,
                 Target = new TargetEntity
@@ -82,7 +86,7 @@ namespace bbqueue.Mapper
                         Name = windowTarget.Target.GroupLink.Name,
                         Description = windowTarget.Target.GroupLink.Description,
                         GroupLinkId = windowTarget.Target.GroupLink.GroupLinkId,
-                        GroupLink = null /* Вынужденная заглушка, иначе так и будем маппить до потери сознания */
+                        GroupLink = null /* Stop recursive mapping */
                     } : null
                 }
             };

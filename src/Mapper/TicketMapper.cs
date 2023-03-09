@@ -6,9 +6,11 @@ namespace bbqueue.Mapper
 {
     internal static class TicketMapper
     {
-        public static Ticket? FromEntityToModel(this TicketEntity? ticketEntity)
+        public static Ticket FromEntityToModel(this TicketEntity ticketEntity)
         {
-            return ticketEntity != null ? new Ticket
+            if (ticketEntity == null)
+                return default!;
+            return new Ticket
             {
                 Id = ticketEntity.Id,
                 Number = ticketEntity.Number,
@@ -16,12 +18,14 @@ namespace bbqueue.Mapper
                 State = ticketEntity.State,
                 Created = ticketEntity.Created,
                 Closed = ticketEntity.Closed
-            } : null;
+            };
         }
 
-        public static TicketEntity? FromModelToEntity(this Ticket? ticket)
+        public static TicketEntity FromModelToEntity(this Ticket ticket)
         {
-            return ticket != null ? new TicketEntity
+            if (ticket == null)
+                return default!;
+            return new TicketEntity
             {
                 Id = ticket.Id,
                 Number = ticket.Number,
@@ -29,18 +33,20 @@ namespace bbqueue.Mapper
                 State = ticket.State,
                 Created = ticket.Created,
                 Closed = ticket.Closed
-            } : null;
+            };
         }
 
-        public static TicketDto? FromModelToDto(this Ticket? ticket)
+        public static TicketDto FromModelToDto(this Ticket ticket)
         {
-            return ticket != null ? new TicketDto
+            if (ticket == null)
+                return default!;
+            return new TicketDto
             {
                 Id = ticket.Id,
                 Number = ticket.Number,
                 PublicNumber = ticket.PublicNumber,
                 Created = ticket.Created
-            } : null;
+            };
         }
     }
 }
