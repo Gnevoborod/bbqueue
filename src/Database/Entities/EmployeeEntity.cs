@@ -19,6 +19,7 @@ namespace bbqueue.Database.Entities
         [Column("active")]
         public bool Active { get; set; }
 
+        [Column("role")]
         public EmployeeRole Role { get; set; }
     }
 }

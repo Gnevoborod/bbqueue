@@ -20,7 +20,7 @@ namespace bbqueue.Controllers
         public async Task<IActionResult> GetTicketAsync([FromQuery]long TargetCode)
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
-            var ticket = await ticketService.CreateTicketAsync(TargetCode, cancellationToken)!;
+            var ticket = await ticketService.CreateTicketAsync(TargetCode, cancellationToken);
             return Ok(ticket.FromModelToDto());
         }
 
@@ -28,7 +28,7 @@ namespace bbqueue.Controllers
         public async Task<IActionResult> RedirectTicketToAnotherWindowAsync([FromBody] TicketRedirectDto ticketRedirectDto)
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
-            await ticketService.ChangeTicketTarget(ticketRedirectDto.TicketNumber, ticketRedirectDto.TargetCode, cancellationToken)!;
+            await ticketService.ChangeTicketTarget(ticketRedirectDto.TicketNumber, ticketRedirectDto.TargetCode, cancellationToken);
             return Ok();
         }
 
@@ -36,7 +36,7 @@ namespace bbqueue.Controllers
         public async Task<IActionResult> GetTicketListAsync([FromQuery] long EmployeeCode)
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
-            var result = await ticketService.LoadTicketsAsync(false, cancellationToken)!;
+            var result = await ticketService.LoadTicketsAsync(false, cancellationToken);
             return Ok(result);
         }
 

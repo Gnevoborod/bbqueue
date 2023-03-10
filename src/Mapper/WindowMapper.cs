@@ -68,12 +68,12 @@ namespace bbqueue.Mapper
             WindowWorkState? windowWorkState=default;
             for(int i =0; i < enumItems.Length;i++)
             {
-                if (enumItems[i].ToLower() == dto.WindowWorkState.ToLower())
+                if (enumItems[i].ToLower() == dto.windowWorkState.ToLower())
                     windowWorkState = (WindowWorkState?)enumItemsIndexes.GetValue(i);
             }
             return new Window
             {
-                Number = dto.Number,
+                Number = dto.number,
                 WindowWorkState = windowWorkState != null ? (WindowWorkState) windowWorkState:default
             };
         }

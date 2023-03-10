@@ -1,7 +1,6 @@
 ﻿using bbqueue.Database.Entities;
 using bbqueue.Mapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Diagnostics;
 
 namespace bbqueue.Database
@@ -47,12 +46,6 @@ namespace bbqueue.Database
                 Debug.WriteLine(ex);
             }
             //optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=bbqueue;Username=postgres;Password=qwerty");
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<TicketAmountEntity>().HasIndex(tae => tae.Prefix).IsUnique(true);
-            modelBuilder.Entity<TargetEntity>().HasIndex(te => te.Prefix).IsUnique(true);
         }
     }
 }

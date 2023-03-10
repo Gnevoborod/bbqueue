@@ -26,7 +26,7 @@ namespace bbqueue.Controllers
             return Ok(new JwtDto
             {
                 Token = await authorizationService
-                        .GetJwtAsync(employeeExternalId, cancellationToken)!
+                        .GetJwtAsync(employeeExternalId, cancellationToken)
             });
         }
     }

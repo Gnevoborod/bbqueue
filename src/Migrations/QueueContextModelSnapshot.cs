@@ -51,7 +51,7 @@ namespace bbqueue.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("employee");
+                    b.ToTable("employee", (string)null);
                 });
 
             modelBuilder.Entity("bbqueue.Database.Entities.GroupEntity", b =>
@@ -82,7 +82,7 @@ namespace bbqueue.Migrations
 
                     b.HasIndex("GroupLinkId");
 
-                    b.ToTable("group");
+                    b.ToTable("group", (string)null);
                 });
 
             modelBuilder.Entity("bbqueue.Database.Entities.TargetEntity", b =>
@@ -117,10 +117,7 @@ namespace bbqueue.Migrations
 
                     b.HasIndex("GroupLinkId");
 
-                    b.HasIndex("Prefix")
-                        .IsUnique();
-
-                    b.ToTable("target");
+                    b.ToTable("target", (string)null);
                 });
 
             modelBuilder.Entity("bbqueue.Database.Entities.TicketAmountEntity", b =>
@@ -142,10 +139,7 @@ namespace bbqueue.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Prefix")
-                        .IsUnique();
-
-                    b.ToTable("ticket_amount");
+                    b.ToTable("ticket_amount", (string)null);
                 });
 
             modelBuilder.Entity("bbqueue.Database.Entities.TicketEntity", b =>
@@ -180,7 +174,7 @@ namespace bbqueue.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ticket");
+                    b.ToTable("ticket", (string)null);
                 });
 
             modelBuilder.Entity("bbqueue.Database.Entities.TicketOperationEntity", b =>
@@ -204,10 +198,6 @@ namespace bbqueue.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("state");
 
-                    b.Property<long?>("TargetId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("target_id");
-
                     b.Property<long>("TicketId")
                         .HasColumnType("bigint")
                         .HasColumnName("ticket_id");
@@ -220,13 +210,11 @@ namespace bbqueue.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.HasIndex("TargetId");
-
                     b.HasIndex("TicketId");
 
                     b.HasIndex("WindowId");
 
-                    b.ToTable("ticket_operation");
+                    b.ToTable("ticket_operation", (string)null);
                 });
 
             modelBuilder.Entity("bbqueue.Database.Entities.WindowEntity", b =>
@@ -261,7 +249,7 @@ namespace bbqueue.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("window");
+                    b.ToTable("window", (string)null);
                 });
 
             modelBuilder.Entity("bbqueue.Database.Entities.WindowTargetEntity", b =>
@@ -287,64 +275,7 @@ namespace bbqueue.Migrations
 
                     b.HasIndex("WindowId");
 
-                    b.ToTable("window_target");
-                });
-
-            modelBuilder.Entity("bbqueue.Domain.Models.Group", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<long?>("GroupLinkId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GroupLinkId");
-
-                    b.ToTable("Group");
-                });
-
-            modelBuilder.Entity("bbqueue.Domain.Models.Target", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<long?>("GroupLinkId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
-                    b.Property<char>("Prefix")
-                        .HasColumnType("character(1)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GroupLinkId");
-
-                    b.ToTable("Target");
+                    b.ToTable("window_target", (string)null);
                 });
 
             modelBuilder.Entity("bbqueue.Database.Entities.GroupEntity", b =>
@@ -371,10 +302,6 @@ namespace bbqueue.Migrations
                         .WithMany()
                         .HasForeignKey("EmployeeId");
 
-                    b.HasOne("bbqueue.Domain.Models.Target", "Target")
-                        .WithMany()
-                        .HasForeignKey("TargetId");
-
                     b.HasOne("bbqueue.Database.Entities.TicketEntity", "Ticket")
                         .WithMany()
                         .HasForeignKey("TicketId")
@@ -386,8 +313,6 @@ namespace bbqueue.Migrations
                         .HasForeignKey("WindowId");
 
                     b.Navigation("Employee");
-
-                    b.Navigation("Target");
 
                     b.Navigation("Ticket");
 
@@ -420,24 +345,6 @@ namespace bbqueue.Migrations
                     b.Navigation("Target");
 
                     b.Navigation("Window");
-                });
-
-            modelBuilder.Entity("bbqueue.Domain.Models.Group", b =>
-                {
-                    b.HasOne("bbqueue.Domain.Models.Group", "GroupLink")
-                        .WithMany()
-                        .HasForeignKey("GroupLinkId");
-
-                    b.Navigation("GroupLink");
-                });
-
-            modelBuilder.Entity("bbqueue.Domain.Models.Target", b =>
-                {
-                    b.HasOne("bbqueue.Domain.Models.Group", "GroupLink")
-                        .WithMany()
-                        .HasForeignKey("GroupLinkId");
-
-                    b.Navigation("GroupLink");
                 });
 #pragma warning restore 612, 618
         }

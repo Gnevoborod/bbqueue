@@ -24,10 +24,10 @@ namespace bbqueue.Controllers
         public async Task<IActionResult> GetTargets() 
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
-            var targets = await targetService.GetTargetsAsync(cancellationToken)!;
+            var targets = await targetService.GetTargetsAsync(cancellationToken);
             TargetListDto targetListDto = new()
             {
-                Targets = targets.Select(t => t.FromModelToDto()!).ToList()
+                Targets = targets.Select(t => t.FromModelToDto()).ToList()
             };
             return Ok(targetListDto);
         }
@@ -41,7 +41,7 @@ namespace bbqueue.Controllers
         public async Task<IActionResult> GetHierarchyAsync()
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
-            var hierarchy = await targetService.GetHierarchyAsync(cancellationToken)!;
+            var hierarchy = await targetService.GetHierarchyAsync(cancellationToken);
             return Ok(hierarchy);
         }
 
@@ -53,10 +53,10 @@ namespace bbqueue.Controllers
         [HttpGet("groups")]
         public async Task<IActionResult> GetGroupsAsync(CancellationToken cancellationToken)
         {
-            var groups = await groupService.GetGroupsAsync(cancellationToken)!;
+            var groups = await groupService.GetGroupsAsync(cancellationToken);
             GroupListDto groupListDto = new()
             {
-                Groups = groups.Select(gld => gld.FromModelToDto()!).ToList()
+                Groups = groups.Select(gld => gld.FromModelToDto()).ToList()
             };
             return Ok(groupListDto);
         }
