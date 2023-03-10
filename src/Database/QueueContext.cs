@@ -12,8 +12,8 @@ namespace bbqueue.Database
         public DbSet<TicketEntity> TicketEntity { get; set; } = default!;
         public DbSet<TicketAmountEntity> TicketAmountEntity { get; set; } = default!;
         public DbSet<TicketOperationEntity> TicketOperationEntity { get; set; } = default!;
-        public DbSet<GroupEntity> GroupEntity { get; set; } = default!;
-        public DbSet<TargetEntity> TargetEntity { get; set; } = default!;
+        internal DbSet<GroupEntity> GroupEntity { get; set; } = default!;
+        internal DbSet<TargetEntity> TargetEntity { get; set; } = default!;
         public DbSet<WindowTargetEntity> WindowTargetEntity { get; set; } = default!;
         public DbSet<EmployeeEntity> EmployeeEntity { get; set; } = default!;
         private static string? connectionString;

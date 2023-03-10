@@ -4,8 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace bbqueue.Database.Entities
 {
-    [Table("target")]
-    public sealed class TargetEntity
+    [Table("target"), Index(nameof(Prefix), IsUnique = true)]
+    internal sealed class TargetEntity
     {
         [Key, Column("target_id")]
         public long Id { get; set; }
@@ -23,7 +23,7 @@ namespace bbqueue.Database.Entities
         public long? GroupLinkId { get; set; }
 
         [ForeignKey(nameof(GroupLinkId))]
-        public GroupEntity? GroupLink { get; set; }
+        public GroupEntity? GroupLink { get; set; } = default!;
     }
 }
 

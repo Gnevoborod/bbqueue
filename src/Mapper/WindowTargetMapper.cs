@@ -86,8 +86,8 @@ namespace bbqueue.Mapper
                         Name = windowTarget.Target.GroupLink.Name,
                         Description = windowTarget.Target.GroupLink.Description,
                         GroupLinkId = windowTarget.Target.GroupLink.GroupLinkId,
-                        GroupLink = null /* Stop recursive mapping */
-                    } : null
+                        GroupLink = null! /* Stop recursive mapping */
+                    } : null!
                 }
             };
         }

@@ -8,10 +8,9 @@ namespace bbqueue.Controllers.Dtos.Window
     public sealed class ChangeWindowWorkStateDto
     {
         [Required, MaxLength(6)]
-        public string number { get; set; } = default!;
+        public string Number { get; set; } = default!;
         [Required]
-        [StringValueScope("Opened","Closed","Suspended")]
-        public string windowWorkState { get; set; } = default!;
-
+        [EnumValueScope(typeof(WindowWorkState))]
+        public string WindowWorkState { get; set; } = default!;
     }
 }

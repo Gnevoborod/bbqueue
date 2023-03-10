@@ -21,5 +21,6 @@ namespace bbqueue.Database.Entities
 
         [Column("role")]
         public EmployeeRole Role { get; set; }
+
     }
 }

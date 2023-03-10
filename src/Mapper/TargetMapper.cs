@@ -46,8 +46,8 @@ namespace bbqueue.Mapper
                     Name = target.GroupLink.Name,
                     Description = target.GroupLink.Description,
                     GroupLinkId = target.GroupLink.GroupLinkId,
-                    GroupLink = null /* Stop recursive mapping */
-                } : null
+                    GroupLink = null! /* Stop recursive mapping */
+                } : null!
             };
         }
 

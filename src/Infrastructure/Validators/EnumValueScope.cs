@@ -4,13 +4,15 @@ using bbqueue.Domain.Models;
 
 namespace bbqueue.Infrastructure.Validators
 {
-    public class StringValueScope : ValidationAttribute
+    public class EnumValueScope : ValidationAttribute
     {
         string[] values;
+        Type type;
 
-        public StringValueScope(params string[] values)
+        public EnumValueScope(Type t)
         {
-            this.values = values;
+            this.values = Enum.GetNames(t);
+            this.type = t;
         }
 
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
@@ -24,7 +26,7 @@ namespace bbqueue.Infrastructure.Validators
             {
                 if (nextItem.ToLower()==compare.ToLower())
                 {
-                    var enumItems = Enum.GetNames(typeof(WindowWorkState));
+                    var enumItems = Enum.GetNames(type);
                     foreach (var enumItem in enumItems)
                     {
                         if (compare.ToLower() == enumItem.ToString().ToLower())

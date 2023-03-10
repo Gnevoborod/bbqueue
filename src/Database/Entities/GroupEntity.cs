@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using bbqueue.Controllers.Dtos.Group;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace bbqueue.Database.Entities
 {
     [Table("group")]
-    public sealed class GroupEntity
+    internal sealed class GroupEntity
     {
         [Key, Column("group_id")]
         public long Id { get; set; }
@@ -19,6 +20,6 @@ namespace bbqueue.Database.Entities
         public long? GroupLinkId { get; set; }
 
         [ForeignKey(nameof(GroupLinkId))]
-        public GroupEntity? GroupLink { get; set; }
+        public GroupEntity? GroupLink { get; set; } = default!;
     }
 }

@@ -6,8 +6,6 @@ namespace bbqueue.Mapper
     {
         public static TicketOperation FromEntityToModel(this TicketOperationEntity ticketOperationEntity)
         {
-            if (ticketOperationEntity == null)
-                return default!;
             return new TicketOperation
             {
                 Id = ticketOperationEntity.Id,
@@ -22,7 +20,6 @@ namespace bbqueue.Mapper
                     Closed = ticketOperationEntity.Ticket.Closed
                 },
                 TargetId = ticketOperationEntity.TargetId,
-                Target = ticketOperationEntity.Target,
                 WindowId = ticketOperationEntity.WindowId,
                 Window = ticketOperationEntity.Window != null ? new Window
                 {
@@ -56,8 +53,6 @@ namespace bbqueue.Mapper
 
         public static TicketOperationEntity FromModelToEntity(this TicketOperation ticketOperation)
         {
-            if (ticketOperation == null)
-                return default!;
             return new TicketOperationEntity
             {
                 Id = ticketOperation.Id,
@@ -72,7 +67,6 @@ namespace bbqueue.Mapper
                     Closed = ticketOperation.Ticket.Closed
                 },
                 TargetId = ticketOperation.TargetId,
-                Target = ticketOperation.Target,
                 WindowId = ticketOperation.WindowId,
                 Window = ticketOperation.Window != null ? new WindowEntity
                 {

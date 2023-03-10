@@ -32,7 +32,7 @@ namespace bbqueue.Mapper
                 Name = group.Name,
                 Description = group.Description,
                 GroupLinkId = group.GroupLinkId,
-                GroupLink = group.GroupLink == null? null : FromModelToEntity(group.GroupLink)
+                GroupLink = group.GroupLink == null? null! : FromModelToEntity(group.GroupLink)
             };
         }
 

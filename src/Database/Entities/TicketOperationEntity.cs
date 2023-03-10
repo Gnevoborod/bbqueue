@@ -17,7 +17,7 @@ namespace bbqueue.Database.Entities
         [Column("target_id")]
         public long? TargetId { get; set; }
         [ForeignKey(nameof(TargetId))]
-        public Target? Target { get; set; }
+        internal TargetEntity? TargetEntity { get; set; }
 
         [Column("window_id")]
         public long? WindowId { get; set; }

@@ -19,6 +19,6 @@ namespace bbqueue.Database.Entities
         public long TargetId { get; set; }
 
         [ForeignKey(nameof(TargetId))]
-        public TargetEntity Target { get; set; } = default!;
+        internal TargetEntity Target { get; set; } = default!;
     }
 }
