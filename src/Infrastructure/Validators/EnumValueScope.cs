@@ -11,6 +11,12 @@ namespace bbqueue.Infrastructure.Validators
 
         public EnumValueScope(Type t)
         {
+            if(!t.IsEnum)
+            {
+                type = t;
+                throw new Exception("Используемый в ограничении тип - не enum");
+            }
+
             this.values = Enum.GetNames(t);
             this.type = t;
         }
@@ -20,6 +26,10 @@ namespace bbqueue.Infrastructure.Validators
             if (value == null)
             {
                 return new ValidationResult("Пустое значение");
+            }
+            if(!type.IsEnum)
+            {
+                return new ValidationResult("Используемый в ограничении тип - не enum");
             }
             string compare = new(value.ToString());//какая-то абсолютно идиотская вышла заглушка, но иначе ругалось
             foreach(var nextItem in values)
