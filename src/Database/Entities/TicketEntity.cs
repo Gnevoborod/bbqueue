@@ -4,13 +4,16 @@ using bbqueue.Domain.Models;
 namespace bbqueue.Database.Entities
 {
     [Table("ticket")]
-    internal sealed class TicketEntity
+    public sealed class TicketEntity
     {
         [Key, Column("ticket_id")]
         public long Id { get; set; }
 
         [Column("number")]
         public int Number { get; set; }
+
+        [Column("public_number")]
+        public string PublicNumber { get; set; } = default!;
 
         [Column("state")]
         public TicketState State { get; set; }

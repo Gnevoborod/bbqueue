@@ -1,16 +1,17 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace bbqueue.Database.Entities
 {
-    [Table("target")]
+    [Table("target"), Index(nameof(Prefix), IsUnique = true)]
     internal sealed class TargetEntity
     {
         [Key, Column("target_id")]
         public long Id { get; set; }
 
         [Column("name"), MaxLength(64)]
-        public string Name { get; set; } = null!;
+        public string Name { get; set; } = default!;
 
         [Column("description"), MaxLength(256)]
         public string? Description { get; set; }
@@ -22,7 +23,7 @@ namespace bbqueue.Database.Entities
         public long? GroupLinkId { get; set; }
 
         [ForeignKey(nameof(GroupLinkId))]
-        public GroupEntity? GroupLink { get; set; }
+        public GroupEntity? GroupLink { get; set; } = default!;
     }
 }
 

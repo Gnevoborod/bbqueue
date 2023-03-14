@@ -4,10 +4,8 @@ namespace bbqueue.Mapper
 {
     internal static class TicketOperationMapper
     {
-        public static TicketOperation? FromEntityToModel(this TicketOperationEntity ticketOperationEntity)
+        public static TicketOperation FromEntityToModel(this TicketOperationEntity ticketOperationEntity)
         {
-            if (ticketOperationEntity == null)
-                return null;
             return new TicketOperation
             {
                 Id = ticketOperationEntity.Id,
@@ -16,10 +14,12 @@ namespace bbqueue.Mapper
                 {
                     Id = ticketOperationEntity.Ticket.Id,
                     Number = ticketOperationEntity.Ticket.Number,
+                    PublicNumber = ticketOperationEntity.Ticket.PublicNumber,
                     State = ticketOperationEntity.Ticket.State,
                     Created = ticketOperationEntity.Ticket.Created,
                     Closed = ticketOperationEntity.Ticket.Closed
                 },
+                TargetId = ticketOperationEntity.TargetId,
                 WindowId = ticketOperationEntity.WindowId,
                 Window = ticketOperationEntity.Window != null ? new Window
                 {
@@ -32,8 +32,10 @@ namespace bbqueue.Mapper
                         Id = ticketOperationEntity.Window.Employee.Id,
                         ExternalSystemIdentity = ticketOperationEntity.Window.Employee.ExternalSystemIdentity,
                         Name = ticketOperationEntity.Window.Employee.Name,
-                        Active = ticketOperationEntity.Window.Employee.Active
-                    } : null
+                        Active = ticketOperationEntity.Window.Employee.Active,
+                        Role = ticketOperationEntity.Window.Employee.Role
+                    } : null,
+                    WindowWorkState = ticketOperationEntity.Window.WindowWorkState
                 } : null,
                 EmployeeId = ticketOperationEntity.EmployeeId,
                 Employee = ticketOperationEntity.Employee != null ? new Employee
@@ -41,17 +43,16 @@ namespace bbqueue.Mapper
                     Id = ticketOperationEntity.Employee.Id,
                     ExternalSystemIdentity = ticketOperationEntity.Employee.ExternalSystemIdentity,
                     Name = ticketOperationEntity.Employee.Name,
-                    Active = ticketOperationEntity.Employee.Active
+                    Active = ticketOperationEntity.Employee.Active,
+                    Role = ticketOperationEntity.Employee.Role
                 } : null,
                 State = ticketOperationEntity.State,
                 Processed = ticketOperationEntity.Processed
             };
         }
 
-        public static TicketOperationEntity? FromModelToEntity(this TicketOperation ticketOperation)
+        public static TicketOperationEntity FromModelToEntity(this TicketOperation ticketOperation)
         {
-            if (ticketOperation == null)
-                return null;
             return new TicketOperationEntity
             {
                 Id = ticketOperation.Id,
@@ -60,10 +61,12 @@ namespace bbqueue.Mapper
                 {
                     Id = ticketOperation.Ticket.Id,
                     Number = ticketOperation.Ticket.Number,
+                    PublicNumber = ticketOperation.Ticket.PublicNumber,
                     State = ticketOperation.Ticket.State,
                     Created = ticketOperation.Ticket.Created,
                     Closed = ticketOperation.Ticket.Closed
                 },
+                TargetId = ticketOperation.TargetId,
                 WindowId = ticketOperation.WindowId,
                 Window = ticketOperation.Window != null ? new WindowEntity
                 {
@@ -76,8 +79,10 @@ namespace bbqueue.Mapper
                         Id = ticketOperation.Window.Employee.Id,
                         ExternalSystemIdentity = ticketOperation.Window.Employee.ExternalSystemIdentity,
                         Name = ticketOperation.Window.Employee.Name,
-                        Active = ticketOperation.Window.Employee.Active
-                    } : null
+                        Active = ticketOperation.Window.Employee.Active,
+                        Role = ticketOperation.Window.Employee.Role
+                    } : null,
+                    WindowWorkState = ticketOperation.Window.WindowWorkState
                 } : null,
                 EmployeeId = ticketOperation.EmployeeId,
                 Employee = ticketOperation.Employee != null ? new EmployeeEntity
@@ -85,7 +90,8 @@ namespace bbqueue.Mapper
                     Id = ticketOperation.Employee.Id,
                     ExternalSystemIdentity = ticketOperation.Employee.ExternalSystemIdentity,
                     Name = ticketOperation.Employee.Name,
-                    Active = ticketOperation.Employee.Active
+                    Active = ticketOperation.Employee.Active,
+                    Role = ticketOperation.Employee.Role
                 } : null,
                 State = ticketOperation.State,
                 Processed = ticketOperation.Processed

@@ -4,10 +4,10 @@ namespace bbqueue.Mapper
 {
     internal static class WindowTargetMapper
     {
-        public static WindowTarget? FromEntityToModel(this WindowTargetEntity windowTargetEntity)
+        public static WindowTarget FromEntityToModel(this WindowTargetEntity windowTargetEntity)
         {
             if (windowTargetEntity == null)
-                return null;
+                return default!;
             return new WindowTarget
             {
                 Id = windowTargetEntity.Id,
@@ -23,8 +23,10 @@ namespace bbqueue.Mapper
                         Id = windowTargetEntity.Window.Employee.Id,
                         ExternalSystemIdentity = windowTargetEntity.Window.Employee.ExternalSystemIdentity,
                         Name = windowTargetEntity.Window.Employee.Name,
-                        Active = windowTargetEntity.Window.Employee.Active
-                    } : null
+                        Active = windowTargetEntity.Window.Employee.Active,
+                        Role = windowTargetEntity.Window.Employee.Role
+                    } : null,
+                    WindowWorkState = windowTargetEntity.Window.WindowWorkState
                 },
                 TargetId = windowTargetEntity.TargetId,
                 Target = new Target
@@ -40,16 +42,16 @@ namespace bbqueue.Mapper
                         Name = windowTargetEntity.Target.GroupLink.Name,
                         Description = windowTargetEntity.Target.GroupLink.Description,
                         GroupLinkId = windowTargetEntity.Target.GroupLink.GroupLinkId,
-                        GroupLink = null /* Вынужденная заглушка, иначе так и будем маппить до потери сознания */
+                        GroupLink =null /* Stop recursive mapping */
                     } : null
                 }
             };
         }
 
-        public static WindowTargetEntity? FromModelToEntity(this WindowTarget windowTarget)
+        public static WindowTargetEntity FromModelToEntity(this WindowTarget windowTarget)
         {
             if (windowTarget == null)
-                return null;
+                return default!;
             return new WindowTargetEntity
             {
                 Id = windowTarget.Id,
@@ -65,8 +67,10 @@ namespace bbqueue.Mapper
                         Id = windowTarget.Window.Employee.Id,
                         ExternalSystemIdentity = windowTarget.Window.Employee.ExternalSystemIdentity,
                         Name = windowTarget.Window.Employee.Name,
-                        Active = windowTarget.Window.Employee.Active
-                    } : null
+                        Active = windowTarget.Window.Employee.Active,
+                        Role = windowTarget.Window.Employee.Role
+                    } : null,
+                    WindowWorkState = windowTarget.Window.WindowWorkState
                 },
                 TargetId = windowTarget.TargetId,
                 Target = new TargetEntity
@@ -82,8 +86,8 @@ namespace bbqueue.Mapper
                         Name = windowTarget.Target.GroupLink.Name,
                         Description = windowTarget.Target.GroupLink.Description,
                         GroupLinkId = windowTarget.Target.GroupLink.GroupLinkId,
-                        GroupLink = null /* Вынужденная заглушка, иначе так и будем маппить до потери сознания */
-                    } : null
+                        GroupLink = null! /* Stop recursive mapping */
+                    } : null!
                 }
             };
         }

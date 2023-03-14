@@ -1,6 +1,11 @@
 using bbqueue.Database;
-using bbqueue.Mapper;
-using System.Runtime.CompilerServices;
+using bbqueue.Domain.Interfaces.Repositories;
+using bbqueue.Domain.Interfaces.Services;
+using bbqueue.Infrastructure;
+using bbqueue.Infrastructure.Repositories;
+using bbqueue.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 namespace bbqueue
 {
@@ -17,8 +22,47 @@ namespace bbqueue
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            var app = builder.Build();
+            //builder.Services.AddScoped<QueueContext>();
+            builder.Services.AddDbContext<QueueContext>();
+            builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+            builder.Services.AddScoped<IGroupService, GroupService>();
+            
+            builder.Services.AddScoped<ITargetRepository,TargetRepository>();
+            builder.Services.AddScoped<ITargetService,TargetService>();
 
+            builder.Services.AddScoped<IWindowRepository, WindowRepository>();
+            builder.Services.AddScoped<IWindowService, WindowService>();
+
+            builder.Services.AddScoped<ITicketRepository,TicketRepository>();
+            builder.Services.AddScoped<ITicketService,TicketService>();
+
+            builder.Services.AddScoped<IQueueService,QueueService>();
+
+            builder.Services.AddScoped<IEmployeeService,EmployeeService>();
+            builder.Services.AddScoped<IEmployeeRepository,EmployeeRepository>();
+
+            builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
+
+            builder.Services.AddAuthorization();
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(
+                options=>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = AuthOptions.ISSUER,
+                        ValidateAudience = true,
+                        ValidAudience = AuthOptions.AUDIENCE,
+                        ValidateLifetime = true,
+                        IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                        ValidateIssuerSigningKey = true
+                    };
+                }
+                );
+
+            var app = builder.Build();
+            
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -28,18 +72,12 @@ namespace bbqueue
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
             app.MapControllers();
-            var config = new ConfigurationBuilder()
-                        .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                        .AddJsonFile("appsettings.json").Build();
-            string connectionString=config.GetSection("ConnectionStrings").GetValue("DatabaseConnectionString", "");
-            //DBCONETXT SECTION
-            QueueContext queueContext= new QueueContext(connectionString);
-           
-            // test of extensions queueContext.FromEntitiesToModels(queueContext.EmployeeEntity.ToList());
+        
             app.Run();
         }
     }

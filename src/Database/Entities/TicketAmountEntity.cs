@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace bbqueue.Database.Entities
 {
-    [Table("ticket_amount")]
-    internal sealed class TicketAmountEntity
+    [Table("ticket_amount"), Index(nameof(Prefix), IsUnique = true)]
+    public sealed class TicketAmountEntity
     {
         [Key, Column("ticket_amount_id")]
         public long Id { get; set; }

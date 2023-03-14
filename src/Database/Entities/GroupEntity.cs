@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using bbqueue.Controllers.Dtos.Group;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace bbqueue.Database.Entities
 {
@@ -11,7 +11,7 @@ namespace bbqueue.Database.Entities
         public long Id { get; set; }
 
         [Column("name"), MaxLength(64)]
-        public string Name { get; set; } = null!;
+        public string Name { get; set; } = default!;
 
         [Column("description"), MaxLength(256)]
         public string? Description { get; set; }
@@ -20,6 +20,6 @@ namespace bbqueue.Database.Entities
         public long? GroupLinkId { get; set; }
 
         [ForeignKey(nameof(GroupLinkId))]
-        public GroupEntity? GroupLink { get; set; }
+        public GroupEntity? GroupLink { get; set; } = default!;
     }
 }

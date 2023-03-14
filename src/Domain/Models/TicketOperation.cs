@@ -1,11 +1,14 @@
 ﻿namespace bbqueue.Domain.Models
 {
-    internal sealed class TicketOperation
+    public sealed class TicketOperation
     {
         public long Id { get; set; }
 
         public long TicketId { get; set; }
-        public Ticket Ticket { get; set; } = null!;
+        public Ticket Ticket { get; set; } = default!;
+
+        public long? TargetId { get; set; }
+        public Target? Target { get; set; }
 
         public long? WindowId { get; set; }
 

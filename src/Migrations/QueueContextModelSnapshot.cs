@@ -46,6 +46,10 @@ namespace bbqueue.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("name");
 
+                    b.Property<int>("Role")
+                        .HasColumnType("integer")
+                        .HasColumnName("role");
+
                     b.HasKey("Id");
 
                     b.ToTable("employee");
@@ -114,6 +118,9 @@ namespace bbqueue.Migrations
 
                     b.HasIndex("GroupLinkId");
 
+                    b.HasIndex("Prefix")
+                        .IsUnique();
+
                     b.ToTable("target");
                 });
 
@@ -135,6 +142,9 @@ namespace bbqueue.Migrations
                         .HasColumnName("prefix");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Prefix")
+                        .IsUnique();
 
                     b.ToTable("ticket_amount");
                 });
@@ -159,6 +169,11 @@ namespace bbqueue.Migrations
                     b.Property<int>("Number")
                         .HasColumnType("integer")
                         .HasColumnName("number");
+
+                    b.Property<string>("PublicNumber")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("public_number");
 
                     b.Property<int>("State")
                         .HasColumnType("integer")
@@ -189,6 +204,10 @@ namespace bbqueue.Migrations
                     b.Property<int>("State")
                         .HasColumnType("integer")
                         .HasColumnName("state");
+
+                    b.Property<long?>("TargetId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("target_id");
 
                     b.Property<long>("TicketId")
                         .HasColumnType("bigint")
@@ -223,7 +242,7 @@ namespace bbqueue.Migrations
                         .HasColumnType("character varying(256)")
                         .HasColumnName("description");
 
-                    b.Property<long>("EmployeeId")
+                    b.Property<long?>("EmployeeId")
                         .HasColumnType("bigint")
                         .HasColumnName("employee_id");
 
@@ -232,6 +251,10 @@ namespace bbqueue.Migrations
                         .HasMaxLength(6)
                         .HasColumnType("character varying(6)")
                         .HasColumnName("number");
+
+                    b.Property<int>("WindowWorkState")
+                        .HasColumnType("integer")
+                        .HasColumnName("window_work_state");
 
                     b.HasKey("Id");
 
@@ -258,8 +281,6 @@ namespace bbqueue.Migrations
                         .HasColumnName("window_id");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TargetId");
 
                     b.HasIndex("WindowId");
 
@@ -311,28 +332,18 @@ namespace bbqueue.Migrations
                 {
                     b.HasOne("bbqueue.Database.Entities.EmployeeEntity", "Employee")
                         .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("EmployeeId");
 
                     b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("bbqueue.Database.Entities.WindowTargetEntity", b =>
                 {
-                    b.HasOne("bbqueue.Database.Entities.TargetEntity", "Target")
-                        .WithMany()
-                        .HasForeignKey("TargetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("bbqueue.Database.Entities.WindowEntity", "Window")
                         .WithMany()
                         .HasForeignKey("WindowId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Target");
 
                     b.Navigation("Window");
                 });

@@ -5,26 +5,33 @@ using System.Diagnostics;
 
 namespace bbqueue.Database
 {
-    internal sealed class QueueContext : DbContext
+    public sealed class QueueContext : DbContext
     {
-        public DbSet<WindowEntity> WindowEntity { get; set; }
-        public DbSet<WindowTargetEntity> WindowTargetEntity { get; set; }
+        public DbSet<WindowEntity> WindowEntity { get; set; } = default!;
 
-        public DbSet<TicketEntity> TicketEntity { get; set; }
-        public DbSet<TicketAmountEntity> TicketAmountEntity { get; set; }
-        public DbSet<TicketOperationEntity> TicketOperationEntity { get; set; }
-        public DbSet<GroupEntity> GroupEntity { get; set; }
-        public DbSet<TargetEntity> TargetEntity { get; set; }
+        public DbSet<TicketEntity> TicketEntity { get; set; } = default!;
+        public DbSet<TicketAmountEntity> TicketAmountEntity { get; set; } = default!;
+        public DbSet<TicketOperationEntity> TicketOperationEntity { get; set; } = default!;
+        internal DbSet<GroupEntity> GroupEntity { get; set; } = default!;
+        internal DbSet<TargetEntity> TargetEntity { get; set; } = default!;
+        public DbSet<WindowTargetEntity> WindowTargetEntity { get; set; } = default!;
+        public DbSet<EmployeeEntity> EmployeeEntity { get; set; } = default!;
+        private static string? connectionString;
 
-        public DbSet<EmployeeEntity> EmployeeEntity { get; set; }
-        private readonly string connectionString;
-        public QueueContext(string connectionString)
+        private void SetConnectionString()
         {
-            this.connectionString = connectionString;
-            //Database.EnsureDeleted();
-            //Database.EnsureCreated();
-            Database.Migrate();
+            var config = new ConfigurationBuilder()
+                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                    .AddJsonFile("appsettings.json").Build();
+            connectionString = config.GetConnectionString("DatabaseConnectionString") ?? throw new NullReferenceException("Невозможно получить путь к базе");
         }
+
+        public QueueContext() 
+        {
+            if (connectionString == null)
+                SetConnectionString();
+        }
+        
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -1,14 +1,16 @@
 ﻿using bbqueue.Database.Entities;
 using bbqueue.Domain.Models;
+using System.Runtime.CompilerServices;
+using bbqueue.Controllers.Dtos.Target;
 
 namespace bbqueue.Mapper
 {
     internal static class TargetMapper
     {
-        public static Target? FromEntityToModel(this TargetEntity targetEntity)
+        public static Target FromEntityToModel(this TargetEntity targetEntity)
         {
             if (targetEntity == null)
-                return null;
+                return default!;
             return new Target
             {
                 Id = targetEntity.Id,
@@ -22,15 +24,15 @@ namespace bbqueue.Mapper
                     Name = targetEntity.GroupLink.Name,
                     Description = targetEntity.GroupLink.Description,
                     GroupLinkId = targetEntity.GroupLink.GroupLinkId,
-                    GroupLink = null /* Вынужденная заглушка, иначе так и будем маппить до потери сознания */
+                    GroupLink = null /* Stop recursive mapping */
                 } : null
             };
         }
 
-        public static TargetEntity? FromModelToEntity(this Target target)
+        public static TargetEntity FromModelToEntity(this Target target)
         {
             if (target == null)
-                return null;
+                return default!;
             return new TargetEntity
             {
                 Id = target.Id,
@@ -44,8 +46,22 @@ namespace bbqueue.Mapper
                     Name = target.GroupLink.Name,
                     Description = target.GroupLink.Description,
                     GroupLinkId = target.GroupLink.GroupLinkId,
-                    GroupLink = null /* Вынужденная заглушка, иначе так и будем маппить до потери сознания */
-                } : null
+                    GroupLink = null! /* Stop recursive mapping */
+                } : null!
+            };
+        }
+
+        public static TargetDto FromModelToDto(this Target target)
+        {
+            if (target == null)
+                return default!;
+            return new TargetDto
+            {
+                Id = target.Id,
+                Name = target.Name,
+                Description = target.Description,
+                Prefix = target.Prefix,
+                GroupLinkId = target.GroupLinkId
             };
         }
     }
