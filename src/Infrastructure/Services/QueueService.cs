@@ -7,11 +7,11 @@ namespace bbqueue.Infrastructure.Services
 {
     public class QueueService:IQueueService
     {
-        IServiceProvider serviceProvider;
+        ITicketRepository ticketRepository;
 
-        public QueueService(IServiceProvider serviceProvider)
+        public QueueService(ITicketRepository ticketRepository)
         {
-            this.serviceProvider = serviceProvider;
+            this.ticketRepository = ticketRepository;
         }
 
         public async Task AddTicketToQueueAsync(Ticket ticket)
@@ -33,10 +33,9 @@ namespace bbqueue.Infrastructure.Services
             await Task.Run(() => { Thread.Sleep(100); }); 
         }
 
-        public async Task<Ticket> GetTicketNextTicketFromQueueAsync(long windowId, CancellationToken cancellationToken) 
+        public Task<Ticket?> GetTicketNextTicketFromQueueAsync(long employeeId, CancellationToken cancellationToken) 
         {
-            await Task.Run(() => { Thread.Sleep(100); });
-            return new();//тут нужно будет дёргать очередь
+            return ticketRepository.GetNextTicketAsync(employeeId, cancellationToken);
         }
 
         public async Task<Ticket> GetNextSpecificTicketFromQueueAsync(long ticketNumber, CancellationToken cancellationToken)
@@ -65,9 +64,10 @@ namespace bbqueue.Infrastructure.Services
             return new();
         }
 
-        private async Task<List<long>> GetListOfTicketsAsync(long windowId, CancellationToken cancellationToken)
+        private Task<List<long>> GetListOfTicketsAsync(long windowId, CancellationToken cancellationToken)
         {
-            //переписать(?)
+
+            /*переписать(?)
             var ticketOperations = await serviceProvider
                            .GetService<ITicketRepository>()!
                            .GetTicketOperationByWindowPlusTargetAsync(windowId, cancellationToken);
@@ -77,6 +77,8 @@ namespace bbqueue.Infrastructure.Services
                 tickets.Add((long)to.TicketId!);
             }
             return tickets;
+            */
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace bbqueue.Controllers.Dtos.Employee
+﻿namespace bbqueue.Controllers.Dtos.Authorization
 {
     public class JwtDto
     {

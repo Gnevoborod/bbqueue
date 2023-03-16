@@ -23,15 +23,23 @@ namespace bbqueue.Infrastructure.Repositories
 
         }
 
-        public async Task ChangeWindowWorkStateAsync(Window window, CancellationToken cancellationToken)
+        public async Task ChangeWindowWorkStateAsync(Window window, long employeeId, CancellationToken cancellationToken)
         {
             var windowEntity = await queueContext
                                     .WindowEntity
                                     .SingleOrDefaultAsync(we => we.Number == window.Number);
             if (windowEntity == null)
                 throw new Exception("Не удалось найти окно по номеру"); //Тут нужен свой эксепшн
+            if (windowEntity.EmployeeId != employeeId)
+                throw new Exception("Невозможно изменить состояние окна, так как к данному окну привязан другой пользователь.");
             windowEntity.WindowWorkState = window.WindowWorkState;
             await queueContext.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<Window> GetWindowByEmployeeId(long employeeId, CancellationToken cancellationToken)
+        {
+            var window = await queueContext.WindowEntity.SingleOrDefaultAsync(w=>w.EmployeeId==employeeId, cancellationToken);
+            return window == null ? default! : window.FromEntityToModel();
         }
     }
 }

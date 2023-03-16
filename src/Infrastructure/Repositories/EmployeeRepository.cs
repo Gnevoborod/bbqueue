@@ -16,15 +16,31 @@ namespace bbqueue.Infrastructure.Repositories
         }
         public async Task AddEmployeeAsync(EmployeeEntity employeeEntity, CancellationToken cancellationToken)
         {
-            await Task.Run(() => Thread.Sleep(100));
+            queueContext.EmployeeEntity.Add(employeeEntity);
+            await queueContext.SaveChangesAsync(cancellationToken);
         }
         public async Task SetRoleToEmployeeAsync(long employeeId, EmployeeRole role, CancellationToken cancellationToken)
         {
-            await Task.Run(() => Thread.Sleep(100));
+            var employee = await queueContext.EmployeeEntity.SingleOrDefaultAsync(e=>e.Id==employeeId, cancellationToken);
+            if (employee == null)
+                throw new Exception("Пользователь не найден");
+            employee.Role = role;
+            await queueContext.SaveChangesAsync(cancellationToken);
         }
-        public async Task AddEmployeeToWindowAsync(EmployeeEntity employeeEntity, WindowEntity windowEntity, CancellationToken cancellationToken)
+        public async Task AddEmployeeToWindowAsync(long employeeEntityId, long windowEntityId, CancellationToken cancellationToken)
         {
-            await Task.Run(() => Thread.Sleep(100));
+            var window = await queueContext.WindowEntity.SingleOrDefaultAsync(w => w.Id == windowEntityId, cancellationToken);
+            if (window == null)
+                throw new Exception("Не найдено указанного окна");
+            //нашли окно - ищем есть ли другие окна с этим сотрудником. Один сотрудник - одно окно
+            var oldWindow = await queueContext.WindowEntity.SingleOrDefaultAsync(w => w.EmployeeId == employeeEntityId, cancellationToken);
+            if(oldWindow!=null)
+            {
+                oldWindow.EmployeeId = null;
+            }
+            window.EmployeeId = employeeEntityId;
+            await queueContext.SaveChangesAsync(cancellationToken);
+
         }
 
         public async Task<Employee> GetEmployeeInfoAsync(string externalNumber, CancellationToken cancellationToken)

@@ -11,7 +11,7 @@ namespace bbqueue.Domain.Interfaces.Services
 
         public Task ClearQueueAsync(CancellationToken cancellationToken);
 
-        public Task<Ticket> GetTicketNextTicketFromQueueAsync(long windowId, CancellationToken cancellationToken);
+        public Task<Ticket?> GetTicketNextTicketFromQueueAsync(long windowId, CancellationToken cancellationToken);
 
         public Task<Ticket> GetNextSpecificTicketFromQueueAsync(long ticketNumber, CancellationToken cancellationToken);
 

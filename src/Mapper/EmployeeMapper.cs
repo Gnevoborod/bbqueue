@@ -1,4 +1,5 @@
-﻿using bbqueue.Database.Entities;
+﻿using bbqueue.Controllers.Dtos.Employee;
+using bbqueue.Database.Entities;
 using bbqueue.Domain.Models;
 
 namespace bbqueue.Mapper
@@ -24,6 +25,46 @@ namespace bbqueue.Mapper
             if (employee == null)
                 return default!;
             return new EmployeeEntity
+            {
+                Id = employee.Id,
+                ExternalSystemIdentity = employee.ExternalSystemIdentity,
+                Name = employee.Name,
+                Active = employee.Active,
+                Role = employee.Role
+            };
+        }
+
+        public static Employee FromDtoToModel(this EmployeeRegistryDto employeeRegistryDto)
+        {
+            var role = EmployeeRoleFromDtoToValue(employeeRegistryDto.Role);
+            return new Employee
+            {
+                ExternalSystemIdentity = employeeRegistryDto.ExternalSystemId,
+                Name = employeeRegistryDto.Name,
+                Active = employeeRegistryDto.Active,
+                Role = role == null? default! : (EmployeeRole)role
+            };
+        }
+
+
+        public static EmployeeRole? EmployeeRoleFromDtoToValue(string dtoRole)
+        {
+            var enumItems = Enum.GetNames(typeof(EmployeeRole));
+            var enumItemsIndexes = Enum.GetValues(typeof(EmployeeRole));
+            EmployeeRole? role = default;
+            for (int i = 0; i < enumItems.Length; i++)
+            {
+                if (enumItems[i].ToLower() == dtoRole.ToLower())
+                    role = (EmployeeRole?)enumItemsIndexes.GetValue(i);
+            }
+            return role;
+        }
+
+        public static EmployeeDto FromModelToDto(this Employee employee)
+        {
+            if (employee == null)
+                return default!;
+            return new EmployeeDto
             {
                 Id = employee.Id,
                 ExternalSystemIdentity = employee.ExternalSystemIdentity,

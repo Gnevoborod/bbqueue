@@ -47,7 +47,8 @@ namespace bbqueue.Mapper
                     Role = ticketOperationEntity.Employee.Role
                 } : null,
                 State = ticketOperationEntity.State,
-                Processed = ticketOperationEntity.Processed
+                Processed = ticketOperationEntity.Processed,
+                Updated = ticketOperationEntity.Updated
             };
         }
 
@@ -94,7 +95,8 @@ namespace bbqueue.Mapper
                     Role = ticketOperation.Employee.Role
                 } : null,
                 State = ticketOperation.State,
-                Processed = ticketOperation.Processed
+                Processed = ticketOperation.Processed,
+                Updated = ticketOperation.Updated
             };
         }
     }

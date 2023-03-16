@@ -4,6 +4,7 @@ using bbqueue.Mapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using IAuth = bbqueue.Domain.Interfaces.Services.IAuthorizationService;
 namespace bbqueue.Controllers
 {
     [Route("api/window")]
@@ -11,10 +12,12 @@ namespace bbqueue.Controllers
     public sealed class WindowController : ControllerBase
     {
         private readonly IWindowService windowService;
+        private readonly IAuth authrizationService;
 
-        public WindowController(IWindowService windowService)
+        public WindowController(IWindowService windowService, IAuth authorizationService)
         {
             this.windowService = windowService;
+            this.authrizationService = authorizationService;
         }
 
         [Authorize]
@@ -23,7 +26,8 @@ namespace bbqueue.Controllers
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
             var window = dto.FromChangeStateDtoToModel();
-            await windowService.ChangeWindowWorkStateAsync(window, cancellationToken);
+            var employeeId = authrizationService.GetUserId(HttpContext);
+            await windowService.ChangeWindowWorkStateAsync(window, employeeId,  cancellationToken);
             return Ok();
         }
 

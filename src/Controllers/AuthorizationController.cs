@@ -1,4 +1,4 @@
-﻿using bbqueue.Controllers.Dtos.Employee;
+﻿using bbqueue.Controllers.Dtos.Authorization;
 using bbqueue.Domain.Interfaces.Services;
 using bbqueue.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;

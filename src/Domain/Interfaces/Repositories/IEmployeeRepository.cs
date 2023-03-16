@@ -9,7 +9,7 @@ namespace bbqueue.Domain.Interfaces.Repositories
         public Task AddEmployeeAsync(EmployeeEntity employeeEntity, CancellationToken cancellationToken);
         public Task SetRoleToEmployeeAsync(long employeeId, EmployeeRole role, CancellationToken cancellationToken);
 
-        public Task AddEmployeeToWindowAsync(EmployeeEntity employeeEntity, WindowEntity windowEntity, CancellationToken cancellationToken);
+        public Task AddEmployeeToWindowAsync(long employeeEntityId, long windowEntityId, CancellationToken cancellationToken);
 
         public Task<Employee> GetEmployeeInfoAsync(string externalNumber, CancellationToken cancellationToken);
         public Task<Employee> GetEmployeeInfoAsync(long employeeId, CancellationToken cancellationToken);

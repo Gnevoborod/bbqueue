@@ -24,12 +24,21 @@ namespace bbqueue.Infrastructure.Repositories
         }
         public async Task UpdateTicketInDbAsync(TicketEntity ticketEntity, CancellationToken cancellationToken)
         {
-            await Task.Run(() => { Thread.Sleep(100); });//просто заглушка чтоб студия не ругалась на async
+            var ticket = await queueContext.TicketEntity.FirstOrDefaultAsync(te=>te.Id==ticketEntity.Id, cancellationToken);
+            if (ticket == null)
+                throw new Exception("Не найдено талона для обновления");//Тут нужен норм эксепшн
+
+            ticket.State=ticketEntity.State;
+            ticket.Closed=ticketEntity.Closed;
+            await queueContext.SaveChangesAsync(cancellationToken);
         }
-        public async Task<List<Ticket>> LoadTicketsFromDbAsync(bool loadOnlyProcessedTickets, CancellationToken cancellationToken)//true грузим обработанные талоны false необработанные талоны
+        public Task<List<Ticket>> LoadTicketsFromDbAsync(bool loadOnlyProcessedTickets, CancellationToken cancellationToken)//true грузим обработанные талоны false необработанные талоны
         {
-            await Task.Run(() => { Thread.Sleep(100); });//просто заглушка чтоб студия не ругалась на async
-            return new();
+            var state = loadOnlyProcessedTickets ? TicketState.Closed : TicketState.Created;
+            return queueContext.TicketEntity
+                .Where(te => te.State == state)
+                .Select(te=>te.FromEntityToModel())
+                .ToListAsync(cancellationToken);
         }
 
         public async Task SaveLastTicketNumberAsync(int number, char prefix, CancellationToken cancellationToken)
@@ -78,8 +87,12 @@ namespace bbqueue.Infrastructure.Repositories
             var ticketOperationEntityInDb = await queueContext.TicketOperationEntity.FirstOrDefaultAsync(toe=>toe.TicketId==ticketOperationEntity.TicketId);
             if (ticketOperationEntityInDb == null)
                 throw new Exception("Не найдено записи по операции с талоном для обновления");//Тут нужен норм эксепшн
-            
-            ticketOperationEntityInDb = ticketOperationEntity;
+
+            ticketOperationEntityInDb.State = ticketOperationEntity.State;
+            ticketOperationEntityInDb.WindowId = ticketOperationEntity.WindowId;
+            ticketOperationEntityInDb.TargetId = ticketOperationEntity.TargetId;
+            ticketOperationEntityInDb.EmployeeId = ticketOperationEntity.EmployeeId;
+            ticketOperationEntityInDb.Updated = DateTime.UtcNow;
             await queueContext.SaveChangesAsync(cancellationToken);
             
             
@@ -110,6 +123,27 @@ namespace bbqueue.Infrastructure.Repositories
             queueContext.TicketAmountEntity.Add(ticketAmountEntity);
             await queueContext.SaveChangesAsync(cancellationToken);
             return ticketAmountEntity;
+        }
+
+        public async Task<Ticket?> GetNextTicketAsync(long employeeId, CancellationToken cancellationToken)
+        {
+            var window = await (from win in queueContext.WindowEntity
+                                where win.EmployeeId == employeeId
+                                select win).FirstOrDefaultAsync(cancellationToken);
+            if (window == null)
+                throw new Exception("Невозможно взять в работу следующий талон. Пользователь не прикреплён к окну.");
+            var query = await (from toe in queueContext.TicketOperationEntity
+                        join
+                        te in queueContext.TicketEntity
+                        on toe.TicketId equals te.Id
+                        join
+                        wte in queueContext.WindowTargetEntity
+                        on toe.TargetId equals wte.TargetId
+                        where wte.WindowId == window.Id
+                        && te.State == TicketState.Created || te.State == TicketState.Returned//вот тут посложнее логику надо сделать
+                        orderby te.Created
+                        select te).FirstOrDefaultAsync(cancellationToken);
+            return query == null ? default! : query.FromEntityToModel();
         }
     }
 }

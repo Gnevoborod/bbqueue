@@ -15,5 +15,6 @@ namespace bbqueue.Domain.Interfaces.Repositories
         public Task SaveTicketOperationToDbAsync(TicketOperationEntity ticketOperationEntity, CancellationToken cancellationToken);
         public Task UpdateTicketOperationToDbAsync(TicketOperationEntity ticketOperationEntity, CancellationToken cancellationToken);
         public Task<TicketAmount> GetTicketAmountAsync(long targetId, CancellationToken cancellationToken);
+        public Task<Ticket?> GetNextTicketAsync(long windowId, CancellationToken cancellationToken);
     }
 }

@@ -2,6 +2,7 @@
 using bbqueue.Domain.Interfaces.Services;
 using bbqueue.Mapper;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace bbqueue.Controllers
 {
@@ -33,7 +34,7 @@ namespace bbqueue.Controllers
         }
 
         [HttpGet("list")]
-        public async Task<IActionResult> GetTicketListAsync([FromQuery] long EmployeeCode)
+        public async Task<IActionResult> GetTicketListAsync()
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
             var result = await ticketService.LoadTicketsAsync(false, cancellationToken);
