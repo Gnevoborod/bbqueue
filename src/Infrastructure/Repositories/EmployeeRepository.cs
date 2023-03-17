@@ -14,10 +14,10 @@ namespace bbqueue.Infrastructure.Repositories
         {
             this.queueContext = queueContext;
         }
-        public async Task AddEmployeeAsync(EmployeeEntity employeeEntity, CancellationToken cancellationToken)
+        public Task AddEmployeeAsync(EmployeeEntity employeeEntity, CancellationToken cancellationToken)
         {
             queueContext.EmployeeEntity.Add(employeeEntity);
-            await queueContext.SaveChangesAsync(cancellationToken);
+            return queueContext.SaveChangesAsync(cancellationToken);
         }
         public async Task SetRoleToEmployeeAsync(long employeeId, EmployeeRole role, CancellationToken cancellationToken)
         {
@@ -58,10 +58,12 @@ namespace bbqueue.Infrastructure.Repositories
             return employee == null? default! : employee.FromEntityToModel();
         }
 
-        public async Task<List<Employee>> GetEmployeeListAsync(CancellationToken cancellationToken)
+        public Task<List<Employee>> GetEmployeeListAsync(CancellationToken cancellationToken)
         {
-            await Task.Run(() => Thread.Sleep(100));
-            return new();
+            return queueContext
+                    .EmployeeEntity
+                    .Select(ee=>ee.FromEntityToModel())
+                    .ToListAsync(cancellationToken);
         }
     }
 }

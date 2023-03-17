@@ -14,13 +14,11 @@ namespace bbqueue.Infrastructure.Repositories
         {
             this.queueContext = queueContext;
         }
-        public async Task<List<Window>> GetWindowsAsync(CancellationToken cancellationToken)
+        public Task<List<Window>> GetWindowsAsync(CancellationToken cancellationToken)
         {
-            return await queueContext.WindowEntity.OrderBy(w => w.Number)
+            return queueContext.WindowEntity.OrderBy(w => w.Number)
                 .Select(w => w.FromEntityToModel())
                 .ToListAsync(cancellationToken);
-
-
         }
 
         public async Task ChangeWindowWorkStateAsync(Window window, long employeeId, CancellationToken cancellationToken)

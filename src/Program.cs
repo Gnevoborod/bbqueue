@@ -26,7 +26,7 @@ namespace bbqueue
             builder.Services.AddSwaggerGen();
 
             //builder.Services.AddScoped<QueueContext>();
-            builder.Services.AddDbContext<QueueContext>();
+            builder.Services.AddDbContext<QueueContext>(ServiceLifetime.Scoped);
             builder.Services.AddScoped<IGroupRepository, GroupRepository>();
             builder.Services.AddScoped<IGroupService, GroupService>();
 

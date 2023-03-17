@@ -36,8 +36,5 @@ namespace bbqueue.Database.Entities
 
         [Column("processed")]
         public DateTime Processed { get; set; }
-
-        [Column("updated")]
-        public DateTime? Updated { get; set; }
     }
 }

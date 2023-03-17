@@ -26,11 +26,11 @@ namespace bbqueue.Controllers
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
             long employeeId = authorizationService.GetUserId(HttpContext);
-            var ticket = await queueService.GetTicketNextTicketFromQueueAsync(employeeId, cancellationToken);
-            if(ticket !=null)
-            {
-                await ticketService.TakeTicketToWork(ticket, employeeId, cancellationToken);
-            }
+               var ticket = await queueService.GetTicketNextTicketFromQueueAsync(employeeId, cancellationToken);
+               if(ticket !=null)
+               {
+                   await ticketService.TakeTicketToWork(ticket, employeeId, cancellationToken);
+               }
             return Ok(ticket?.FromModelToDto());
         }
     }

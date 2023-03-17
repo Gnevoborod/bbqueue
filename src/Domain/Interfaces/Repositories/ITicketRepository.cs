@@ -10,11 +10,13 @@ namespace bbqueue.Domain.Interfaces.Repositories
         public Task<List<Ticket>> LoadTicketsFromDbAsync(bool loadOnlyProcessedTickets, CancellationToken cancellationToken);
         public Task SaveLastTicketNumberAsync(int number, char prefix, CancellationToken cancellationToken);
         public Task<List<TicketOperation>> GetTicketOperationByWindowPlusTargetAsync(long windowId, CancellationToken cancellationToken);
-        public Task<TicketOperation> GetTicketOperationByTicketAsync(long ticketId, CancellationToken cancellationToken);
         public Task<TicketOperation> GetTicketOperationByTicket(long ticketId, CancellationToken cancellationToken);
         public Task SaveTicketOperationToDbAsync(TicketOperationEntity ticketOperationEntity, CancellationToken cancellationToken);
-        public Task UpdateTicketOperationToDbAsync(TicketOperationEntity ticketOperationEntity, CancellationToken cancellationToken);
         public Task<TicketAmount> GetTicketAmountAsync(long targetId, CancellationToken cancellationToken);
-        public Task<Ticket?> GetNextTicketAsync(long windowId, CancellationToken cancellationToken);
+        public Task<Ticket?> GetNextTicketAsync(long employeeId, CancellationToken cancellationToken);
+        public Task<Ticket?> GetNextSpecificTicketAsync(long ticketId, long employeeId, CancellationToken cancellationToken);
+
+        public Task DeleteAllTicketsFromDBAsync(CancellationToken cancellationToken);
+        public Task<Ticket?> GetTicketByIdAsync(long ticketId, CancellationToken cancellationToken);
     }
 }

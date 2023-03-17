@@ -1,8 +1,10 @@
 ﻿using bbqueue.Controllers.Dtos.Ticket;
 using bbqueue.Domain.Interfaces.Services;
 using bbqueue.Mapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+
+using IAuth = bbqueue.Domain.Interfaces.Services.IAuthorizationService;
 
 namespace bbqueue.Controllers
 {
@@ -11,10 +13,12 @@ namespace bbqueue.Controllers
     public class TicketController : Controller
     {
         private readonly ITicketService ticketService;
+        private readonly IAuth authorizationService;
 
-        public TicketController(ITicketService ticketService)
+        public TicketController(ITicketService ticketService, IAuth authorizationService)
         {
             this.ticketService = ticketService;
+            this.authorizationService = authorizationService;
         }
 
         [HttpGet("ticket")]
@@ -25,11 +29,12 @@ namespace bbqueue.Controllers
             return Ok(ticket.FromModelToDto());
         }
 
+        [Authorize]
         [HttpPost("redirect")]
         public async Task<IActionResult> RedirectTicketToAnotherWindowAsync([FromBody] TicketRedirectDto ticketRedirectDto)
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
-            await ticketService.ChangeTicketTarget(ticketRedirectDto.TicketNumber, ticketRedirectDto.TargetCode, cancellationToken);
+            await ticketService.ChangeTicketTarget(ticketRedirectDto.TicketId, ticketRedirectDto.TargetId, authorizationService.GetUserId(HttpContext),  cancellationToken);
             return Ok();
         }
 

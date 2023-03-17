@@ -2,9 +2,6 @@
 using bbqueue.Domain.Interfaces.Services;
 using bbqueue.Domain.Models;
 using bbqueue.Mapper;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace bbqueue.Infrastructure.Services
 {
@@ -30,21 +27,20 @@ namespace bbqueue.Infrastructure.Services
             return employeeRepository.AddEmployeeToWindowAsync(employeeId, windowId, cancellationToken);
         }
 
-        public async Task<Employee?> GetEmployeeInfoAsync(string externalNumber, CancellationToken cancellationToken)
+        public Task<Employee?> GetEmployeeInfoAsync(string externalNumber, CancellationToken cancellationToken)
         {
-            return await employeeRepository
+            return employeeRepository
                 .GetEmployeeInfoAsync(externalNumber, cancellationToken)!;
         }
-        public async Task<Employee?> GetEmployeeInfoAsync(long employeeId, CancellationToken cancellationToken)
+        public Task<Employee?> GetEmployeeInfoAsync(long employeeId, CancellationToken cancellationToken)
         {
-            return await employeeRepository
+            return employeeRepository
                 .GetEmployeeInfoAsync(employeeId, cancellationToken)!;
         }
 
-        public async Task<List<Employee>> GetEmployeeListAsync(CancellationToken cancellationToken)
+        public Task<List<Employee>> GetEmployeeListAsync(CancellationToken cancellationToken)
         {
-            await Task.Run(() => Thread.Sleep(100));
-            return new();
+            return employeeRepository.GetEmployeeListAsync(cancellationToken);
         }
 
     }

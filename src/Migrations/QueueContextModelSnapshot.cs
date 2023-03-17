@@ -179,6 +179,10 @@ namespace bbqueue.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("state");
 
+                    b.Property<long>("TargetId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("target_id");
+
                     b.HasKey("Id");
 
                     b.ToTable("ticket");
@@ -212,10 +216,6 @@ namespace bbqueue.Migrations
                     b.Property<long>("TicketId")
                         .HasColumnType("bigint")
                         .HasColumnName("ticket_id");
-
-                    b.Property<DateTime?>("Updated")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated");
 
                     b.Property<long?>("WindowId")
                         .HasColumnType("bigint")

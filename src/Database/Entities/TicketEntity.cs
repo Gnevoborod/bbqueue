@@ -18,6 +18,13 @@ namespace bbqueue.Database.Entities
         [Column("state")]
         public TicketState State { get; set; }
 
+        [Column("target_id")]
+        public long TargetId { get; set; }
+
+        [ForeignKey(nameof(TargetId))]
+        internal TargetEntity Target { get; set; } = default!;
+        
+
         [Column("created")]
         public DateTime Created { get; set; }
 

@@ -15,9 +15,9 @@ namespace bbqueue.Infrastructure.Repositories
         {
             this.queueContext = queueContext;
         }
-        public async Task<List<Group>> GetGroupsAsync(CancellationToken cancellationToken)
+        public Task<List<Group>> GetGroupsAsync(CancellationToken cancellationToken)
         {
-            return await queueContext.GroupEntity
+            return queueContext.GroupEntity
                     .OrderByDescending(g => g.GroupLinkId)
                     .Select(g=> g.FromEntityToModel())
                     .ToListAsync(cancellationToken);

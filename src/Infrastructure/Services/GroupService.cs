@@ -11,9 +11,9 @@ namespace bbqueue.Infrastructure.Services
         {
             this.groupRepository = groupRepository;
         }
-        public async Task<List<Group>> GetGroupsAsync(CancellationToken cancellationToken)
+        public Task<List<Group>> GetGroupsAsync(CancellationToken cancellationToken)
         {
-            return await groupRepository.GetGroupsAsync(cancellationToken);
+            return groupRepository.GetGroupsAsync(cancellationToken);
         }
     }
 }

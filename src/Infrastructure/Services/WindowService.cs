@@ -13,14 +13,14 @@ namespace bbqueue.Infrastructure.Services
         {
             this.windowRepository = windowRepository;
         }
-        public async Task<List<Window>> GetWindowsAsync(CancellationToken cancellationToken)
+        public Task<List<Window>> GetWindowsAsync(CancellationToken cancellationToken)
         {
-            return await windowRepository.GetWindowsAsync(cancellationToken);
+            return windowRepository.GetWindowsAsync(cancellationToken);
         }
 
-        public async Task ChangeWindowWorkStateAsync(Window window, long employeeId, CancellationToken cancellationToken)
+        public Task ChangeWindowWorkStateAsync(Window window, long employeeId, CancellationToken cancellationToken)
         {
-            await windowRepository.ChangeWindowWorkStateAsync(window,employeeId, cancellationToken);
+            return windowRepository.ChangeWindowWorkStateAsync(window,employeeId, cancellationToken);
         }
 
     }

@@ -22,6 +22,5 @@
 
         public DateTime Processed { get; set; }
 
-        public DateTime? Updated { get; set; }
     }
 }
