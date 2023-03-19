@@ -31,6 +31,10 @@ namespace bbqueue.Infrastructure.Repositories
             if (windowEntity.EmployeeId != employeeId)
                 throw new Exception("Невозможно изменить состояние окна, так как к данному окну привязан другой пользователь.");
             windowEntity.WindowWorkState = window.WindowWorkState;
+            if(windowEntity.WindowWorkState == WindowWorkState.Closed)
+            {
+                windowEntity.EmployeeId = null;
+            }
             await queueContext.SaveChangesAsync(cancellationToken);
         }
 

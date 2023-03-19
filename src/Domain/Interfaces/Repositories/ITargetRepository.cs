@@ -4,6 +4,11 @@ namespace bbqueue.Domain.Interfaces.Repositories
 {
     public interface ITargetRepository
     {
+        /// <summary>
+        /// Поставляет информацию о целях
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         Task<List<Target>> GetTargetsAsync(CancellationToken cancellationToken);
     }
 }

@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 namespace bbqueue
 {
@@ -90,7 +91,23 @@ namespace bbqueue
                         jwtSecurityScheme, Array.Empty<string>() 
                     }
                 });
+
+
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "BBQueue API",
+                    Description = "BBQueue - очередь лучшей прожарки"
+                });
+
+                // using System.Reflection;
+                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+
             }) ;
+
+
 
             var app = builder.Build();
             

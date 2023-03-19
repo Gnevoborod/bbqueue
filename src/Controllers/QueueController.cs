@@ -1,4 +1,6 @@
-﻿using bbqueue.Domain.Interfaces.Services;
+﻿using bbqueue.Controllers.Dtos.Error;
+using bbqueue.Controllers.Dtos.Ticket;
+using bbqueue.Domain.Interfaces.Services;
 using bbqueue.Mapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +8,7 @@ using IAuthService = bbqueue.Domain.Interfaces.Services.IAuthorizationService;
 namespace bbqueue.Controllers
 {
     [Route("api/queue")]
+    [Produces("application/json")]
     [ApiController]
     public class QueueController : Controller
     {
@@ -20,7 +23,15 @@ namespace bbqueue.Controllers
             this.authorizationService = authorizationService;
         }
 
+
+        /// <summary>
+        /// Вызов следующего талона к определённому окну
+        /// </summary>
+        /// <returns></returns>
         [Authorize]
+        [ProducesResponseType(typeof(TicketDto),200)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(ErrorDto), 401)]
         [HttpPost("nextCustomer")]
         public async Task<IActionResult> GetNextTicket()
         {

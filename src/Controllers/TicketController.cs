@@ -1,4 +1,5 @@
 ﻿using bbqueue.Controllers.Dtos.Ticket;
+using bbqueue.Controllers.Dtos.Error;
 using bbqueue.Domain.Interfaces.Services;
 using bbqueue.Mapper;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +10,7 @@ using IAuth = bbqueue.Domain.Interfaces.Services.IAuthorizationService;
 namespace bbqueue.Controllers
 {
     [Route("api/ticket")]
+    [Produces("application/json")]
     [ApiController]
     public class TicketController : Controller
     {
@@ -21,15 +23,31 @@ namespace bbqueue.Controllers
             this.authorizationService = authorizationService;
         }
 
+        /// <summary>
+        /// Выдаёт новый талон
+        /// </summary>
+        /// <param name="TargetId">Код цели</param>
+        /// <returns></returns>
         [HttpGet("ticket")]
-        public async Task<IActionResult> GetTicketAsync([FromQuery]long TargetCode)
+        [ProducesResponseType(typeof(TicketDto),200)]
+        [ProducesResponseType(typeof(ErrorDto),400)]
+        public async Task<IActionResult> GetTicketAsync([FromQuery]long TargetId)
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
-            var ticket = await ticketService.CreateTicketAsync(TargetCode, cancellationToken);
+            var ticket = await ticketService.CreateTicketAsync(TargetId, cancellationToken);
             return Ok(ticket.FromModelToDto());
         }
 
+
+        /// <summary>
+        /// Осуществляет перенаправление талона на другую цель
+        /// </summary>
+        /// <param name="ticketRedirectDto"></param>
+        /// <returns></returns>
         [Authorize]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(ErrorDto),401)]
         [HttpPost("redirect")]
         public async Task<IActionResult> RedirectTicketToAnotherWindowAsync([FromBody] TicketRedirectDto ticketRedirectDto)
         {
@@ -38,6 +56,13 @@ namespace bbqueue.Controllers
             return Ok();
         }
 
+
+        /// <summary>
+        /// Поставляет список необработанных талонов
+        /// </summary>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
         [HttpGet("list")]
         public async Task<IActionResult> GetTicketListAsync()
         {

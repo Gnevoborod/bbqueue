@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using bbqueue.Infrastructure.Services;
 using bbqueue.Mapper;
 using bbqueue.Controllers.Dtos.Target;
 using bbqueue.Controllers.Dtos.Group;
 using bbqueue.Domain.Interfaces.Services;
+using bbqueue.Controllers.Dtos.Error;
 
 namespace bbqueue.Controllers
 {
     [Route("api/target")]
+    [Produces("application/json")]
     [ApiController]
     public sealed class TargetController : ControllerBase
     {
@@ -20,6 +21,12 @@ namespace bbqueue.Controllers
             this.groupService = groupService;
         }
 
+        /// <summary>
+        /// Поставляет список целей
+        /// </summary>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(TargetListDto),200)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
         [HttpGet("targets")]
         public async Task<IActionResult> GetTargets() 
         {
@@ -33,10 +40,11 @@ namespace bbqueue.Controllers
         }
 
         /// <summary>
-        /// Обновлённый метод возвращающий список подразделов и целей
+        /// Возвращает список подразделов и целей
         /// </summary>
-        /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [ProducesResponseType(typeof(GroupHierarchyDto),200)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
         [HttpGet("hierarchy")]
         public async Task<IActionResult> GetHierarchyAsync()
         {
@@ -46,10 +54,11 @@ namespace bbqueue.Controllers
         }
 
         /// <summary>
-        /// Получаем список разделов\подразделов.
-        /// На фронте для выстраивания дерева страниц потребуется вызов и /targets и /groups
+        /// Поставляет список разделов и подразделов.
         /// </summary>
         /// <returns></returns>
+        [ProducesResponseType(typeof(GroupListDto),200)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
         [HttpGet("groups")]
         public async Task<IActionResult> GetGroupsAsync(CancellationToken cancellationToken)
         {

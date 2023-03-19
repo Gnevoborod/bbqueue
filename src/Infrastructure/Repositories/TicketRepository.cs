@@ -73,10 +73,9 @@ namespace bbqueue.Infrastructure.Repositories
             return ticketOperations.ToListAsync(cancellationToken);
         }
 
-        public async Task<TicketOperation> GetTicketOperationByTicket(long ticketId, CancellationToken cancellationToken)
+        public Task<List<TicketOperation>> GetTicketOperationByTicket(long ticketId, CancellationToken cancellationToken)
         {
-            var ticketOperationEntity = await queueContext.TicketOperationEntity.FirstOrDefaultAsync(to => to.TicketId == ticketId, cancellationToken);
-            return ticketOperationEntity == null ? default! : ticketOperationEntity.FromEntityToModel();
+            return queueContext.TicketOperationEntity.Where(to => to.TicketId == ticketId).Select(to=>to.FromEntityToModel()).ToListAsync(cancellationToken);
         }
 
         public Task SaveTicketOperationToDbAsync(TicketOperationEntity ticketOperationEntity, CancellationToken cancellationToken)
