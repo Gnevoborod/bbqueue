@@ -22,14 +22,31 @@ namespace bbqueue.Infrastructure.Repositories
             await queueContext.SaveChangesAsync(cancellationToken);
             return ticketEntity.Id;
         }
+
+        public async Task<Ticket?> GetTicketByIdAsync(long ticketId, CancellationToken cancellationToken)
+        {
+            var ticket = await queueContext.TicketEntity.SingleOrDefaultAsync(t => t.Id == ticketId,cancellationToken);
+            return ticket == null ? default! : ticket.FromEntityToModel();
+        }
+
         public async Task UpdateTicketInDbAsync(TicketEntity ticketEntity, CancellationToken cancellationToken)
         {
-            await Task.Run(() => { Thread.Sleep(100); });//просто заглушка чтоб студия не ругалась на async
+            var ticket = await queueContext.TicketEntity.FirstOrDefaultAsync(te=>te.Id==ticketEntity.Id, cancellationToken);
+            if (ticket == null)
+                throw new Exception("Не найдено талона для обновления");//Тут нужен норм эксепшн
+
+            ticket.State=ticketEntity.State;
+            ticket.Closed=ticketEntity.Closed;
+            ticket.TargetId=ticketEntity.TargetId; 
+            await queueContext.SaveChangesAsync(cancellationToken);
         }
-        public async Task<List<Ticket>> LoadTicketsFromDbAsync(bool loadOnlyProcessedTickets, CancellationToken cancellationToken)//true грузим обработанные талоны false необработанные талоны
+        public Task<List<Ticket>> LoadTicketsFromDbAsync(bool loadOnlyProcessedTickets, CancellationToken cancellationToken)//true грузим обработанные талоны false необработанные талоны
         {
-            await Task.Run(() => { Thread.Sleep(100); });//просто заглушка чтоб студия не ругалась на async
-            return new();
+            var state = loadOnlyProcessedTickets ? TicketState.Closed : TicketState.Created;
+            return queueContext.TicketEntity
+                .Where(te => te.State == state)
+                .Select(te=>te.FromEntityToModel())
+                .ToListAsync(cancellationToken);
         }
 
         public async Task SaveLastTicketNumberAsync(int number, char prefix, CancellationToken cancellationToken)
@@ -44,7 +61,7 @@ namespace bbqueue.Infrastructure.Repositories
             await queueContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<List<TicketOperation>> GetTicketOperationByWindowPlusTargetAsync(long windowId, CancellationToken cancellationToken)
+        public Task<List<TicketOperation>> GetTicketOperationByWindowPlusTargetAsync(long windowId, CancellationToken cancellationToken)
         {
 
             var ticketOperations = from ticketOperation in queueContext.TicketOperationEntity
@@ -53,36 +70,18 @@ namespace bbqueue.Infrastructure.Repositories
                                    where windowTarget.WindowId == windowId
                                    select ticketOperation.FromEntityToModel();
 
-            return await ticketOperations.ToListAsync(cancellationToken);
+            return ticketOperations.ToListAsync(cancellationToken);
         }
 
-        public async Task<TicketOperation> GetTicketOperationByTicketAsync(long ticketId, CancellationToken cancellationToken)
+        public Task<List<TicketOperation>> GetTicketOperationByTicket(long ticketId, CancellationToken cancellationToken)
         {
-            var ticketOperationEntity = await queueContext.TicketOperationEntity.FirstOrDefaultAsync(to => to.TicketId == ticketId, cancellationToken);
-            return ticketOperationEntity == null? default! : ticketOperationEntity.FromEntityToModel();
+            return queueContext.TicketOperationEntity.Where(to => to.TicketId == ticketId).Select(to=>to.FromEntityToModel()).ToListAsync(cancellationToken);
         }
 
-        public async Task<TicketOperation> GetTicketOperationByTicket(long ticketId, CancellationToken cancellationToken)
-        {
-            var ticketOperationEntity = await queueContext.TicketOperationEntity.FirstOrDefaultAsync(to => to.TicketId == ticketId, cancellationToken);
-            return ticketOperationEntity == null ? default! : ticketOperationEntity.FromEntityToModel();
-        }
-
-        public async Task SaveTicketOperationToDbAsync(TicketOperationEntity ticketOperationEntity, CancellationToken cancellationToken)
+        public Task SaveTicketOperationToDbAsync(TicketOperationEntity ticketOperationEntity, CancellationToken cancellationToken)
         {
             queueContext.TicketOperationEntity.Add(ticketOperationEntity);
-            await queueContext.SaveChangesAsync(cancellationToken);
-        }
-        public async Task UpdateTicketOperationToDbAsync(TicketOperationEntity ticketOperationEntity, CancellationToken cancellationToken)
-        {
-            var ticketOperationEntityInDb = await queueContext.TicketOperationEntity.FirstOrDefaultAsync(toe=>toe.TicketId==ticketOperationEntity.TicketId);
-            if (ticketOperationEntityInDb == null)
-                throw new Exception("Не найдено записи по операции с талоном для обновления");//Тут нужен норм эксепшн
-            
-            ticketOperationEntityInDb = ticketOperationEntity;
-            await queueContext.SaveChangesAsync(cancellationToken);
-            
-            
+            return queueContext.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<TicketAmount> GetTicketAmountAsync(long targetId, CancellationToken cancellationToken)
@@ -110,6 +109,50 @@ namespace bbqueue.Infrastructure.Repositories
             queueContext.TicketAmountEntity.Add(ticketAmountEntity);
             await queueContext.SaveChangesAsync(cancellationToken);
             return ticketAmountEntity;
+        }
+
+        public async Task<Ticket?> GetNextTicketAsync(long employeeId, CancellationToken cancellationToken)
+        {
+            var window = await WindowRelatedToEmployeeasync(employeeId,cancellationToken);
+            if (window == null)
+                throw new Exception("Невозможно взять в работу следующий талон. Пользователь не прикреплён к окну.");
+            var query = await (from toe in queueContext.TicketOperationEntity
+                        join
+                        te in queueContext.TicketEntity
+                        on toe.TicketId equals te.Id
+                        join
+                        wte in queueContext.WindowTargetEntity
+                        on toe.TargetId equals wte.TargetId
+                        where wte.WindowId == window.Id
+                        && te.State == TicketState.Created || te.State == TicketState.Returned//вот тут посложнее логику надо сделать
+                        orderby te.Created
+                        select te).FirstOrDefaultAsync(cancellationToken);
+            return query == null ? default! : query.FromEntityToModel();
+        }
+
+        public async Task<Ticket?> GetNextSpecificTicketAsync(long ticketId, long employeeId, CancellationToken cancellationToken)
+        {
+            var window = await WindowRelatedToEmployeeasync(employeeId, cancellationToken);
+            if (window == null)
+                throw new Exception("Невозможно взять в работу следующий талон. Пользователь не прикреплён к окну.");
+            var ticket = await queueContext.TicketEntity.SingleOrDefaultAsync(te=>te.Id == ticketId, cancellationToken);
+            return ticket == null? default! : ticket.FromEntityToModel();
+        }
+
+
+        private Task<WindowEntity?> WindowRelatedToEmployeeasync(long employeeId, CancellationToken cancellationToken)
+        {
+           return (from win in queueContext.WindowEntity
+                                where win.EmployeeId == employeeId
+                                select win).FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public Task DeleteAllTicketsFromDBAsync(CancellationToken cancellationToken)
+        {
+            queueContext.RemoveRange(queueContext.TicketAmountEntity);
+            queueContext.RemoveRange(queueContext.TicketOperationEntity);
+            queueContext.RemoveRange(queueContext.TicketEntity);
+            return queueContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

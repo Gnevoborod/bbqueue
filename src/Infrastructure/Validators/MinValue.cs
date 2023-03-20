@@ -16,7 +16,7 @@ namespace bbqueue.Infrastructure.Validators
 
             if (value == null)
                 return new ValidationResult("Поле не может быть пустым");
-            int result = (int)value;
+            long result = (long)value;
             return (result >= minValue)
                 ? ValidationResult.Success
                 : new ValidationResult("Значение поля не может быть меньше " + minValue);

@@ -21,5 +21,6 @@
         public TicketState State { get; set; }
 
         public DateTime Processed { get; set; }
+
     }
 }

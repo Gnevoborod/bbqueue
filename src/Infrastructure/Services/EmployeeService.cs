@@ -1,9 +1,7 @@
 ﻿using bbqueue.Domain.Interfaces.Repositories;
 using bbqueue.Domain.Interfaces.Services;
 using bbqueue.Domain.Models;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using bbqueue.Mapper;
 
 namespace bbqueue.Infrastructure.Services
 {
@@ -15,35 +13,34 @@ namespace bbqueue.Infrastructure.Services
         {
             this.employeeRepository = employeeRepository;
         }
-        public async Task AddEmployeeAsync(Employee employee, CancellationToken cancellationToken)
+        public Task AddEmployeeAsync(Employee employee, CancellationToken cancellationToken)
         {
-            await Task.Run(() => Thread.Sleep(100));
+           return employeeRepository.AddEmployeeAsync(employee.FromModelToEntity(), cancellationToken);
         }
-        public async Task SetRoleToEmployeeAsync(long employeeId, EmployeeRole role, CancellationToken cancellationToken)
+        public Task SetRoleToEmployeeAsync(long employeeId, EmployeeRole role, CancellationToken cancellationToken)
         {
-            await Task.Run(() => Thread.Sleep(100));
-        }
-
-        public async Task AddEmployeeToWindowAsync(Employee employee, Window window, CancellationToken cancellationToken)
-        {
-            await Task.Run(() => Thread.Sleep(100));
+            return employeeRepository.SetRoleToEmployeeAsync(employeeId, role, cancellationToken); 
         }
 
-        public async Task<Employee?> GetEmployeeInfoAsync(string externalNumber, CancellationToken cancellationToken)
+        public Task AddEmployeeToWindowAsync(long employeeId, long windowId, CancellationToken cancellationToken)
         {
-            return await employeeRepository
+            return employeeRepository.AddEmployeeToWindowAsync(employeeId, windowId, cancellationToken);
+        }
+
+        public Task<Employee?> GetEmployeeInfoAsync(string externalNumber, CancellationToken cancellationToken)
+        {
+            return employeeRepository
                 .GetEmployeeInfoAsync(externalNumber, cancellationToken)!;
         }
-        public async Task<Employee?> GetEmployeeInfoAsync(long employeeId, CancellationToken cancellationToken)
+        public Task<Employee?> GetEmployeeInfoAsync(long employeeId, CancellationToken cancellationToken)
         {
-            return await employeeRepository
+            return employeeRepository
                 .GetEmployeeInfoAsync(employeeId, cancellationToken)!;
         }
 
-        public async Task<List<Employee>> GetEmployeeListAsync(CancellationToken cancellationToken)
+        public Task<List<Employee>> GetEmployeeListAsync(CancellationToken cancellationToken)
         {
-            await Task.Run(() => Thread.Sleep(100));
-            return new();
+            return employeeRepository.GetEmployeeListAsync(cancellationToken);
         }
 
     }

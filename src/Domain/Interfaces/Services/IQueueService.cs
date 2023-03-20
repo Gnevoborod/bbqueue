@@ -4,18 +4,29 @@ namespace bbqueue.Domain.Interfaces.Services
 {
     public interface IQueueService
     {
-        public Task AddTicketToQueueAsync(Ticket ticket);
-        public Task ReturnTicketToQueueAsync(Ticket ticket, CancellationToken cancellationToken);
-
-        public Task RemoveTicketAsync(Ticket ticket, CancellationToken cancellationToken);
-
+        /// <summary>
+        /// Очищает очередь
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public Task ClearQueueAsync(CancellationToken cancellationToken);
 
-        public Task<Ticket> GetTicketNextTicketFromQueueAsync(long windowId, CancellationToken cancellationToken);
+        /// <summary>
+        /// Поставляет следующий талон из очереди (в разрезе сотрудника)
+        /// </summary>
+        /// <param name="employeeId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Task<Ticket?> GetTicketNextTicketFromQueueAsync(long employeeId, CancellationToken cancellationToken);
 
-        public Task<Ticket> GetNextSpecificTicketFromQueueAsync(long ticketNumber, CancellationToken cancellationToken);
-
-        public Task RestoreQueueAsync(CancellationToken cancellationToken);
+        /// <summary>
+        /// Поставляет следующий конкретный талон для сотрудника
+        /// </summary>
+        /// <param name="ticketNumber"></param>
+        /// <param name="employeeId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Task<Ticket?> GetNextSpecificTicketFromQueueAsync(long ticketNumber, long employeeId, CancellationToken cancellationToken);
 
     }
 }

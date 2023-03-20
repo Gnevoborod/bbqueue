@@ -12,6 +12,9 @@
 
         public TicketState State { get; set; }
 
+        public long TargetId { get; set; }
+        public Target Target { get; set; } = default!;
+
         public DateTime Created { get; set; }
 
         public DateTime Closed { get; set; }

@@ -14,17 +14,38 @@ namespace bbqueue.Infrastructure.Repositories
         {
             this.queueContext = queueContext;
         }
-        public async Task AddEmployeeAsync(EmployeeEntity employeeEntity, CancellationToken cancellationToken)
+        public Task AddEmployeeAsync(EmployeeEntity employeeEntity, CancellationToken cancellationToken)
         {
-            await Task.Run(() => Thread.Sleep(100));
+            queueContext.EmployeeEntity.Add(employeeEntity);
+            return queueContext.SaveChangesAsync(cancellationToken);
         }
         public async Task SetRoleToEmployeeAsync(long employeeId, EmployeeRole role, CancellationToken cancellationToken)
         {
-            await Task.Run(() => Thread.Sleep(100));
+            var employee = await queueContext.EmployeeEntity.SingleOrDefaultAsync(e=>e.Id==employeeId, cancellationToken);
+            if (employee == null)
+                throw new Exception("Пользователь не найден");
+            employee.Role = role;
+            await queueContext.SaveChangesAsync(cancellationToken);
         }
-        public async Task AddEmployeeToWindowAsync(EmployeeEntity employeeEntity, WindowEntity windowEntity, CancellationToken cancellationToken)
+        public async Task AddEmployeeToWindowAsync(long employeeEntityId, long windowEntityId, CancellationToken cancellationToken)
         {
-            await Task.Run(() => Thread.Sleep(100));
+            //var window = await queueContext.WindowEntity.Include(a=>a.Employee).SingleOrDefaultAsync(w => w.Id == windowEntityId, cancellationToken);
+            var window = await queueContext.WindowEntity.Where(w => w.Id == windowEntityId).Select(w=>w).SingleOrDefaultAsync(cancellationToken);
+            if (window == null)
+                throw new Exception("Не найдено указанного окна");
+            //нашли окно - ищем есть ли другие окна с этим сотрудником. Один сотрудник - одно окно
+            var oldWindow = await queueContext.WindowEntity.Where(w => w.EmployeeId == employeeEntityId).Select(w => w).SingleOrDefaultAsync(cancellationToken);
+            if(oldWindow!=null)
+            {
+                oldWindow.EmployeeId = null;
+            }
+            if(window.EmployeeId != null)
+            {
+                throw new Exception("Для данного окна уже назначен сотрудник");
+            }
+            window.EmployeeId = employeeEntityId;
+            await queueContext.SaveChangesAsync(cancellationToken);
+
         }
 
         public async Task<Employee> GetEmployeeInfoAsync(string externalNumber, CancellationToken cancellationToken)
@@ -42,10 +63,12 @@ namespace bbqueue.Infrastructure.Repositories
             return employee == null? default! : employee.FromEntityToModel();
         }
 
-        public async Task<List<Employee>> GetEmployeeListAsync(CancellationToken cancellationToken)
+        public Task<List<Employee>> GetEmployeeListAsync(CancellationToken cancellationToken)
         {
-            await Task.Run(() => Thread.Sleep(100));
-            return new();
+            return queueContext
+                    .EmployeeEntity
+                    .Select(ee=>ee.FromEntityToModel())
+                    .ToListAsync(cancellationToken);
         }
     }
 }

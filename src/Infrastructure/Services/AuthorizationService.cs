@@ -26,8 +26,8 @@ namespace bbqueue.Infrastructure.Services
 
             var claims = new List<Claim>
             {
-               new Claim(ClaimTypes.Role,employee!.Role.ToString()),
-               new Claim(ClaimTypes.PrimarySid, employee!.Id.ToString())
+               new Claim(ClaimTypes.Role,employee.Role.ToString()),
+               new Claim(ClaimTypes.PrimarySid, employee.Id.ToString())
             };
 
             var jwt = new JwtSecurityToken(
@@ -39,6 +39,14 @@ namespace bbqueue.Infrastructure.Services
 
             return new JwtSecurityTokenHandler().WriteToken(jwt);
 
+        }
+
+        public long GetUserId(HttpContext httpContext)
+        {
+            var employeeId = httpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.PrimarySid)?.Value;
+            if (employeeId == null)
+                throw new Exception("Значение идентификатора пользователя не установлено");
+            return Int64.Parse(employeeId);
         }
     }
 }
