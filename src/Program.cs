@@ -1,12 +1,10 @@
-using bbqueue.Database;
+ï»¿using bbqueue.Database;
 using bbqueue.Domain.Interfaces.Repositories;
 using bbqueue.Domain.Interfaces.Services;
 using bbqueue.Infrastructure;
 using bbqueue.Infrastructure.Repositories;
 using bbqueue.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
@@ -97,7 +95,7 @@ namespace bbqueue
                 {
                     Version = "v1",
                     Title = "BBQueue API",
-                    Description = "BBQueue - î÷åðåäü ëó÷øåé ïðîæàðêè"
+                    Description = "BBQueue - Ð¾Ñ‡ÐµÑ€ÐµÐ´ÑŒ Ð»ÑƒÑ‡ÑˆÐµÐ¹ Ð¿Ñ€Ð¾Ð¶Ð°Ñ€ÐºÐ¸"
                 });
 
                 // using System.Reflection;
@@ -106,7 +104,6 @@ namespace bbqueue
 
 
             }) ;
-
 
 
             var app = builder.Build();
@@ -123,7 +120,7 @@ namespace bbqueue
             app.UseAuthentication();
             app.UseAuthorization();
 
-
+            
             app.MapControllers();
         
             app.Run();

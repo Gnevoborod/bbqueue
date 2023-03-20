@@ -2,6 +2,7 @@
 using bbqueue.Database.Entities;
 using bbqueue.Domain.Interfaces.Repositories;
 using bbqueue.Domain.Models;
+using bbqueue.Infrastructure.Exceptions;
 using bbqueue.Mapper;
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
@@ -15,12 +16,12 @@ namespace bbqueue.Infrastructure.Repositories
         {
             this.queueContext = queueContext;
         }
-        public async Task<long> SaveTicketToDbAsync(TicketEntity ticketEntity, char prefix, CancellationToken cancellationToken)
+        public async Task<long> SaveTicketToDbAsync(Ticket ticket, char prefix, CancellationToken cancellationToken)
         {
-            queueContext.TicketEntity.Add(ticketEntity);
-            await SaveLastTicketNumberAsync(ticketEntity.Number, prefix, cancellationToken);
+            queueContext.TicketEntity.Add(ticket.FromModelToEntity());
+            await SaveLastTicketNumberAsync(ticket.Number, prefix, cancellationToken);
             await queueContext.SaveChangesAsync(cancellationToken);
-            return ticketEntity.Id;
+            return ticket.Id;
         }
 
         public async Task<Ticket?> GetTicketByIdAsync(long ticketId, CancellationToken cancellationToken)
@@ -29,15 +30,15 @@ namespace bbqueue.Infrastructure.Repositories
             return ticket == null ? default! : ticket.FromEntityToModel();
         }
 
-        public async Task UpdateTicketInDbAsync(TicketEntity ticketEntity, CancellationToken cancellationToken)
+        public async Task UpdateTicketInDbAsync(Ticket ticket, CancellationToken cancellationToken)
         {
-            var ticket = await queueContext.TicketEntity.FirstOrDefaultAsync(te=>te.Id==ticketEntity.Id, cancellationToken);
-            if (ticket == null)
-                throw new Exception("Не найдено талона для обновления");//Тут нужен норм эксепшн
+            var ticketEntity = await queueContext.TicketEntity.FirstOrDefaultAsync(te=>te.Id==ticket.Id, cancellationToken);
+            if (ticketEntity == null)
+                throw new ApiException(ExceptionEvents.TicketNotFound);
 
-            ticket.State=ticketEntity.State;
-            ticket.Closed=ticketEntity.Closed;
-            ticket.TargetId=ticketEntity.TargetId; 
+            ticketEntity.State= ticket.State;
+            ticketEntity.Closed= ticket.Closed;
+            ticketEntity.TargetId= ticket.TargetId; 
             await queueContext.SaveChangesAsync(cancellationToken);
         }
         public Task<List<Ticket>> LoadTicketsFromDbAsync(bool loadOnlyProcessedTickets, CancellationToken cancellationToken)//true грузим обработанные талоны false необработанные талоны
@@ -78,9 +79,9 @@ namespace bbqueue.Infrastructure.Repositories
             return queueContext.TicketOperationEntity.Where(to => to.TicketId == ticketId).Select(to=>to.FromEntityToModel()).ToListAsync(cancellationToken);
         }
 
-        public Task SaveTicketOperationToDbAsync(TicketOperationEntity ticketOperationEntity, CancellationToken cancellationToken)
+        public Task SaveTicketOperationToDbAsync(TicketOperation ticketOperation, CancellationToken cancellationToken)
         {
-            queueContext.TicketOperationEntity.Add(ticketOperationEntity);
+            queueContext.TicketOperationEntity.Add(ticketOperation.FromModelToEntity());
             return queueContext.SaveChangesAsync(cancellationToken);
         }
 
@@ -115,7 +116,7 @@ namespace bbqueue.Infrastructure.Repositories
         {
             var window = await WindowRelatedToEmployeeasync(employeeId,cancellationToken);
             if (window == null)
-                throw new Exception("Невозможно взять в работу следующий талон. Пользователь не прикреплён к окну.");
+                throw new ApiException(ExceptionEvents.TicketUnableToTakeToWork);
             var query = await (from toe in queueContext.TicketOperationEntity
                         join
                         te in queueContext.TicketEntity
@@ -134,7 +135,7 @@ namespace bbqueue.Infrastructure.Repositories
         {
             var window = await WindowRelatedToEmployeeasync(employeeId, cancellationToken);
             if (window == null)
-                throw new Exception("Невозможно взять в работу следующий талон. Пользователь не прикреплён к окну.");
+                throw new ApiException(ExceptionEvents.TicketUnableToTakeToWork);
             var ticket = await queueContext.TicketEntity.SingleOrDefaultAsync(te=>te.Id == ticketId, cancellationToken);
             return ticket == null? default! : ticket.FromEntityToModel();
         }

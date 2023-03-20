@@ -6,12 +6,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using IAuth = bbqueue.Domain.Interfaces.Services.IAuthorizationService;
+using bbqueue.Infrastructure.Exceptions;
+using bbqueue.Infrastructure.Extensions;
 
 namespace bbqueue.Controllers
 {
     [Route("api/ticket")]
     [Produces("application/json")]
     [ApiController]
+    [TypeFilter(typeof(ApiExceptionFilter))]
     public class TicketController : Controller
     {
         private readonly ITicketService ticketService;
@@ -52,7 +55,7 @@ namespace bbqueue.Controllers
         public async Task<IActionResult> RedirectTicketToAnotherWindowAsync([FromBody] TicketRedirectDto ticketRedirectDto)
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
-            await ticketService.ChangeTicketTarget(ticketRedirectDto.TicketId, ticketRedirectDto.TargetId, authorizationService.GetUserId(HttpContext),  cancellationToken);
+            await ticketService.ChangeTicketTarget(ticketRedirectDto.TicketId, ticketRedirectDto.TargetId, HttpContext.User.GetUserId(),  cancellationToken);
             return Ok();
         }
 
