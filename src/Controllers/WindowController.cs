@@ -2,6 +2,8 @@
 using bbqueue.Controllers.Dtos.Target;
 using bbqueue.Controllers.Dtos.Window;
 using bbqueue.Domain.Interfaces.Services;
+using bbqueue.Infrastructure.Exceptions;
+using bbqueue.Infrastructure.Extensions;
 using bbqueue.Mapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +14,11 @@ namespace bbqueue.Controllers
     [Route("api/window")]
     [Produces("application/json")]
     [ApiController]
+    [TypeFilter(typeof(ApiExceptionFilter))]
     public sealed class WindowController : ControllerBase
     {
         private readonly IWindowService windowService;
         private readonly IAuth authrizationService;
-
         public WindowController(IWindowService windowService, IAuth authorizationService)
         {
             this.windowService = windowService;
@@ -38,7 +40,7 @@ namespace bbqueue.Controllers
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
             var window = dto.FromChangeStateDtoToModel();
-            var employeeId = authrizationService.GetUserId(HttpContext);
+            var employeeId = HttpContext.User.GetUserId();
             await windowService.ChangeWindowWorkStateAsync(window, employeeId,  cancellationToken);
             return Ok();
         }

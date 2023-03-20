@@ -9,10 +9,10 @@ namespace bbqueue.Domain.Interfaces.Repositories
         /// <summary>
         /// Сохраняет нового сотрудника
         /// </summary>
-        /// <param name="employeeEntity"></param>
+        /// <param name="employee"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task AddEmployeeAsync(EmployeeEntity employeeEntity, CancellationToken cancellationToken);
+        public Task AddEmployeeAsync(Employee employee, CancellationToken cancellationToken);
         /// <summary>
         /// Устанавливает роль для сотрудника
         /// </summary>
