@@ -18,11 +18,11 @@ namespace bbqueue.Controllers
     public sealed class WindowController : ControllerBase
     {
         private readonly IWindowService windowService;
-        private readonly ILogger<WindowController> logger;
-        public WindowController(IWindowService windowService, ILogger<WindowController> logger)
+        private readonly IAuth authrizationService;
+        public WindowController(IWindowService windowService, IAuth authorizationService)
         {
             this.windowService = windowService;
-            this.logger = logger;
+            this.authrizationService = authorizationService;
         }
 
         /// <summary>
@@ -39,11 +39,9 @@ namespace bbqueue.Controllers
         public async Task<IActionResult> ChangeWindowWorkStateAsync([FromBody] ChangeWindowWorkStateDto dto)
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
-            var employeeId = HttpContext.User.GetUserId();
-            logger.LogInformation($"Инициирована смена состояния окна {dto.Number} сотрудником с employeeId = {employeeId}");
             var window = dto.FromChangeStateDtoToModel();
-            await windowService.ChangeWindowWorkStateAsync(window, employeeId, cancellationToken);
-            logger.LogInformation($"Cмена состояния окна {dto.Number} завершена");
+            var employeeId = HttpContext.User.GetUserId();
+            await windowService.ChangeWindowWorkStateAsync(window, employeeId,  cancellationToken);
             return Ok();
         }
 

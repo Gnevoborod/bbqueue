@@ -14,11 +14,10 @@ namespace bbqueue.Controllers
     public class AuthorizationController : Controller
     {
         private readonly IAuthorizationService authorizationService;
-        private readonly ILogger<AuthorizationController> logger;
-        public AuthorizationController(IAuthorizationService authorizationService, ILogger<AuthorizationController> logger)
+
+        public AuthorizationController(IAuthorizationService authorizationService)
         {
             this.authorizationService = authorizationService;
-            this.logger = logger;
         }
         /* Авторизация - тонкий момент. По идее вначале должен идти запрос во внешнюю систему, где лежат учётные данные пользователей.
          * В той системе происходить авторизация и аутентификация, после чего в нашу систему будет прилетать просто идентификатор пользователя
@@ -35,7 +34,6 @@ namespace bbqueue.Controllers
         public async Task<IActionResult> GetJWT([FromQuery] string employeeExternalId)
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
-            logger.LogInformation($"Запрос JWT токена для {employeeExternalId}");
             return Ok(new JwtDto
             {
                 Token = await authorizationService
