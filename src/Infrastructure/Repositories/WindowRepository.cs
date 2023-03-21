@@ -1,9 +1,9 @@
-﻿using bbqueue.Database;
+﻿using bbqueue.Database.Entities;
+using bbqueue.Database;
 using bbqueue.Domain.Models;
 using bbqueue.Mapper;
 using Microsoft.EntityFrameworkCore;
 using bbqueue.Domain.Interfaces.Repositories;
-using bbqueue.Infrastructure.Exceptions;
 
 namespace bbqueue.Infrastructure.Repositories
 {
@@ -27,9 +27,9 @@ namespace bbqueue.Infrastructure.Repositories
                                     .WindowEntity
                                     .SingleOrDefaultAsync(we => we.Number == window.Number);
             if (windowEntity == null)
-                throw new ApiException(ExceptionEvents.WindowNotExists);
+                throw new Exception("Не удалось найти окно по номеру"); //Тут нужен свой эксепшн
             if (windowEntity.EmployeeId != employeeId)
-                throw new ApiException(ExceptionEvents.WindowRelatedToAnotherEmployee);
+                throw new Exception("Невозможно изменить состояние окна, так как к данному окну привязан другой пользователь.");
             windowEntity.WindowWorkState = window.WindowWorkState;
             if(windowEntity.WindowWorkState == WindowWorkState.Closed)
             {

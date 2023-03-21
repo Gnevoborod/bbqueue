@@ -8,18 +8,18 @@ namespace bbqueue.Domain.Interfaces.Repositories
         /// <summary>
         /// Сохраняет талон в БД
         /// </summary>
-        /// <param name="ticket"></param>
+        /// <param name="ticketEntity"></param>
         /// <param name="prefix"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task<long> SaveTicketToDbAsync(Ticket ticket, char prefix, CancellationToken cancellationToken);
+        public Task<long> SaveTicketToDbAsync(TicketEntity ticketEntity, char prefix, CancellationToken cancellationToken);
         /// <summary>
         /// Обновляет талон в БД
         /// </summary>
-        /// <param name="ticket"></param>
+        /// <param name="ticketEntity"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task UpdateTicketInDbAsync(Ticket ticket, CancellationToken cancellationToken);
+        public Task UpdateTicketInDbAsync(TicketEntity ticketEntity, CancellationToken cancellationToken);
         /// <summary>
         /// Поставляет список талонов из БД
         /// </summary>
@@ -55,10 +55,10 @@ namespace bbqueue.Domain.Interfaces.Repositories
         /// <summary>
         /// Сохраняет операцию по талону
         /// </summary>
-        /// <param name="ticketOperation"></param>
+        /// <param name="ticketOperationEntity"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task SaveTicketOperationToDbAsync(TicketOperation ticketOperation, CancellationToken cancellationToken);
+        public Task SaveTicketOperationToDbAsync(TicketOperationEntity ticketOperationEntity, CancellationToken cancellationToken);
         /// <summary>
         /// Возвращает количество выданных талонов (для формирования нового номера талона)
         /// </summary>

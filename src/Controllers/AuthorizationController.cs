@@ -1,7 +1,6 @@
 ﻿using bbqueue.Controllers.Dtos.Authorization;
 using bbqueue.Controllers.Dtos.Error;
 using bbqueue.Domain.Interfaces.Services;
-using bbqueue.Infrastructure.Exceptions;
 using bbqueue.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,7 +9,6 @@ namespace bbqueue.Controllers
     [ApiController]
     [Produces("application/json")]
     [Route("api/authorization")]
-    [TypeFilter(typeof(ApiExceptionFilter))]
     public class AuthorizationController : Controller
     {
         private readonly IAuthorizationService authorizationService;

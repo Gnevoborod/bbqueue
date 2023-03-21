@@ -1,6 +1,5 @@
 ﻿using bbqueue.Domain.Interfaces.Repositories;
 using bbqueue.Domain.Interfaces.Services;
-using bbqueue.Infrastructure.Exceptions;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -22,7 +21,7 @@ namespace bbqueue.Infrastructure.Services
             var employee = await employeeService.GetEmployeeInfoAsync(employeeId, cancellationToken)!;
             if (employee == null)
             {
-                throw new ApiException(ExceptionEvents.EmployeeNotFound);
+                return null;
             }
 
             var claims = new List<Claim>
@@ -40,6 +39,14 @@ namespace bbqueue.Infrastructure.Services
 
             return new JwtSecurityTokenHandler().WriteToken(jwt);
 
+        }
+
+        public long GetUserId(HttpContext httpContext)
+        {
+            var employeeId = httpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.PrimarySid)?.Value;
+            if (employeeId == null)
+                throw new Exception("Значение идентификатора пользователя не установлено");
+            return Int64.Parse(employeeId);
         }
     }
 }

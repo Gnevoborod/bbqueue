@@ -4,14 +4,12 @@ using bbqueue.Controllers.Dtos.Target;
 using bbqueue.Controllers.Dtos.Group;
 using bbqueue.Domain.Interfaces.Services;
 using bbqueue.Controllers.Dtos.Error;
-using bbqueue.Infrastructure.Exceptions;
 
 namespace bbqueue.Controllers
 {
     [Route("api/target")]
     [Produces("application/json")]
     [ApiController]
-    [TypeFilter(typeof(ApiExceptionFilter))]
     public sealed class TargetController : ControllerBase
     {
         private readonly ITargetService targetService;

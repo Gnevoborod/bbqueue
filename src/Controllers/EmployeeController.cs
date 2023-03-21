@@ -6,17 +6,14 @@ using bbqueue.Mapper;
 using bbqueue.Domain.Models;
 using bbqueue.Controllers.Dtos.Error;
 using bbqueue.Controllers.Dtos.Ticket;
-using bbqueue.Infrastructure.Extensions;
 
 using IAuth = bbqueue.Domain.Interfaces.Services.IAuthorizationService;
-using bbqueue.Infrastructure.Exceptions;
 
 namespace bbqueue.Controllers
 {
     [ApiController]
     [Produces("application/json")]
     [Route("api/employee")]
-    [TypeFilter(typeof(ApiExceptionFilter))]
     public class EmployeeController : Controller
     {
         private readonly IEmployeeService employeeService;
@@ -45,7 +42,7 @@ namespace bbqueue.Controllers
             var employee = await employeeService.GetEmployeeInfoAsync(employeeId, cancellationToken);
             if(employee == null)
             {
-                throw new ApiException(ExceptionEvents.EmployeeNotFound);
+                return NotFound();
             }
             return Ok(employee.FromModelToDto());
         }
@@ -83,7 +80,7 @@ namespace bbqueue.Controllers
             CancellationToken cancellationToken = HttpContext.RequestAborted;
             var role = EmployeeMapper.EmployeeRoleFromDtoToValue(employeeSetRoleDto.Role);
             if (role == null)
-                throw new ApiException(ExceptionEvents.WrongRoleInRequest);
+                throw new Exception("Некорректно указана роль");
             await employeeService.SetRoleToEmployeeAsync(employeeSetRoleDto.EmployeeId, (EmployeeRole)role, cancellationToken);
             return Ok();
         }
@@ -117,7 +114,7 @@ namespace bbqueue.Controllers
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
 
-            await employeeService.AddEmployeeToWindowAsync(HttpContext.User.GetUserId(), employeeToWindowDto.WindowId, cancellationToken);
+            await employeeService.AddEmployeeToWindowAsync(authorizationService.GetUserId(HttpContext), employeeToWindowDto.WindowId, cancellationToken);
             return Ok();
         }
 

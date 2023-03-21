@@ -1,8 +1,6 @@
 ﻿using bbqueue.Controllers.Dtos.Error;
 using bbqueue.Controllers.Dtos.Ticket;
 using bbqueue.Domain.Interfaces.Services;
-using bbqueue.Infrastructure.Exceptions;
-using bbqueue.Infrastructure.Extensions;
 using bbqueue.Mapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +10,6 @@ namespace bbqueue.Controllers
     [Route("api/queue")]
     [Produces("application/json")]
     [ApiController]
-    [TypeFilter(typeof(ApiExceptionFilter))]
     public class QueueController : Controller
     {
         private readonly IQueueService queueService;
@@ -39,7 +36,7 @@ namespace bbqueue.Controllers
         public async Task<IActionResult> GetNextTicket()
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
-            long employeeId = HttpContext.User.GetUserId();
+            long employeeId = authorizationService.GetUserId(HttpContext);
                var ticket = await queueService.GetTicketNextTicketFromQueueAsync(employeeId, cancellationToken);
                if(ticket !=null)
                {
