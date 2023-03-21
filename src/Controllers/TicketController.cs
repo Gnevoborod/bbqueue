@@ -5,7 +5,6 @@ using bbqueue.Mapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using IAuth = bbqueue.Domain.Interfaces.Services.IAuthorizationService;
 using bbqueue.Infrastructure.Exceptions;
 using bbqueue.Infrastructure.Extensions;
 
@@ -18,12 +17,12 @@ namespace bbqueue.Controllers
     public class TicketController : Controller
     {
         private readonly ITicketService ticketService;
-        private readonly IAuth authorizationService;
+        private readonly ILogger<TicketController> logger;
 
-        public TicketController(ITicketService ticketService, IAuth authorizationService)
+        public TicketController(ITicketService ticketService, ILogger<TicketController> logger)
         {
             this.ticketService = ticketService;
-            this.authorizationService = authorizationService;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -32,9 +31,9 @@ namespace bbqueue.Controllers
         /// <param name="TargetId">Код цели</param>
         /// <returns></returns>
         [HttpGet("ticket")]
-        [ProducesResponseType(typeof(TicketDto),200)]
-        [ProducesResponseType(typeof(ErrorDto),400)]
-        public async Task<IActionResult> GetTicketAsync([FromQuery]long TargetId)
+        [ProducesResponseType(typeof(TicketDto), 200)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        public async Task<IActionResult> GetTicketAsync([FromQuery] long TargetId)
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
             var ticket = await ticketService.CreateTicketAsync(TargetId, cancellationToken);
@@ -50,12 +49,14 @@ namespace bbqueue.Controllers
         [Authorize]
         [ProducesResponseType(200)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
-        [ProducesResponseType(typeof(ErrorDto),401)]
+        [ProducesResponseType(typeof(ErrorDto), 401)]
         [HttpPost("redirect")]
         public async Task<IActionResult> RedirectTicketToAnotherWindowAsync([FromBody] TicketRedirectDto ticketRedirectDto)
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
-            await ticketService.ChangeTicketTarget(ticketRedirectDto.TicketId, ticketRedirectDto.TargetId, HttpContext.User.GetUserId(),  cancellationToken);
+            logger.LogInformation($"Redirecting ticket {ticketRedirectDto.TicketId} init.");
+            await ticketService.ChangeTicketTarget(ticketRedirectDto.TicketId, ticketRedirectDto.TargetId, HttpContext.User.GetUserId(), cancellationToken);
+            logger.LogInformation($"Redirecting ticket {ticketRedirectDto.TicketId} done.");
             return Ok();
         }
 

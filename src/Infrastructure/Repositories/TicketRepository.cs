@@ -5,6 +5,7 @@ using bbqueue.Domain.Models;
 using bbqueue.Infrastructure.Exceptions;
 using bbqueue.Mapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Threading;
 
 namespace bbqueue.Infrastructure.Repositories
@@ -12,16 +13,19 @@ namespace bbqueue.Infrastructure.Repositories
     public sealed class TicketRepository:ITicketRepository
     {
         private readonly QueueContext queueContext;
-        public TicketRepository(QueueContext queueContext)
+        private readonly ILogger<TicketRepository> logger;
+        public TicketRepository(QueueContext queueContext, ILogger<TicketRepository> logger)
         {
             this.queueContext = queueContext;
+            this.logger = logger;
         }
         public async Task<long> SaveTicketToDbAsync(Ticket ticket, char prefix, CancellationToken cancellationToken)
         {
-            queueContext.TicketEntity.Add(ticket.FromModelToEntity());
-            await SaveLastTicketNumberAsync(ticket.Number, prefix, cancellationToken);
+            var ticketEntity = ticket.FromModelToEntity();
+            queueContext.TicketEntity.Add(ticketEntity);
+            await SaveLastTicketNumberAsync(ticketEntity.Number, prefix, cancellationToken);
             await queueContext.SaveChangesAsync(cancellationToken);
-            return ticket.Id;
+            return ticketEntity.Id;
         }
 
         public async Task<Ticket?> GetTicketByIdAsync(long ticketId, CancellationToken cancellationToken)
@@ -34,8 +38,10 @@ namespace bbqueue.Infrastructure.Repositories
         {
             var ticketEntity = await queueContext.TicketEntity.FirstOrDefaultAsync(te=>te.Id==ticket.Id, cancellationToken);
             if (ticketEntity == null)
+            {
+                logger.LogError(ExceptionEvents.TicketNotFound, ExceptionEvents.TicketNotFound.Name + $". Id талона на входе = {ticket.Id}");
                 throw new ApiException(ExceptionEvents.TicketNotFound);
-
+            }
             ticketEntity.State= ticket.State;
             ticketEntity.Closed= ticket.Closed;
             ticketEntity.TargetId= ticket.TargetId; 
@@ -116,7 +122,10 @@ namespace bbqueue.Infrastructure.Repositories
         {
             var window = await WindowRelatedToEmployeeasync(employeeId,cancellationToken);
             if (window == null)
+            {
+                logger.LogError(ExceptionEvents.TicketUnableToTakeToWork, ExceptionEvents.TicketUnableToTakeToWork.Name + $". EmployeeId = {employeeId}");
                 throw new ApiException(ExceptionEvents.TicketUnableToTakeToWork);
+            }
             var query = await (from toe in queueContext.TicketOperationEntity
                         join
                         te in queueContext.TicketEntity
@@ -135,7 +144,10 @@ namespace bbqueue.Infrastructure.Repositories
         {
             var window = await WindowRelatedToEmployeeasync(employeeId, cancellationToken);
             if (window == null)
+            {
+                logger.LogError(ExceptionEvents.TicketUnableToTakeToWork, ExceptionEvents.TicketUnableToTakeToWork.Name + $". EmployeeId = {employeeId}, ticketId = {ticketId}");
                 throw new ApiException(ExceptionEvents.TicketUnableToTakeToWork);
+            }
             var ticket = await queueContext.TicketEntity.SingleOrDefaultAsync(te=>te.Id == ticketId, cancellationToken);
             return ticket == null? default! : ticket.FromEntityToModel();
         }
