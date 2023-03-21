@@ -10,6 +10,7 @@ using bbqueue.Infrastructure.Extensions;
 
 using IAuth = bbqueue.Domain.Interfaces.Services.IAuthorizationService;
 using bbqueue.Infrastructure.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace bbqueue.Controllers
 {
@@ -20,12 +21,11 @@ namespace bbqueue.Controllers
     public class EmployeeController : Controller
     {
         private readonly IEmployeeService employeeService;
-        private readonly IAuth authorizationService;
-
-        public EmployeeController(IEmployeeService employeeService, IAuth authorizationService)
+        private readonly ILogger<EmployeeController> logger;
+        public EmployeeController(IEmployeeService employeeService, ILogger<EmployeeController> logger)
         {
             this.employeeService = employeeService;
-            this.authorizationService = authorizationService;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -43,8 +43,9 @@ namespace bbqueue.Controllers
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
             var employee = await employeeService.GetEmployeeInfoAsync(employeeId, cancellationToken);
-            if(employee == null)
+            if (employee == null)
             {
+                logger.LogError(ExceptionEvents.EmployeeNotFound, ExceptionEvents.EmployeeNotFound.Name + $" employeeId = {employeeId}");
                 throw new ApiException(ExceptionEvents.EmployeeNotFound);
             }
             return Ok(employee.FromModelToDto());
@@ -63,7 +64,9 @@ namespace bbqueue.Controllers
         public async Task<IActionResult> AddEmployee([FromBody] EmployeeRegistryDto employeeRegistryDto)
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
+            logger.LogInformation($"Инициировано создание записи о сотруднике {employeeRegistryDto.Name}, с внешним идентификатором {employeeRegistryDto.ExternalSystemId}");
             await employeeService.AddEmployeeAsync(employeeRegistryDto.FromDtoToModel(), cancellationToken);
+            logger.LogInformation($"Создание записи о сотруднике {employeeRegistryDto.Name} завершено");
             return Ok();
         }
 
@@ -81,10 +84,15 @@ namespace bbqueue.Controllers
         public async Task<IActionResult> SetRole([FromBody] EmployeeSetRoleDto employeeSetRoleDto)
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
+            logger.LogInformation($"Инициирована установка роли для сотрудника c employeeId = {employeeSetRoleDto.EmployeeId}, роль = {employeeSetRoleDto.Role}");
             var role = EmployeeMapper.EmployeeRoleFromDtoToValue(employeeSetRoleDto.Role);
             if (role == null)
+            {
+                logger.LogError(ExceptionEvents.WrongRoleInRequest, ExceptionEvents.WrongRoleInRequest.Name + $". Role is = {employeeSetRoleDto.Role}");
                 throw new ApiException(ExceptionEvents.WrongRoleInRequest);
+            }
             await employeeService.SetRoleToEmployeeAsync(employeeSetRoleDto.EmployeeId, (EmployeeRole)role, cancellationToken);
+            logger.LogInformation($"Установка роли для сотрудника c employeeId = {employeeSetRoleDto.EmployeeId} завершена");
             return Ok();
         }
 
@@ -116,8 +124,10 @@ namespace bbqueue.Controllers
         public async Task<IActionResult> AddEmployeeToWindow([FromBody] EmployeeToWindowDto employeeToWindowDto)
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
-
-            await employeeService.AddEmployeeToWindowAsync(HttpContext.User.GetUserId(), employeeToWindowDto.WindowId, cancellationToken);
+            var userId = HttpContext.User.GetUserId();
+            logger.LogInformation($"Инициирована привязка сотрудника с employeeId = {userId} к окну {employeeToWindowDto.WindowId}");
+            await employeeService.AddEmployeeToWindowAsync(userId, employeeToWindowDto.WindowId, cancellationToken);
+            logger.LogInformation($"Привязка сотрудника с employeeId = {userId} к окну {employeeToWindowDto.WindowId} завершена");
             return Ok();
         }
 

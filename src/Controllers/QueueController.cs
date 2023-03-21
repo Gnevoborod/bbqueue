@@ -6,7 +6,6 @@ using bbqueue.Infrastructure.Extensions;
 using bbqueue.Mapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using IAuthService = bbqueue.Domain.Interfaces.Services.IAuthorizationService;
 namespace bbqueue.Controllers
 {
     [Route("api/queue")]
@@ -17,13 +16,12 @@ namespace bbqueue.Controllers
     {
         private readonly IQueueService queueService;
         private readonly ITicketService ticketService;
-        private readonly IAuthService authorizationService;
-
-        public QueueController(IQueueService queueService, ITicketService ticketService, IAuthService authorizationService)
+        private readonly ILogger<QueueController> logger;
+        public QueueController(IQueueService queueService, ITicketService ticketService, ILogger<QueueController> logger)
         {
             this.queueService = queueService;
             this.ticketService = ticketService;
-            this.authorizationService = authorizationService;
+            this.logger = logger;
         }
 
 
@@ -40,11 +38,13 @@ namespace bbqueue.Controllers
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
             long employeeId = HttpContext.User.GetUserId();
+            logger.LogInformation($"Инициирован процесс вызова следующего посетителя с талоном. Инициатор employeeId = {employeeId}");
                var ticket = await queueService.GetTicketNextTicketFromQueueAsync(employeeId, cancellationToken);
                if(ticket !=null)
                {
                    await ticketService.TakeTicketToWork(ticket, employeeId, cancellationToken);
                }
+            logger.LogInformation($"Процесс вызова следующего посетителя с талоном для employeeId = {employeeId} завершён");
             return Ok(ticket?.FromModelToDto());
         }
     }
