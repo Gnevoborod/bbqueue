@@ -2,8 +2,7 @@
 {
     public class ErrorDto
     {
-        public string Code { get; private set; } = default!;
-        public string Message { get; private set; } = default!;
-        public string TraceId { get; private set; } = default!;
+        public string Code { get; set; } = default!;
+        public string Message { get; set; } = default!;
     }
 }

@@ -15,7 +15,7 @@ namespace bbqueue.Infrastructure.Services
         }
         public Task AddEmployeeAsync(Employee employee, CancellationToken cancellationToken)
         {
-           return employeeRepository.AddEmployeeAsync(employee.FromModelToEntity(), cancellationToken);
+           return employeeRepository.AddEmployeeAsync(employee, cancellationToken);
         }
         public Task SetRoleToEmployeeAsync(long employeeId, EmployeeRole role, CancellationToken cancellationToken)
         {

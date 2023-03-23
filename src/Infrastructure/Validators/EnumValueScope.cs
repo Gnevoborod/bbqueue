@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text;
 using bbqueue.Domain.Models;
+using bbqueue.Infrastructure.Exceptions;
 
 namespace bbqueue.Infrastructure.Validators
 {
@@ -14,7 +15,7 @@ namespace bbqueue.Infrastructure.Validators
             if(!t.IsEnum)
             {
                 type = t;
-                throw new Exception("Используемый в ограничении тип - не enum");
+                throw new ApiException(ExceptionEvents.EnumValidatorTypeNotEnum); 
             }
 
             this.values = Enum.GetNames(t);
@@ -25,11 +26,11 @@ namespace bbqueue.Infrastructure.Validators
         {
             if (value == null)
             {
-                return new ValidationResult("Пустое значение");
+                throw new ApiException(ExceptionEvents.ValidatorEmptyValue);
             }
             if(!type.IsEnum)
             {
-                return new ValidationResult("Используемый в ограничении тип - не enum");
+                throw new ApiException(ExceptionEvents.EnumValidatorTypeNotEnum);
             }
             string compare = new(value.ToString());//какая-то абсолютно идиотская вышла заглушка, но иначе ругалось
             foreach(var nextItem in values)
@@ -47,13 +48,12 @@ namespace bbqueue.Infrastructure.Validators
                 
             }
             StringBuilder sb = new StringBuilder();
-            sb.Append("Значение не найдено среди допустимых: ");
             for(int i=0; i<values.Length;i++)
             {
                 var nextItem = " " + values[i] + (i + 1==values.Length ? "": ",");
                 sb.Append(nextItem);
             }
-            return new ValidationResult(sb.ToString());
+            throw new ApiException(ExceptionEvents.EnumValidatorValueNotInScope, sb.ToString());
         }
     }
 }

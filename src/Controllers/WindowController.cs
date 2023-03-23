@@ -2,6 +2,8 @@
 using bbqueue.Controllers.Dtos.Target;
 using bbqueue.Controllers.Dtos.Window;
 using bbqueue.Domain.Interfaces.Services;
+using bbqueue.Infrastructure.Exceptions;
+using bbqueue.Infrastructure.Extensions;
 using bbqueue.Mapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,15 +14,15 @@ namespace bbqueue.Controllers
     [Route("api/window")]
     [Produces("application/json")]
     [ApiController]
+    [TypeFilter(typeof(ApiExceptionFilter))]
     public sealed class WindowController : ControllerBase
     {
         private readonly IWindowService windowService;
-        private readonly IAuth authrizationService;
-
-        public WindowController(IWindowService windowService, IAuth authorizationService)
+        private readonly ILogger<WindowController> logger;
+        public WindowController(IWindowService windowService, ILogger<WindowController> logger)
         {
             this.windowService = windowService;
-            this.authrizationService = authorizationService;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -37,9 +39,11 @@ namespace bbqueue.Controllers
         public async Task<IActionResult> ChangeWindowWorkStateAsync([FromBody] ChangeWindowWorkStateDto dto)
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
+            var employeeId = HttpContext.User.GetUserId();
+            logger.LogInformation($"Инициирована смена состояния окна {dto.Number} сотрудником с employeeId = {employeeId}");
             var window = dto.FromChangeStateDtoToModel();
-            var employeeId = authrizationService.GetUserId(HttpContext);
-            await windowService.ChangeWindowWorkStateAsync(window, employeeId,  cancellationToken);
+            await windowService.ChangeWindowWorkStateAsync(window, employeeId, cancellationToken);
+            logger.LogInformation($"Cмена состояния окна {dto.Number} завершена");
             return Ok();
         }
 

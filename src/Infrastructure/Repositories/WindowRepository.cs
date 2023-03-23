@@ -1,18 +1,21 @@
-﻿using bbqueue.Database.Entities;
-using bbqueue.Database;
+﻿using bbqueue.Database;
 using bbqueue.Domain.Models;
 using bbqueue.Mapper;
 using Microsoft.EntityFrameworkCore;
 using bbqueue.Domain.Interfaces.Repositories;
+using bbqueue.Infrastructure.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace bbqueue.Infrastructure.Repositories
 {
     public sealed class WindowRepository : IWindowRepository
     {
         private readonly QueueContext queueContext;
-        public WindowRepository(QueueContext queueContext)
+        private readonly ILogger<WindowRepository> logger;
+        public WindowRepository(QueueContext queueContext, ILogger<WindowRepository> logger)
         {
             this.queueContext = queueContext;
+            this.logger = logger;
         }
         public Task<List<Window>> GetWindowsAsync(CancellationToken cancellationToken)
         {
@@ -27,9 +30,15 @@ namespace bbqueue.Infrastructure.Repositories
                                     .WindowEntity
                                     .SingleOrDefaultAsync(we => we.Number == window.Number);
             if (windowEntity == null)
-                throw new Exception("Не удалось найти окно по номеру"); //Тут нужен свой эксепшн
+            {
+                logger.LogError(ExceptionEvents.WindowNotExists, ExceptionEvents.WindowNotExists.Name + $". Window number = {window.Number}, employeeId = {employeeId}");
+                throw new ApiException(ExceptionEvents.WindowNotExists);
+            }
             if (windowEntity.EmployeeId != employeeId)
-                throw new Exception("Невозможно изменить состояние окна, так как к данному окну привязан другой пользователь.");
+            {
+                logger.LogError(ExceptionEvents.WindowRelatedToAnotherEmployee, ExceptionEvents.WindowRelatedToAnotherEmployee.Name + $". Window number = {window.Number}, employeeId из запроса = {employeeId}, employeeId к которому привязано окно {windowEntity.EmployeeId}");
+                throw new ApiException(ExceptionEvents.WindowRelatedToAnotherEmployee);
+            }
             windowEntity.WindowWorkState = window.WindowWorkState;
             if(windowEntity.WindowWorkState == WindowWorkState.Closed)
             {

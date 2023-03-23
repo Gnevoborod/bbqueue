@@ -2,7 +2,9 @@
 using bbqueue.Domain.Interfaces.Repositories;
 using bbqueue.Domain.Interfaces.Services;
 using bbqueue.Domain.Models;
+using bbqueue.Infrastructure.Exceptions;
 using bbqueue.Mapper;
+using Microsoft.Extensions.Logging;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -11,13 +13,14 @@ namespace bbqueue.Infrastructure.Services
     public class TicketService: ITicketService
     {
         private readonly ITicketRepository ticketRepository;
-        private readonly IQueueService queueService;
         public readonly IWindowRepository windowRepository;
-        public TicketService(ITicketRepository ticketRepository, IQueueService queueService, IWindowRepository windowRepository) 
+        public readonly ILogger<TicketService> logger;
+
+        public TicketService(ITicketRepository ticketRepository, IWindowRepository windowRepository, ILogger<TicketService> logger) 
         {
             this.ticketRepository = ticketRepository;
-            this.queueService = queueService;
             this.windowRepository = windowRepository;
+            this.logger = logger;
         }
 
         public async Task<Ticket> CreateTicketAsync(long targetId, CancellationToken cancellationToken)
@@ -25,7 +28,8 @@ namespace bbqueue.Infrastructure.Services
             var ticketAmount = await ticketRepository.GetTicketAmountAsync(targetId, cancellationToken);
             if(ticketAmount == null )
             {
-                throw new Exception("Для указанной цели отсутствует префикс");//пока так, потом надо будет припилить собственный экспешн
+                logger.LogError(ExceptionEvents.TargetPrefixUndefined, ExceptionEvents.TargetPrefixUndefined.Name + $". TargetId = {targetId}");
+                throw new ApiException(ExceptionEvents.TargetPrefixUndefined);
             }
             Ticket ticket = new()
             {
@@ -37,9 +41,9 @@ namespace bbqueue.Infrastructure.Services
             ticket.Number = nextNumber;
             ticket.PublicNumber = prefix + nextNumber.ToString();
             ticket.TargetId = targetId;
-            ticket.Id = await ticketRepository.SaveTicketToDbAsync(ticket.FromModelToEntity(), prefix, cancellationToken);
+            ticket.Id = await ticketRepository.SaveTicketToDbAsync(ticket, prefix, cancellationToken);
 
-            await ticketRepository.SaveTicketOperationToDbAsync(new TicketOperationEntity()
+            await ticketRepository.SaveTicketOperationToDbAsync(new TicketOperation()
             {
                 TicketId = ticket.Id,
                 TargetId = targetId,
@@ -55,7 +59,10 @@ namespace bbqueue.Infrastructure.Services
             //сразу проверяем существует ли такой талон
             var ticket = await ticketRepository.GetTicketByIdAsync(ticketId, cancellationToken);
             if (ticket == null)
-                throw new Exception("В базе не обнаружен талон");
+            {
+                logger.LogError(ExceptionEvents.TicketNotFound, ExceptionEvents.TicketNotFound.Name + $". TicketId = {ticketId}, employeeId = {employeeId}, targetId = {targetId}");
+                throw new ApiException(ExceptionEvents.TicketNotFound);
+            }
             var ticketOperation = new TicketOperation();
             ticketOperation.State = TicketState.Returned;
             ticketOperation.TargetId = targetId;
@@ -67,8 +74,8 @@ namespace bbqueue.Infrastructure.Services
             ticket.TargetId = targetId;
             ticket.State= TicketState.Returned;
             //обновляем данные в базе
-            await ticketRepository.SaveTicketOperationToDbAsync(ticketOperation.FromModelToEntity(), cancellationToken);
-            await ticketRepository.UpdateTicketInDbAsync(ticket.FromModelToEntity(), cancellationToken);
+            await ticketRepository.SaveTicketOperationToDbAsync(ticketOperation, cancellationToken);
+            await ticketRepository.UpdateTicketInDbAsync(ticket, cancellationToken);
         }
         public Task<List<Ticket>> LoadTicketsAsync(bool loadOnlyProcessedTickets, CancellationToken cancellationToken)
         {
@@ -86,8 +93,8 @@ namespace bbqueue.Infrastructure.Services
             ticketOperation.Processed = DateTime.UtcNow;
             ticketOperation.TargetId = ticket.TargetId;
             ticketOperation.TicketId = ticket.Id;
-            await ticketRepository.SaveTicketOperationToDbAsync(ticketOperation.FromModelToEntity(), cancellationToken);
-            await ticketRepository.UpdateTicketInDbAsync(ticket.FromModelToEntity(), cancellationToken);
+            await ticketRepository.SaveTicketOperationToDbAsync(ticketOperation, cancellationToken);
+            await ticketRepository.UpdateTicketInDbAsync(ticket, cancellationToken);
         }
     }
 }
