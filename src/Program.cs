@@ -12,6 +12,8 @@ using NLog;
 using NLog.Web;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using bbqueue.Infrastructure.Middleware;
+using bbqueue.Infrastructure.Exceptions;
+using bbqueue.Infrastructure.Jobs;
 
 namespace bbqueue
 {
@@ -35,6 +37,9 @@ namespace bbqueue
                 builder.Logging.AddEventLog();
 
                 //builder.Services.AddScoped<QueueContext>();
+
+                builder.Services.AddMvc(options => options.Filters.Add(typeof(ApiExceptionFilter)));
+                builder.Services.AddHostedService<TicketsCleanHostedService>();
                 builder.Services.AddDbContext<QueueContext>(ServiceLifetime.Scoped);
                 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
                 builder.Services.AddScoped<IGroupService, GroupService>();
@@ -133,7 +138,7 @@ namespace bbqueue
                 app.UseAuthorization();
 
                 
-
+                
                 app.MapControllers();
 
                 app.Run();

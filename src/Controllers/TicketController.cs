@@ -5,7 +5,6 @@ using bbqueue.Mapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using bbqueue.Infrastructure.Exceptions;
 using bbqueue.Infrastructure.Extensions;
 
 namespace bbqueue.Controllers
@@ -13,16 +12,13 @@ namespace bbqueue.Controllers
     [Route("api/ticket")]
     [Produces("application/json")]
     [ApiController]
-    [TypeFilter(typeof(ApiExceptionFilter))]
     public class TicketController : Controller
     {
         private readonly ITicketService ticketService;
-        private readonly ILogger<TicketController> logger;
 
-        public TicketController(ITicketService ticketService, ILogger<TicketController> logger)
+        public TicketController(ITicketService ticketService)
         {
             this.ticketService = ticketService;
-            this.logger = logger;
         }
 
         /// <summary>
@@ -54,9 +50,7 @@ namespace bbqueue.Controllers
         public async Task<IActionResult> RedirectTicketToAnotherWindowAsync([FromBody] TicketRedirectDto ticketRedirectDto)
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
-            logger.LogInformation($"Redirecting ticket {ticketRedirectDto.TicketId} init.");
             await ticketService.ChangeTicketTarget(ticketRedirectDto.TicketId, ticketRedirectDto.TargetId, HttpContext.User.GetUserId(), cancellationToken);
-            logger.LogInformation($"Redirecting ticket {ticketRedirectDto.TicketId} done.");
             return Ok();
         }
 

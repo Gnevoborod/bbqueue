@@ -11,17 +11,14 @@ namespace bbqueue.Controllers
     [Route("api/queue")]
     [Produces("application/json")]
     [ApiController]
-    [TypeFilter(typeof(ApiExceptionFilter))]
     public class QueueController : Controller
     {
         private readonly IQueueService queueService;
         private readonly ITicketService ticketService;
-        private readonly ILogger<QueueController> logger;
-        public QueueController(IQueueService queueService, ITicketService ticketService, ILogger<QueueController> logger)
+        public QueueController(IQueueService queueService, ITicketService ticketService)
         {
             this.queueService = queueService;
             this.ticketService = ticketService;
-            this.logger = logger;
         }
 
 
@@ -38,13 +35,11 @@ namespace bbqueue.Controllers
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
             long employeeId = HttpContext.User.GetUserId();
-            logger.LogInformation($"Инициирован процесс вызова следующего посетителя с талоном. Инициатор employeeId = {employeeId}");
-               var ticket = await queueService.GetTicketNextTicketFromQueueAsync(employeeId, cancellationToken);
-               if(ticket !=null)
-               {
-                   await ticketService.TakeTicketToWork(ticket, employeeId, cancellationToken);
-               }
-            logger.LogInformation($"Процесс вызова следующего посетителя с талоном для employeeId = {employeeId} завершён");
+            var ticket = await queueService.GetTicketNextTicketFromQueueAsync(employeeId, cancellationToken);
+            if(ticket !=null)
+            {
+                await ticketService.TakeTicketToWork(ticket, employeeId, cancellationToken);
+            }
             return Ok(ticket?.FromModelToDto());
         }
     }

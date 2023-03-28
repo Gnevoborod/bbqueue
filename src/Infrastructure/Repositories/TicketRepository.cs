@@ -5,8 +5,6 @@ using bbqueue.Domain.Models;
 using bbqueue.Infrastructure.Exceptions;
 using bbqueue.Mapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System.Threading;
 
 namespace bbqueue.Infrastructure.Repositories
 {
@@ -19,9 +17,8 @@ namespace bbqueue.Infrastructure.Repositories
             this.queueContext = queueContext;
             this.logger = logger;
         }
-        public async Task<long> SaveTicketToDbAsync(Ticket ticket, char prefix, CancellationToken cancellationToken)
+        private async Task<long> SaveTicketToDbAsync(TicketEntity ticketEntity, char prefix, CancellationToken cancellationToken)
         {
-            var ticketEntity = ticket.FromModelToEntity();
             queueContext.TicketEntity.Add(ticketEntity);
             await SaveLastTicketNumberAsync(ticketEntity.Number, prefix, cancellationToken);
             await queueContext.SaveChangesAsync(cancellationToken);
@@ -39,7 +36,6 @@ namespace bbqueue.Infrastructure.Repositories
             var ticketEntity = await queueContext.TicketEntity.FirstOrDefaultAsync(te=>te.Id==ticket.Id, cancellationToken);
             if (ticketEntity == null)
             {
-                logger.LogError(ExceptionEvents.TicketNotFound, ExceptionEvents.TicketNotFound.Name + $". Id талона на входе = {ticket.Id}");
                 throw new ApiException(ExceptionEvents.TicketNotFound);
             }
             ticketEntity.State= ticket.State;
@@ -123,7 +119,6 @@ namespace bbqueue.Infrastructure.Repositories
             var window = await WindowRelatedToEmployeeasync(employeeId,cancellationToken);
             if (window == null)
             {
-                logger.LogError(ExceptionEvents.TicketUnableToTakeToWork, ExceptionEvents.TicketUnableToTakeToWork.Name + $". EmployeeId = {employeeId}");
                 throw new ApiException(ExceptionEvents.TicketUnableToTakeToWork);
             }
             var query = await (from toe in queueContext.TicketOperationEntity
@@ -145,7 +140,6 @@ namespace bbqueue.Infrastructure.Repositories
             var window = await WindowRelatedToEmployeeasync(employeeId, cancellationToken);
             if (window == null)
             {
-                logger.LogError(ExceptionEvents.TicketUnableToTakeToWork, ExceptionEvents.TicketUnableToTakeToWork.Name + $". EmployeeId = {employeeId}, ticketId = {ticketId}");
                 throw new ApiException(ExceptionEvents.TicketUnableToTakeToWork);
             }
             var ticket = await queueContext.TicketEntity.SingleOrDefaultAsync(te=>te.Id == ticketId, cancellationToken);
@@ -160,12 +154,84 @@ namespace bbqueue.Infrastructure.Repositories
                                 select win).FirstOrDefaultAsync(cancellationToken);
         }
 
-        public Task DeleteAllTicketsFromDBAsync(CancellationToken cancellationToken)
+        public async Task DeleteAllTicketsFromDBAsync(CancellationToken cancellationToken)
         {
-            queueContext.RemoveRange(queueContext.TicketAmountEntity);
-            queueContext.RemoveRange(queueContext.TicketOperationEntity);
-            queueContext.RemoveRange(queueContext.TicketEntity);
-            return queueContext.SaveChangesAsync(cancellationToken);
+            using var transaction = queueContext.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead);
+            try
+            {
+                logger.BeginScope("Запуск автоочистки данных по талонам");
+                queueContext.RemoveRange(queueContext.TicketAmountEntity);
+                logger.LogInformation("Очистка данных о последних номерах талонов");
+                queueContext.RemoveRange(queueContext.TicketOperationEntity);
+                logger.LogInformation("Очистка лога операций с талонами");
+                queueContext.RemoveRange(queueContext.TicketEntity);
+                logger.LogInformation("Удаление талонов");
+                await queueContext.SaveChangesAsync(cancellationToken);
+                await transaction.CommitAsync();
+                logger.LogInformation("Очистка успешно завершена");
+            }
+            catch
+            {
+                throw new ApiException(ExceptionEvents.TicketCleaningFailed);
+            }
+        }
+
+        public async Task AddTicketOperation(TicketOperation ticketOperation, Ticket ticket, CancellationToken cancellationToken)
+        {
+            using var transaction = queueContext.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead);
+            try
+            {
+                await SaveTicketOperationToDbAsync(ticketOperation, cancellationToken);
+                await UpdateTicketInDbAsync(ticket, cancellationToken);
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                throw new ApiException(ExceptionEvents.TicketTakeToWorkTransactionFailed);
+            }
+        }
+
+        public async Task<Ticket> CreateTicketAsync(long targetId, CancellationToken cancellationToken)
+        {
+
+            var ticketAmount = await GetTicketAmountAsync(targetId, cancellationToken);
+            if (ticketAmount == null)
+            {
+                throw new ApiException(ExceptionEvents.TargetPrefixUndefined);
+            }
+            TicketEntity ticket = new()
+            {
+                State = TicketState.Created,
+                Created = DateTime.UtcNow
+            };
+            char prefix = ticketAmount.Prefix;
+            int nextNumber = ++ticketAmount.Number;
+            ticket.Number = nextNumber;
+            ticket.PublicNumber = prefix + nextNumber.ToString();
+            ticket.TargetId = targetId;
+
+
+            using var transaction = queueContext.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead);
+            try
+            {
+                ticket.Id = await SaveTicketToDbAsync(ticket, prefix, cancellationToken);
+
+                await SaveTicketOperationToDbAsync(new TicketOperation()
+                {
+                    TicketId = ticket.Id,
+                    TargetId = targetId,
+                    State = TicketState.Created,
+                    Processed = DateTime.UtcNow
+
+                }, cancellationToken);
+
+                await transaction.CommitAsync();
+                return ticket.FromEntityToModel();
+            }
+            catch
+            {
+                throw new ApiException(ExceptionEvents.TicketUnableToCreate);
+            }
         }
     }
 }

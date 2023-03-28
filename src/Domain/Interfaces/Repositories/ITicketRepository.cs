@@ -5,14 +5,7 @@ namespace bbqueue.Domain.Interfaces.Repositories
 {
     public interface ITicketRepository
     {
-        /// <summary>
-        /// Сохраняет талон в БД
-        /// </summary>
-        /// <param name="ticket"></param>
-        /// <param name="prefix"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public Task<long> SaveTicketToDbAsync(Ticket ticket, char prefix, CancellationToken cancellationToken);
+   
         /// <summary>
         /// Обновляет талон в БД
         /// </summary>
@@ -96,5 +89,22 @@ namespace bbqueue.Domain.Interfaces.Repositories
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public Task<Ticket?> GetTicketByIdAsync(long ticketId, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Записывает информацию о назначении талона сотруднику и изменении его состояния в режиме транзакции.
+        /// </summary>
+        /// <param name="ticketOperation"></param>
+        /// <param name="ticket"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Task AddTicketOperation(TicketOperation ticketOperation, Ticket ticket, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Добавляет новый талон в режиме транзакции
+        /// </summary>
+        /// <param name="targetId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Task<Ticket> CreateTicketAsync(long targetId, CancellationToken cancellationToken);
     }
 }

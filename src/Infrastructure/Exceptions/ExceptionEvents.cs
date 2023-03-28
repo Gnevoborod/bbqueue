@@ -14,12 +14,20 @@
         public static readonly EventId TicketNotFound = new(21, "Не найдено талона для обновления");
         public static readonly EventId TicketUnableToTakeToWork = new(22, "Невозможно взять в работу следующий талон. Пользователь не прикреплён к окну");
 
+        public static readonly EventId TicketCleaningFailed = new(27, "Очистка данных в БД закончилась неудачей");
+        public static readonly EventId TicketUnableToCreate = new(28, "Невозможно создать новый талон. Ошибка при сохранении данных в БД");
+        public static readonly EventId TicketTakeToWorkTransactionFailed = new(29, "Невозможно взять в работу следующий талон. Ошибка при сохранении данных в БД");
+
         public static readonly EventId TargetPrefixUndefined = new(31, "Для указанной цели отсутствует префикс");
 
 
         public static readonly EventId ValidatorEmptyValue = new(300, "Пустое значение");
         public static readonly EventId EnumValidatorTypeNotEnum = new(351,"Используемый в ограничении тип - не enum");
         public static readonly EventId EnumValidatorValueNotInScope = new(352, "Значение не найдено среди допустимых:");
+
+
+        public static readonly EventId HostedServiceErrorWhileExecuted = new(701, "Ошибка при выполнении автозадания по очистке данных о талонах.");
+
         public static readonly EventId Default = new(0, "Unkonown error");
 
     }

@@ -11,7 +11,6 @@ namespace bbqueue.Controllers
     [Route("api/target")]
     [Produces("application/json")]
     [ApiController]
-    [TypeFilter(typeof(ApiExceptionFilter))]
     public sealed class TargetController : ControllerBase
     {
         private readonly ITargetService targetService;

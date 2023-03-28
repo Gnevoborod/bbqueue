@@ -14,45 +14,16 @@ namespace bbqueue.Infrastructure.Services
     {
         private readonly ITicketRepository ticketRepository;
         public readonly IWindowRepository windowRepository;
-        public readonly ILogger<TicketService> logger;
 
-        public TicketService(ITicketRepository ticketRepository, IWindowRepository windowRepository, ILogger<TicketService> logger) 
+        public TicketService(ITicketRepository ticketRepository, IWindowRepository windowRepository) 
         {
             this.ticketRepository = ticketRepository;
             this.windowRepository = windowRepository;
-            this.logger = logger;
         }
 
-        public async Task<Ticket> CreateTicketAsync(long targetId, CancellationToken cancellationToken)
+        public Task<Ticket> CreateTicketAsync(long targetId, CancellationToken cancellationToken)
         {
-            var ticketAmount = await ticketRepository.GetTicketAmountAsync(targetId, cancellationToken);
-            if(ticketAmount == null )
-            {
-                logger.LogError(ExceptionEvents.TargetPrefixUndefined, ExceptionEvents.TargetPrefixUndefined.Name + $". TargetId = {targetId}");
-                throw new ApiException(ExceptionEvents.TargetPrefixUndefined);
-            }
-            Ticket ticket = new()
-            {
-                State = TicketState.Created,
-                Created = DateTime.UtcNow
-            };
-            char prefix = ticketAmount.Prefix;
-            int nextNumber = ++ticketAmount.Number;
-            ticket.Number = nextNumber;
-            ticket.PublicNumber = prefix + nextNumber.ToString();
-            ticket.TargetId = targetId;
-            ticket.Id = await ticketRepository.SaveTicketToDbAsync(ticket, prefix, cancellationToken);
-
-            await ticketRepository.SaveTicketOperationToDbAsync(new TicketOperation()
-            {
-                TicketId = ticket.Id,
-                TargetId = targetId,
-                State = TicketState.Created,
-                Processed = DateTime.UtcNow
-
-            }, cancellationToken); ;
-
-            return ticket;
+            return ticketRepository.CreateTicketAsync(targetId, cancellationToken);
         }
         public async Task ChangeTicketTarget(long ticketId, long targetId, long employeeId, CancellationToken cancellationToken)
         {
@@ -60,7 +31,6 @@ namespace bbqueue.Infrastructure.Services
             var ticket = await ticketRepository.GetTicketByIdAsync(ticketId, cancellationToken);
             if (ticket == null)
             {
-                logger.LogError(ExceptionEvents.TicketNotFound, ExceptionEvents.TicketNotFound.Name + $". TicketId = {ticketId}, employeeId = {employeeId}, targetId = {targetId}");
                 throw new ApiException(ExceptionEvents.TicketNotFound);
             }
             var ticketOperation = new TicketOperation();
@@ -93,8 +63,9 @@ namespace bbqueue.Infrastructure.Services
             ticketOperation.Processed = DateTime.UtcNow;
             ticketOperation.TargetId = ticket.TargetId;
             ticketOperation.TicketId = ticket.Id;
-            await ticketRepository.SaveTicketOperationToDbAsync(ticketOperation, cancellationToken);
-            await ticketRepository.UpdateTicketInDbAsync(ticket, cancellationToken);
+
+            await ticketRepository.AddTicketOperation(ticketOperation, ticket, cancellationToken);
+
         }
     }
 }
