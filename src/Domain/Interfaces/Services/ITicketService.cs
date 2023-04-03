@@ -40,5 +40,6 @@ namespace bbqueue.Domain.Interfaces.Services
         /// <returns></returns>
         public Task TakeTicketToWork(Ticket ticket, long windowId, CancellationToken cancellationToken);
 
+        public int Sum(int a, int b);
     }
 }

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace bbqueue.Infrastructure.Repositories
 {
-    public sealed class TicketRepository:ITicketRepository
+    public sealed class TicketRepository : ITicketRepository
     {
         private readonly QueueContext queueContext;
         private readonly ILogger<TicketRepository> logger;
@@ -27,20 +27,20 @@ namespace bbqueue.Infrastructure.Repositories
 
         public async Task<Ticket?> GetTicketByIdAsync(long ticketId, CancellationToken cancellationToken)
         {
-            var ticket = await queueContext.TicketEntity.SingleOrDefaultAsync(t => t.Id == ticketId,cancellationToken);
+            var ticket = await queueContext.TicketEntity.SingleOrDefaultAsync(t => t.Id == ticketId, cancellationToken);
             return ticket == null ? default! : ticket.FromEntityToModel();
         }
 
         public async Task UpdateTicketInDbAsync(Ticket ticket, CancellationToken cancellationToken)
         {
-            var ticketEntity = await queueContext.TicketEntity.FirstOrDefaultAsync(te=>te.Id==ticket.Id, cancellationToken);
+            var ticketEntity = await queueContext.TicketEntity.FirstOrDefaultAsync(te => te.Id == ticket.Id, cancellationToken);
             if (ticketEntity == null)
             {
                 throw new ApiException(ExceptionEvents.TicketNotFound);
             }
-            ticketEntity.State= ticket.State;
-            ticketEntity.Closed= ticket.Closed;
-            ticketEntity.TargetId= ticket.TargetId; 
+            ticketEntity.State = ticket.State;
+            ticketEntity.Closed = ticket.Closed;
+            ticketEntity.TargetId = ticket.TargetId;
             await queueContext.SaveChangesAsync(cancellationToken);
         }
         public Task<List<Ticket>> LoadTicketsFromDbAsync(bool loadOnlyProcessedTickets, CancellationToken cancellationToken)//true грузим обработанные талоны false необработанные талоны
@@ -48,14 +48,14 @@ namespace bbqueue.Infrastructure.Repositories
             var state = loadOnlyProcessedTickets ? TicketState.Closed : TicketState.Created;
             return queueContext.TicketEntity
                 .Where(te => te.State == state)
-                .Select(te=>te.FromEntityToModel())
+                .Select(te => te.FromEntityToModel())
                 .ToListAsync(cancellationToken);
         }
 
         public async Task SaveLastTicketNumberAsync(int number, char prefix, CancellationToken cancellationToken)
         {
-            var ticketAmount = await queueContext.TicketAmountEntity.SingleOrDefaultAsync(tae=>tae.Prefix==prefix && tae.Number == number-1, cancellationToken);
-            if(ticketAmount == null)
+            var ticketAmount = await queueContext.TicketAmountEntity.SingleOrDefaultAsync(tae => tae.Prefix == prefix && tae.Number == number - 1, cancellationToken);
+            if (ticketAmount == null)
             {
                 await CreateTicketAmountRecordAsync(prefix, cancellationToken);
                 return;
@@ -78,7 +78,7 @@ namespace bbqueue.Infrastructure.Repositories
 
         public Task<List<TicketOperation>> GetTicketOperationByTicket(long ticketId, CancellationToken cancellationToken)
         {
-            return queueContext.TicketOperationEntity.Where(to => to.TicketId == ticketId).Select(to=>to.FromEntityToModel()).ToListAsync(cancellationToken);
+            return queueContext.TicketOperationEntity.Where(to => to.TicketId == ticketId).Select(to => to.FromEntityToModel()).ToListAsync(cancellationToken);
         }
 
         public Task SaveTicketOperationToDbAsync(TicketOperation ticketOperation, CancellationToken cancellationToken)
@@ -95,7 +95,7 @@ namespace bbqueue.Infrastructure.Repositories
             var ticketAmount = await queueContext
                         .TicketAmountEntity
                         .SingleOrDefaultAsync(ta => ta.Prefix == target.Prefix, cancellationToken);
-            if(ticketAmount == null)
+            if (ticketAmount == null)
             {
                 ticketAmount = await CreateTicketAmountRecordAsync(target.Prefix, cancellationToken);
             }
@@ -116,22 +116,22 @@ namespace bbqueue.Infrastructure.Repositories
 
         public async Task<Ticket?> GetNextTicketAsync(long employeeId, CancellationToken cancellationToken)
         {
-            var window = await WindowRelatedToEmployeeasync(employeeId,cancellationToken);
+            var window = await WindowRelatedToEmployeeasync(employeeId, cancellationToken);
             if (window == null)
             {
                 throw new ApiException(ExceptionEvents.TicketUnableToTakeToWork);
             }
             var query = await (from toe in queueContext.TicketOperationEntity
-                        join
-                        te in queueContext.TicketEntity
-                        on toe.TicketId equals te.Id
-                        join
-                        wte in queueContext.WindowTargetEntity
-                        on toe.TargetId equals wte.TargetId
-                        where wte.WindowId == window.Id
-                        && te.State == TicketState.Created || te.State == TicketState.Returned//вот тут посложнее логику надо сделать
-                        orderby te.Created
-                        select te).FirstOrDefaultAsync(cancellationToken);
+                               join
+                               te in queueContext.TicketEntity
+                               on toe.TicketId equals te.Id
+                               join
+                               wte in queueContext.WindowTargetEntity
+                               on toe.TargetId equals wte.TargetId
+                               where wte.WindowId == window.Id
+                               && te.State == TicketState.Created || te.State == TicketState.Returned//вот тут посложнее логику надо сделать
+                               orderby te.Created
+                               select te).FirstOrDefaultAsync(cancellationToken);
             return query == null ? default! : query.FromEntityToModel();
         }
 
@@ -142,32 +142,38 @@ namespace bbqueue.Infrastructure.Repositories
             {
                 throw new ApiException(ExceptionEvents.TicketUnableToTakeToWork);
             }
-            var ticket = await queueContext.TicketEntity.SingleOrDefaultAsync(te=>te.Id == ticketId, cancellationToken);
-            return ticket == null? default! : ticket.FromEntityToModel();
+            var ticket = await queueContext.TicketEntity.SingleOrDefaultAsync(te => te.Id == ticketId, cancellationToken);
+            return ticket == null ? default! : ticket.FromEntityToModel();
         }
 
 
         private Task<WindowEntity?> WindowRelatedToEmployeeasync(long employeeId, CancellationToken cancellationToken)
         {
-           return (from win in queueContext.WindowEntity
-                                where win.EmployeeId == employeeId
-                                select win).FirstOrDefaultAsync(cancellationToken);
+            return (from win in queueContext.WindowEntity
+                    where win.EmployeeId == employeeId
+                    select win).FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task DeleteAllTicketsFromDBAsync(CancellationToken cancellationToken)
         {
-            using var transaction = queueContext.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead);
+            int MAX_TICKETS_TO_DELETE = 1000;
             try
-            {
+            { 
                 logger.BeginScope("Запуск автоочистки данных по талонам");
-                queueContext.RemoveRange(queueContext.TicketAmountEntity);
+                queueContext.RemoveRange(queueContext.TicketAmountEntity);//тут всегда конечное количество записей - 30, так что можем не беспокоиться о производительности
                 logger.LogInformation("Очистка данных о последних номерах талонов");
-                queueContext.RemoveRange(queueContext.TicketOperationEntity);
-                logger.LogInformation("Очистка лога операций с талонами");
-                queueContext.RemoveRange(queueContext.TicketEntity);
-                logger.LogInformation("Удаление талонов");
-                await queueContext.SaveChangesAsync(cancellationToken);
-                await transaction.CommitAsync();
+                List<TicketEntity> ticket = default!;
+                while((ticket = queueContext.TicketEntity.Where(te => te.Created > DateTime.UtcNow.AddMonths(1)).Take(MAX_TICKETS_TO_DELETE).ToList()).Count>0)
+                {
+                    using var transaction = queueContext.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead);
+                    var ticketIds = ticket.Select(t=>t.Id).ToList();
+                    queueContext.RemoveRange(queueContext.TicketOperationEntity.Where(to => ticketIds.Contains(to.TicketId)).Take(MAX_TICKETS_TO_DELETE));
+                    logger.LogInformation("Очистка лога операций с талонами");
+                    queueContext.RemoveRange(ticket);
+                    logger.LogInformation("Удаление талонов");
+                    await queueContext.SaveChangesAsync(cancellationToken);
+                    await transaction.CommitAsync();
+                }
                 logger.LogInformation("Очистка успешно завершена");
             }
             catch
