@@ -5,7 +5,7 @@ using System.Net.Sockets;
 
 namespace bbqueue.Mapper
 {
-    internal static class TicketMapper
+    public static class TicketMapper
     {
         public static Ticket FromEntityToModel(this TicketEntity ticketEntity)
         {

@@ -6,9 +6,11 @@ using bbqueue.Database;
 using bbqueue.Database.Entities;
 using bbqueue.Infrastructure.Services;
 using bbqueue.Domain.Interfaces.Repositories;
-using bbqueue.Infrastructure.Repositories;
+using bbqueue.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using bbqueue.Infrastructure.Exceptions;
+using NSubstitute.ReceivedExtensions;
 
 namespace BBQueueTest
 {
@@ -16,6 +18,7 @@ namespace BBQueueTest
     {
         private ITicketService ticketService;
         private ITicketRepository ticketRepository;
+        private IWindowRepository windowRepository;
 
         private QueueContext queueContext;
 
@@ -31,20 +34,42 @@ namespace BBQueueTest
 
             PrepareDatabase();
 
-            ticketRepository = new TicketRepository(queueContext, null);
-            ticketService = new TicketService(ticketRepository, null);
+            ticketRepository = Substitute.For<ITicketRepository>();
+            windowRepository = Substitute.For<IWindowRepository>();
+            ticketService = new TicketService(ticketRepository, windowRepository);
         }
         [Theory]
-        [InlineData(1)]
-        public async void CreateTicketPublicNumberTest(long targetId)
+        [InlineData(5)]
+        public async void ChangeTicketTarget_ThrownExceptionTest(long targetId)
         {
-            var ticket = await ticketService.CreateTicketAsync(targetId, CancellationToken.None);
-            ticket.Number.ShouldBe(1);
-            ticket.PublicNumber.ShouldBe("Ш1");
-            ticket.State.ShouldBe(bbqueue.Domain.Models.TicketState.Created);
-            ticket.TargetId.ShouldBe(targetId);
+            //тест переписал, поскольку в создании талона, если мы мокаем талон, никакого смысла нет
+            var exception = Should.Throw<ApiException>(async ()=>await ticketService.ChangeTicketTarget(-1, targetId, 0, CancellationToken.None));
+            exception.HResult.ShouldBe(ExceptionEvents.TicketNotFound.Id);
         }
 
+
+        [Theory]
+        [InlineData(5)]
+        public async void ChangeTicketTarget_SuccessTest(long targetId)
+        {
+            //тест переписал, поскольку в создании талона, если мы мокаем талон, никакого смысла нет
+
+            ticketRepository.GetTicketByIdAsync(1, CancellationToken.None).ReturnsForAnyArgs(new Ticket()
+            {
+                Id = 1,
+                TargetId = 1,
+                Number = 1,
+                PublicNumber = "Ж1",
+                Created = DateTime.UtcNow,
+                State = TicketState.Created
+            });
+
+            await ticketService.ChangeTicketTarget(-1, targetId, 0, CancellationToken.None);
+
+            await ticketRepository.Received().GetTicketByIdAsync(-1, CancellationToken.None);
+            await ticketRepository.Received().SaveTicketOperationToDbAsync(Arg.Any<TicketOperation>(), CancellationToken.None);
+            await ticketRepository.Received().UpdateTicketInDbAsync(Arg.Any<Ticket>(), CancellationToken.None);
+        }
 
         public void Dispose()
         {

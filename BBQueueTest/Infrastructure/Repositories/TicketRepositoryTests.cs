@@ -2,10 +2,13 @@
 using bbqueue.Database.Entities;
 using bbqueue.Domain.Interfaces.Repositories;
 using bbqueue.Domain.Models;
+using bbqueue.Mapper;
 using bbqueue.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using NLog.Targets;
 using Shouldly;
+using AutoFixture;
 
 namespace BBQueueTest.Infrastructure.Repositories
 {
@@ -14,11 +17,10 @@ namespace BBQueueTest.Infrastructure.Repositories
         private ITicketRepository ticketRepository;
         private QueueContext queueContext;
 
-        private Ticket? preparedTicket;
         public TicketRepositoryTests()
         {
             var options = new DbContextOptionsBuilder<QueueContext>()
-        .UseInMemoryDatabase(databaseName: "bbqueue_test")
+        .UseInMemoryDatabase(databaseName: "bbqueue_test_repository")
         .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
         .Options;
             queueContext = new QueueContext(options);
@@ -28,15 +30,25 @@ namespace BBQueueTest.Infrastructure.Repositories
             PrepareDatabase();
         }
 
+        //ниже пробую AutoFixture
         [Theory]
         [InlineData(TicketState.InProcess)]
         public async void ChangeTicketStateTest(TicketState ticketState)
         {
-            preparedTicket.State = ticketState;
-            await ticketRepository.UpdateTicketInDbAsync(preparedTicket, CancellationToken.None);
-            var ticket = await ticketRepository.GetTicketByIdAsync(preparedTicket.Id, CancellationToken.None);
+            Fixture fixture = new Fixture();
+            TicketEntity ticket = fixture.Create<TicketEntity>();
+            ticket.Id = 1;
+            ticket.TargetId = 2;
+            queueContext.TicketEntity.Add(ticket);
+            await queueContext.SaveChangesAsync();
 
-            ticket.State.ShouldBe(ticketState);
+            ticket.State = ticketState;
+            await queueContext.SaveChangesAsync();
+
+            await ticketRepository.UpdateTicketInDbAsync(ticket.FromEntityToModel(), CancellationToken.None);
+            
+            var newTicket = queueContext.TicketEntity.Where(te=>te.Id == 1).SingleOrDefault();
+            newTicket.State.ShouldBe(ticketState);
 
         }
 
@@ -51,9 +63,7 @@ namespace BBQueueTest.Infrastructure.Repositories
                 Prefix = 'Г'
             };
             queueContext.TargetEntity.Add(targetEntity);
-            queueContext.SaveChanges();
-
-            preparedTicket = await ticketRepository.CreateTicketAsync(targetId, CancellationToken.None);
+            await queueContext.SaveChangesAsync();
         }
 
 
