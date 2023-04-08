@@ -15,3 +15,6 @@
 /src/.vs/bbqueue/v17/.suo
 /src/.vs/ProjectEvaluation/bbqueue.metadata.v5.2
 /src/.vs/ProjectEvaluation/bbqueue.projects.v5.2
+/BBQueueTest/obj
+/BBQueueTest/bin/Debug/net6.0
+/src/bin/Release/net6.0
