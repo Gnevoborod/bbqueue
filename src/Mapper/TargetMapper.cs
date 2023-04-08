@@ -64,5 +64,18 @@ namespace bbqueue.Mapper
                 GroupLinkId = target.GroupLinkId
             };
         }
+
+        public static Target FromDtoToModel(this TargetCreateDto targetCreateDto)
+        {
+            if (targetCreateDto == null) 
+                return default!;
+            return new Target
+            {
+                Name = targetCreateDto.Name,
+                Description = targetCreateDto.Description,
+                Prefix = targetCreateDto.Prefix,
+                GroupLinkId = targetCreateDto.GroupLinkId
+            };
+        }
     }
 }

@@ -30,6 +30,7 @@ namespace bbqueue.Database
         {
             if (connectionString == null)
                 SetConnectionString();
+            Database.EnsureCreated();
         }
         
 

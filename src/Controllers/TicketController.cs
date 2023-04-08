@@ -69,5 +69,24 @@ namespace bbqueue.Controllers
             return Ok(result);
         }
 
+
+        /// <summary>
+        /// Осуществляет закрытие талона
+        /// </summary>
+        /// <param name="ticketClose"></param>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(ErrorDto),400)]
+        [ProducesResponseType(typeof(ErrorDto),401)]
+        [ProducesResponseType(typeof(ErrorDto),404)]
+        [Authorize]
+        [HttpPost("close")]
+        public async Task<IActionResult> CloseTicketAsync([FromBody]TicketClose ticketClose)
+        {
+            CancellationToken cancellationToken = HttpContext.RequestAborted;
+            await ticketService.CloseTicket(ticketClose.TicketId, HttpContext.User.GetUserId(), cancellationToken);
+            return Ok();
+        }
+
     }
 }

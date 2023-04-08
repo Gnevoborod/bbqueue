@@ -15,5 +15,10 @@ namespace bbqueue.Infrastructure.Services
         {
             return groupRepository.GetGroupsAsync(cancellationToken);
         }
+
+        public Task<long> AddGroupAsync(Group group) 
+        {
+            return groupRepository.AddGroupAsync(group);
+        }
     }
 }

@@ -69,5 +69,16 @@ namespace bbqueue.Mapper
             return groupHierarchyDto;
         }
 
+        public static Group FromDtoToModel(this GroupCreateDto groupCreateDto)
+        {
+            if (groupCreateDto == null)
+                return default!;
+            return new Group
+            {
+                Name = groupCreateDto.Name,
+                Description = groupCreateDto.Description,
+                GroupLinkId = groupCreateDto.GroupLinkId
+            };
+        }
     }
 }

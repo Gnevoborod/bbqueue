@@ -10,6 +10,7 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using NLog;
 using NLog.Web;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using bbqueue.Infrastructure.Middleware;
 using bbqueue.Infrastructure.Exceptions;
@@ -34,10 +35,11 @@ namespace bbqueue
 
                 builder.Logging.ClearProviders();
                 builder.Host.UseNLog();
-                builder.Logging.AddEventLog();
+                //builder.Logging.AddEventLog();
 
                 //builder.Services.AddScoped<QueueContext>();
-
+                if(builder.Environment.IsProduction())
+                    builder.WebHost.UseUrls("http://*:5005");
                 builder.Services.AddMvc(options => options.Filters.Add(typeof(ApiExceptionFilter)));
                 builder.Services.AddHostedService<TicketsCleanHostedService>();
                 builder.Services.AddDbContext<QueueContext>(ServiceLifetime.Scoped);
@@ -120,15 +122,16 @@ namespace bbqueue
 
                 });
 
+                
 
                 var app = builder.Build();
 
                 // Configure the HTTP request pipeline.
-                if (app.Environment.IsDevelopment())
-                {
+               // if (app.Environment.IsDevelopment())
+                //{
                     app.UseSwagger();
                     app.UseSwaggerUI();
-                }
+                //}
 
                 app.UseMiddleware<RequestIdentityMiddleware>();
 
@@ -140,7 +143,6 @@ namespace bbqueue
                 
                 
                 app.MapControllers();
-
                 app.Run();
             }
             catch(Exception exception)

@@ -5,6 +5,8 @@ using bbqueue.Controllers.Dtos.Group;
 using bbqueue.Domain.Interfaces.Services;
 using bbqueue.Controllers.Dtos.Error;
 using bbqueue.Infrastructure.Exceptions;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace bbqueue.Controllers
 {
@@ -69,6 +71,45 @@ namespace bbqueue.Controllers
                 Groups = groups.Select(gld => gld.FromModelToDto()).ToList()
             };
             return Ok(groupListDto);
+        }
+
+
+        /// <summary>
+        /// Создаёт новую цель
+        /// </summary>
+        /// <param name="targetCreateDto"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "Manager")]
+        [ProducesResponseType(typeof(TargetCreatedIdDto),200)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [HttpPost("add_target")]
+        public async Task<IActionResult> AddTargetAsync([FromBody]TargetCreateDto targetCreateDto)
+        {
+            CancellationToken cancellationToken = HttpContext.RequestAborted;
+            var targetId = await targetService.AddTargetAsync(targetCreateDto.FromDtoToModel());
+            return Ok(new TargetCreatedIdDto()
+            {
+                TargetId = targetId
+            });
+        }
+
+        /// <summary>
+        /// Создаёт новый раздел\подраздел
+        /// </summary>
+        /// <param name="groupCreateDto"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "Manager")]
+        [ProducesResponseType(typeof(GroupCreatedIdDto),200)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [HttpPost("add_group")]
+        public async Task<IActionResult> AddGroupAsync([FromBody]GroupCreateDto groupCreateDto)
+        {
+            CancellationToken cancellationToken = HttpContext.RequestAborted;
+            var groupId = await groupService.AddGroupAsync(groupCreateDto.FromDtoToModel());
+            return Ok(new GroupCreatedIdDto()
+            {
+                GroupId = groupId
+            });
         }
     }
 }

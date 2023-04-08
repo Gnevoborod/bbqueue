@@ -5,6 +5,7 @@ using bbqueue.Mapper;
 using bbqueue.Domain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using bbqueue.Controllers.Dtos.Group;
+using bbqueue.Infrastructure.Exceptions;
 
 namespace bbqueue.Infrastructure.Repositories
 {
@@ -22,6 +23,32 @@ namespace bbqueue.Infrastructure.Repositories
                     .Select(g=> g.FromEntityToModel())
                     .ToListAsync(cancellationToken);
             
+        }
+
+        public async Task<long> AddGroupAsync(Group group)
+        {
+            GroupEntity? groupInDb = default!;
+            if (group.GroupLinkId != null)
+            {
+                groupInDb = await queueContext.GroupEntity.FirstOrDefaultAsync(ge => ge.Id == group.Id);
+                if (groupInDb == null)
+                {
+                    throw new ApiException(ExceptionEvents.GroupParentIdNotExists);
+                }
+            }
+
+            groupInDb = await queueContext.GroupEntity.FirstOrDefaultAsync(ge=>ge.Name == group.Name);
+            if(groupInDb!=null)
+            {
+                throw new ApiException(ExceptionEvents.GroupNameExists);
+            }
+
+
+            var newGroup = group.FromModelToEntity();
+            queueContext.GroupEntity.Add(newGroup);
+            await queueContext.SaveChangesAsync();
+            return newGroup.Id;
+
         }
     }
 }
