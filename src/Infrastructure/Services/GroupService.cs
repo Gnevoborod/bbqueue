@@ -16,9 +16,9 @@ namespace bbqueue.Infrastructure.Services
             return groupRepository.GetGroupsAsync(cancellationToken);
         }
 
-        public Task<long> AddGroupAsync(Group group) 
+        public Task<long> AddGroupAsync(Group group, CancellationToken cancellationToken) 
         {
-            return groupRepository.AddGroupAsync(group);
+            return groupRepository.AddGroupAsync(group, cancellationToken);
         }
     }
 }

@@ -31,9 +31,9 @@ namespace bbqueue.Infrastructure.Services
             return result;
         }
 
-        public Task<long> AddTargetAsync(Target target)
+        public Task<long> AddTargetAsync(Target target, CancellationToken cancellationToken)
         {
-            return targetRepository.AddTargetAsync(target);
+            return targetRepository.AddTargetAsync(target, cancellationToken);
         }
     }
 }

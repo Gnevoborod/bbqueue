@@ -23,14 +23,14 @@ namespace bbqueue.Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<long> AddTargetAsync(Target target)
+        public async Task<long> AddTargetAsync(Target target, CancellationToken cancellationToken)
         {
-            var targetInDb = await queueContext.TargetEntity.FirstOrDefaultAsync(te => te.Prefix == target.Prefix);
+            var targetInDb = await queueContext.TargetEntity.FirstOrDefaultAsync(te => te.Prefix == target.Prefix, cancellationToken);
             if(targetInDb != null)
             {
                 throw new ApiException(ExceptionEvents.TargetPrefixExists);
             }
-            targetInDb = await queueContext.TargetEntity.FirstOrDefaultAsync(te=>te.Name == target.Name);
+            targetInDb = await queueContext.TargetEntity.FirstOrDefaultAsync(te=>te.Name == target.Name, cancellationToken);
             if(targetInDb != null )
             {
                 throw new ApiException(ExceptionEvents.TargetNameExists);
@@ -38,7 +38,7 @@ namespace bbqueue.Infrastructure.Repositories
 
             if (target.GroupLinkId != null)
             {
-                var groupInDb = await queueContext.GroupEntity.FirstOrDefaultAsync(ge => ge.Id == target.GroupLinkId);
+                var groupInDb = await queueContext.GroupEntity.FirstOrDefaultAsync(ge => ge.Id == target.GroupLinkId, cancellationToken);
                 if (groupInDb == null)
                 {
                     throw new ApiException(ExceptionEvents.GroupParentIdNotExists);
@@ -46,7 +46,7 @@ namespace bbqueue.Infrastructure.Repositories
             }
             var newTarget = target.FromModelToEntity();
             queueContext.TargetEntity.Add(newTarget);
-            await queueContext.SaveChangesAsync();
+            await queueContext.SaveChangesAsync(cancellationToken);
             return newTarget.Id;
         }
     }

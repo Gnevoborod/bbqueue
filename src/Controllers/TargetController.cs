@@ -86,7 +86,7 @@ namespace bbqueue.Controllers
         public async Task<IActionResult> AddTargetAsync([FromBody]TargetCreateDto targetCreateDto)
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
-            var targetId = await targetService.AddTargetAsync(targetCreateDto.FromDtoToModel());
+            var targetId = await targetService.AddTargetAsync(targetCreateDto.FromDtoToModel(), cancellationToken);
             return Ok(new TargetCreatedIdDto()
             {
                 TargetId = targetId
@@ -105,7 +105,7 @@ namespace bbqueue.Controllers
         public async Task<IActionResult> AddGroupAsync([FromBody]GroupCreateDto groupCreateDto)
         {
             CancellationToken cancellationToken = HttpContext.RequestAborted;
-            var groupId = await groupService.AddGroupAsync(groupCreateDto.FromDtoToModel());
+            var groupId = await groupService.AddGroupAsync(groupCreateDto.FromDtoToModel(), cancellationToken);
             return Ok(new GroupCreatedIdDto()
             {
                 GroupId = groupId

@@ -15,7 +15,8 @@ namespace bbqueue.Domain.Interfaces.Repositories
         /// Создаёт новый раздел или подраздел
         /// </summary>
         /// <param name="group"></param>
+        /// /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task<long> AddGroupAsync(Group group);
+        public Task<long> AddGroupAsync(Group group, CancellationToken cancellationToken);
     }
 }
