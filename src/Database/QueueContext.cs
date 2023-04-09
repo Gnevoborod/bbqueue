@@ -12,18 +12,20 @@ namespace bbqueue.Database
         public DbSet<TicketEntity> TicketEntity { get; set; } = default!;
         public DbSet<TicketAmountEntity> TicketAmountEntity { get; set; } = default!;
         public DbSet<TicketOperationEntity> TicketOperationEntity { get; set; } = default!;
-        internal DbSet<GroupEntity> GroupEntity { get; set; } = default!;
-        internal DbSet<TargetEntity> TargetEntity { get; set; } = default!;
+        public DbSet<GroupEntity> GroupEntity { get; set; } = default!;
+        public DbSet<TargetEntity> TargetEntity { get; set; } = default!;
         public DbSet<WindowTargetEntity> WindowTargetEntity { get; set; } = default!;
         public DbSet<EmployeeEntity> EmployeeEntity { get; set; } = default!;
         private static string? connectionString;
 
-        private void SetConnectionString()
+        private void SetConnectionString(bool IntegrationTests = false)
         {
             var config = new ConfigurationBuilder()
                     .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                     .AddJsonFile("appsettings.json").Build();
-            connectionString = config.GetConnectionString("DatabaseConnectionString") ?? throw new NullReferenceException("Невозможно получить путь к базе");
+            connectionString = IntegrationTests?
+                  config.GetConnectionString("DatabaseConnsectionStringForIntegrationTests") ?? throw new NullReferenceException("Невозможно получить путь к базе") 
+                : config.GetConnectionString("DatabaseConnectionString") ?? throw new NullReferenceException("Невозможно получить путь к базе");
         }
 
         public QueueContext() 
@@ -33,7 +35,11 @@ namespace bbqueue.Database
             Database.EnsureCreated();
         }
         
-
+        public QueueContext(bool IntegrationTests)
+        {
+            if (connectionString == null)
+                SetConnectionString(IntegrationTests);
+        }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             try

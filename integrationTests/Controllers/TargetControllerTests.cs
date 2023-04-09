@@ -1,4 +1,6 @@
-﻿using IntegrationTests.BbqueueIntegrations;
+﻿using bbqueue.Database;
+using IntegrationTests.BbqueueIntegrations;
+using Microsoft.EntityFrameworkCore;
 using Shouldly;
 using System;
 using System.Collections.Generic;
@@ -10,10 +12,7 @@ using System.Threading.Tasks;
 
 namespace integrationTests.Controllers
 {
-    [TestCaseOrderer(
-    ordererTypeName: "XUnit.Project.Orderers.AlphabeticalOrderer",
-    ordererAssemblyName: "XUnit.Project")]
-    public class TargetControllerTests
+    public class TargetControllerTests:IDisposable
     {
         /// <summary>
         /// Создаём простые разделы, без разделов предков
@@ -25,7 +24,7 @@ namespace integrationTests.Controllers
         [InlineData("Овощи","Лавка с овощами")]
         [InlineData("Фрукты", "Лавка с фруктами")]
         [InlineData("Мясо", "Мясной отдел")]
-        public async Task ACreateGroupsTestAsync_NoRelations(string name, string description)
+        public async Task CreateGroupsTestAsync_NoRelations(string name, string description)
         {
             //создаём ряд групп без привязки к предыдущим группам
             string jwt = await TestSettings.GetJwtForAdminAsync();
@@ -38,8 +37,7 @@ namespace integrationTests.Controllers
                 Name = name,
                 Description = description
             });
-            result.GroupId.ShouldBeGreaterThan(0L);
-            
+            result.GroupId.ShouldBeGreaterThan(0L);   
         }
 
         /// <summary>
@@ -51,7 +49,7 @@ namespace integrationTests.Controllers
         [Theory]
         [InlineData("Свинина", "Сложную логику не закладываем")]
         [InlineData("Говядина", "Сложную логику не закладываем")]
-        public async Task BCreateGroupsTestAsync_WithRelations(string name, string description)
+        public async Task CreateGroupsTestAsync_WithRelations(string name, string description)
         {
             //создаём ряд групп c привязкой к предыдущим группам
             string jwt = await TestSettings.GetJwtForAdminAsync();
@@ -74,7 +72,7 @@ namespace integrationTests.Controllers
         [Theory]
         [InlineData("Шашлык","Шашлыка заточить")]
         [InlineData("Жаркое", "Жаркое под прохладное")]
-        public async Task CCreateTargetsTestAsync_WithRelations(string name, string description)
+        public async Task CreateTargetsTestAsync_WithRelations(string name, string description)
         {
             string jwt = await TestSettings.GetJwtForAdminAsync();
             HttpClient httpClient = new HttpClient();
@@ -92,6 +90,23 @@ namespace integrationTests.Controllers
             });
 
             result.TargetId.ShouldBeGreaterThan(0L);
+        }
+
+        public async void Dispose()
+        {
+            try
+            {
+                using (QueueContext queueContext = new QueueContext(true))
+                {
+                    queueContext.RemoveRange(queueContext.TargetEntity);
+                    queueContext.RemoveRange(queueContext.GroupEntity);
+                    await queueContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
     }
 }
