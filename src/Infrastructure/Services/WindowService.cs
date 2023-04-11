@@ -23,5 +23,14 @@ namespace bbqueue.Infrastructure.Services
             return windowRepository.ChangeWindowWorkStateAsync(window,employeeId, cancellationToken);
         }
 
+        public Task<long> AddNewWindowAsync(Window window, CancellationToken cancellationToken)
+        {
+            return windowRepository.AddNewWindowAsync(window, cancellationToken);
+        }
+
+        public Task AddTargetToWindowAsync(long WindowId, long TargetId, CancellationToken cancellationToken)
+        {
+            return windowRepository.AddTargetToWindowAsync(WindowId, TargetId, cancellationToken);
+        }
     }
 }

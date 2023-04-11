@@ -30,7 +30,7 @@ namespace bbqueue.Controllers
         /// <param name="employeeId"></param>
         /// <returns></returns>
         [Authorize]
-        [ProducesResponseType(typeof(TicketDto), 200)]
+        [ProducesResponseType(typeof(EmployeeDto), 200)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ProducesResponseType(typeof(ErrorDto), 401)]
         [ProducesResponseType(typeof(ErrorDto), 404)]

@@ -55,5 +55,41 @@ namespace bbqueue.Controllers
             };
             return Ok(windowListDto);
         }
+
+        /// <summary>
+        /// Создаёт новое окно
+        /// </summary>
+        /// <param name="windowCreateDto"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "Manager")]
+        [ProducesResponseType(typeof(WindowCreatedIdDto), 200)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(ErrorDto), 401)]
+        [HttpPost("add_window")]
+        public async Task<IActionResult> CreateNewWindowAsync(WindowCreateDto windowCreateDto)
+        {
+            CancellationToken cancellationToken = HttpContext.RequestAborted;
+            var windowId = await windowService.AddNewWindowAsync(windowCreateDto.FromDtoToModel(), cancellationToken);
+            return Ok(new WindowCreatedIdDto
+            {
+                WindowId = windowId
+            });
+        }
+
+        /// <summary>
+        /// Прикрепляет цель к окну
+        /// </summary>
+        /// <param name="windowTargetCreateDto"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "Manager")]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(ErrorDto), 401)]
+        [HttpPost("add_target_window")]
+        public async Task <IActionResult> AddTargetToWindowAsync(WindowTargetCreateDto windowTargetCreateDto)
+        {
+            CancellationToken cancellationToken= HttpContext.RequestAborted;
+            await windowService.AddTargetToWindowAsync(windowTargetCreateDto.WindowId, windowTargetCreateDto.TargetId, cancellationToken);
+            return Ok();
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿using bbqueue.Domain.Models;
+﻿using bbqueue.Controllers.Dtos.Window;
+using bbqueue.Domain.Models;
+using System.Threading;
 
 namespace bbqueue.Domain.Interfaces.Repositories
 {
@@ -26,5 +28,22 @@ namespace bbqueue.Domain.Interfaces.Repositories
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public Task<Window> GetWindowByEmployeeId(long employeeId, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Добавление нового окна
+        /// </summary>
+        /// <param name="window"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Task<long> AddNewWindowAsync(Window window, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Назначает цель к окну
+        /// </summary>
+        /// <param name="WindowId"></param>
+        /// <param name="TargetId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Task AddTargetToWindowAsync(long WindowId, long TargetId, CancellationToken cancellationToken);
     }
 }

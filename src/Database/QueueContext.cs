@@ -18,24 +18,28 @@ namespace bbqueue.Database
         public DbSet<EmployeeEntity> EmployeeEntity { get; set; } = default!;
         private static string? connectionString;
 
-        private void SetConnectionString()
+        private void SetConnectionString(bool IntegrationTests = false)
         {
             var config = new ConfigurationBuilder()
                     .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                     .AddJsonFile("appsettings.json").Build();
-            connectionString = config.GetConnectionString("DatabaseConnectionString") ?? throw new NullReferenceException("Невозможно получить путь к базе");
+            connectionString = IntegrationTests?
+                  config.GetConnectionString("DatabaseConnsectionStringForIntegrationTests") ?? throw new NullReferenceException("Невозможно получить путь к базе") 
+                : config.GetConnectionString("DatabaseConnectionString") ?? throw new NullReferenceException("Невозможно получить путь к базе");
         }
 
         public QueueContext() 
         {
             if (connectionString == null)
                 SetConnectionString();
+            Database.EnsureCreated();
         }
-
-        public QueueContext(DbContextOptions options) : base(options)
+        
+        public QueueContext(bool IntegrationTests)
         {
+            if (connectionString == null)
+                SetConnectionString(IntegrationTests);
         }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             try

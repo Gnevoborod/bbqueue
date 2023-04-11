@@ -18,5 +18,22 @@ namespace bbqueue.Domain.Interfaces.Services
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public Task<List<Window>> GetWindowsAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Добавление нового окна
+        /// </summary>
+        /// <param name="window"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Task<long> AddNewWindowAsync(Window window, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Назначает цель к окну
+        /// </summary>
+        /// <param name="WindowId"></param>
+        /// <param name="TargetId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Task AddTargetToWindowAsync(long WindowId, long TargetId, CancellationToken cancellationToken);
     }
 }

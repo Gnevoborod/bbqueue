@@ -4,6 +4,8 @@ using bbqueue.Mapper;
 using Microsoft.EntityFrameworkCore;
 using bbqueue.Domain.Interfaces.Repositories;
 using bbqueue.Infrastructure.Exceptions;
+using Microsoft.AspNetCore.Mvc.Formatters.Xml;
+using bbqueue.Database.Entities;
 
 namespace bbqueue.Infrastructure.Repositories
 {
@@ -46,6 +48,41 @@ namespace bbqueue.Infrastructure.Repositories
         {
             var window = await queueContext.WindowEntity.SingleOrDefaultAsync(w=>w.EmployeeId==employeeId, cancellationToken);
             return window == null ? default! : window.FromEntityToModel();
+        }
+
+        public async Task<long> AddNewWindowAsync(Window window, CancellationToken cancellationToken)
+        {
+            var windowInDb = await queueContext.WindowEntity.FirstOrDefaultAsync(w=>w.Number== window.Number, cancellationToken);
+            if (windowInDb != null)
+                throw new ApiException(ExceptionEvents.WindowNumberExists);
+            var newWindow = window.FromModelToEntity();
+            queueContext.WindowEntity.Add(newWindow);
+            await queueContext.SaveChangesAsync(cancellationToken);
+            return newWindow.Id;
+        }
+
+ 
+        public async Task AddTargetToWindowAsync(long WindowId, long TargetId, CancellationToken cancellationToken)
+        {
+            var window = await queueContext.WindowEntity.FirstOrDefaultAsync(w => w.Id == WindowId);
+            if (window == null)
+                throw new ApiException(ExceptionEvents.WindowNotExists);
+            var target = await queueContext.TargetEntity.FirstOrDefaultAsync(t=>t.Id == TargetId);
+            if(target == null)
+                throw new ApiException(ExceptionEvents.TargetNotExists);
+            var windowTargetId = await queueContext.WindowTargetEntity.FirstOrDefaultAsync(wte => wte.WindowId == WindowId && wte.TargetId == TargetId, cancellationToken);
+            if (windowTargetId != null)
+                throw new ApiException(ExceptionEvents.WindowTargetExists);
+
+            WindowTargetEntity windowTarget = new ()
+            {
+                WindowId = WindowId,
+                TargetId = TargetId
+            };
+
+            queueContext.WindowTargetEntity.Add(windowTarget);
+            await queueContext.SaveChangesAsync(cancellationToken);
+
         }
     }
 }

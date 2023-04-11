@@ -77,5 +77,17 @@ namespace bbqueue.Mapper
                 WindowWorkState = windowWorkState != null ? (WindowWorkState) windowWorkState:default
             };
         }
+
+        public static Window FromDtoToModel(this WindowCreateDto windowCreateDto)
+        {
+            if(windowCreateDto == null)
+                return default!;
+            return new Window
+            {
+                Number = windowCreateDto.Number,
+                Description = windowCreateDto.Description
+            };
+        }
+
     }
 }

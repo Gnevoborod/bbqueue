@@ -40,5 +40,14 @@ namespace bbqueue.Domain.Interfaces.Services
         /// <returns></returns>
         public Task TakeTicketToWork(Ticket ticket, long windowId, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Переводит талон в состояние "Закрыт"
+        /// </summary>
+        /// <param name="ticketId"></param>
+        /// <param name="userId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Task CloseTicket(long ticketId, long userId, CancellationToken cancellationToken);
+
     }
 }

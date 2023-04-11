@@ -30,5 +30,10 @@ namespace bbqueue.Infrastructure.Services
             var result= Groups.FromModelToHierarchyDto(Targets);
             return result;
         }
+
+        public Task<long> AddTargetAsync(Target target, CancellationToken cancellationToken)
+        {
+            return targetRepository.AddTargetAsync(target, cancellationToken);
+        }
     }
 }

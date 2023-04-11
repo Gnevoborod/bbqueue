@@ -68,5 +68,33 @@ namespace bbqueue.Infrastructure.Services
 
         }
 
+        public async Task CloseTicket(long ticketId, long userId, CancellationToken cancellationToken)
+        {
+            var ticket = await ticketRepository.GetTicketByIdAsync(ticketId, cancellationToken);
+            if(ticket == null)
+            {
+                throw new ApiException(ExceptionEvents.TicketNotFound);
+            }
+
+            var ticketOperationList = await ticketRepository.GetTicketOperationByTicket(ticketId, cancellationToken);
+            var userInLastTicketOperation = ticketOperationList.OrderByDescending(to=>to.Processed).Select(to=>to.EmployeeId).FirstOrDefault();
+            if(userInLastTicketOperation != null && userInLastTicketOperation != userId) 
+            {
+                throw new ApiException(ExceptionEvents.TicketNotRelatedToThisEmployee);
+            }
+            ticket.State = TicketState.Closed;
+            ticket.Closed = DateTime.UtcNow;
+            var window = await windowRepository.GetWindowByEmployeeId(userId, cancellationToken);
+            var operation = new TicketOperation()
+            {
+                TicketId = ticketId,
+                EmployeeId = userId,
+                Processed = DateTime.UtcNow,
+                TargetId = ticket.TargetId,
+                WindowId = window.Id,
+                State = TicketState.Closed
+            };
+            await ticketRepository.AddTicketOperation(operation, ticket, cancellationToken);
+        }
     }
 }
