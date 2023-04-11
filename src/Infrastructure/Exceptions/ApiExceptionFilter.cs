@@ -1,6 +1,7 @@
 ﻿using bbqueue.Controllers.Dtos.Error;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Net;
 
 namespace bbqueue.Infrastructure.Exceptions
 {
@@ -19,6 +20,7 @@ namespace bbqueue.Infrastructure.Exceptions
                 Code = exceptionContext.Exception.HResult.ToString(),
                 Message = exceptionContext.Exception.Message,
             };
+            exceptionContext.HttpContext.Response.StatusCode = (int) HttpStatusCode.BadRequest;
             exceptionContext.Result = new JsonResult(errorDto);
             logger.LogError(exceptionContext.Exception.HResult, exceptionContext.Exception.Message);
         }
