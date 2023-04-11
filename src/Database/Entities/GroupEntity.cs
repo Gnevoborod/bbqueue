@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace bbqueue.Database.Entities
 {
     [Table("group")]
-    internal sealed class GroupEntity
+    public sealed class GroupEntity
     {
         [Key, Column("group_id")]
         public long Id { get; set; }

@@ -67,5 +67,6 @@ namespace bbqueue.Infrastructure.Services
             await ticketRepository.AddTicketOperation(ticketOperation, ticket, cancellationToken);
 
         }
+
     }
 }

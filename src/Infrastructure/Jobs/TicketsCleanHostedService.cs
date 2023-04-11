@@ -23,7 +23,7 @@ namespace bbqueue.Infrastructure.Jobs
             while(!cancellationToken.IsCancellationRequested)
             {
                 logger.BeginScope("Очередной старт работы крона");
-                var cron = CrontabSchedule.Parse("0 07 * * 1");
+                var cron = CrontabSchedule.Parse("0 7 * * *");//запускаем каждый день, так как номера талонов надо очищать ежедневно, а сами талоны удаляем по прошествии месяца после их создания
                 var nextOccurrence = cron.GetNextOccurrence(DateTime.Now);
                 var delay = nextOccurrence - DateTime.Now;
                 await Task.Delay(delay, cancellationToken);
