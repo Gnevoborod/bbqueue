@@ -1,10 +1,14 @@
-﻿using bbqueue.Database.Entities;
+﻿using bbqueue.Controllers;
+using bbqueue.Controllers.Dtos.Ticket;
+using bbqueue.Database.Entities;
 using bbqueue.Domain.Interfaces.Repositories;
 using bbqueue.Domain.Interfaces.Services;
 using bbqueue.Domain.Models;
 using bbqueue.Infrastructure.Exceptions;
 using bbqueue.Mapper;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -14,16 +18,20 @@ namespace bbqueue.Infrastructure.Services
     {
         private readonly ITicketRepository ticketRepository;
         public readonly IWindowRepository windowRepository;
+        private readonly IHubContext<TicketsHub> ticketsHub;
 
-        public TicketService(ITicketRepository ticketRepository, IWindowRepository windowRepository) 
+        public TicketService(ITicketRepository ticketRepository, IWindowRepository windowRepository, IHubContext<TicketsHub> ticketsHub) 
         {
             this.ticketRepository = ticketRepository;
             this.windowRepository = windowRepository;
+            this.ticketsHub = ticketsHub;
         }
 
-        public Task<Ticket> CreateTicketAsync(long targetId, CancellationToken cancellationToken)
+        public async Task<Ticket> CreateTicketAsync(long targetId, CancellationToken cancellationToken)
         {
-            return ticketRepository.CreateTicketAsync(targetId, cancellationToken);
+            var ticket = await ticketRepository.CreateTicketAsync(targetId, cancellationToken);
+            await RefreshOnlineQueueAsync();
+            return ticket;
         }
         public async Task ChangeTicketTarget(long ticketId, long targetId, long employeeId, CancellationToken cancellationToken)
         {
@@ -46,6 +54,7 @@ namespace bbqueue.Infrastructure.Services
             //обновляем данные в базе
             await ticketRepository.SaveTicketOperationToDbAsync(ticketOperation, cancellationToken);
             await ticketRepository.UpdateTicketInDbAsync(ticket, cancellationToken);
+            await RefreshOnlineQueueAsync();
         }
         public Task<List<Ticket>> LoadTicketsAsync(bool loadOnlyProcessedTickets, CancellationToken cancellationToken)
         {
@@ -65,7 +74,7 @@ namespace bbqueue.Infrastructure.Services
             ticketOperation.TicketId = ticket.Id;
 
             await ticketRepository.AddTicketOperation(ticketOperation, ticket, cancellationToken);
-
+            await RefreshOnlineQueueAsync();
         }
 
         public async Task CloseTicket(long ticketId, long userId, CancellationToken cancellationToken)
@@ -95,6 +104,25 @@ namespace bbqueue.Infrastructure.Services
                 State = TicketState.Closed
             };
             await ticketRepository.AddTicketOperation(operation, ticket, cancellationToken);
+            await RefreshOnlineQueueAsync();
+        }
+
+        public async Task<string> GetTicketsForOnlineQueueAsync()
+        {
+            var result = await ticketRepository.LoadTicketsFromDbAsync(false, CancellationToken.None);
+            TicketListDto ticketListDtos = new TicketListDto();
+            ticketListDtos.Tickets = new();
+            foreach (var ticket in result)
+            {
+                ticketListDtos.Tickets.Add(ticket.FromModelToDto());
+            }
+            return JsonConvert.SerializeObject(ticketListDtos);
+        }
+
+        private async Task RefreshOnlineQueueAsync()
+        {
+            var messageR = await GetTicketsForOnlineQueueAsync();
+            await ticketsHub.Clients.All.SendAsync(messageR);
         }
     }
 }

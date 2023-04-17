@@ -45,9 +45,8 @@ namespace bbqueue.Infrastructure.Repositories
         }
         public Task<List<Ticket>> LoadTicketsFromDbAsync(bool loadOnlyProcessedTickets, CancellationToken cancellationToken)//true грузим обработанные талоны false необработанные талоны
         {
-            var state = loadOnlyProcessedTickets ? TicketState.Closed : TicketState.Created;
             return queueContext.TicketEntity
-                .Where(te => te.State == state)
+                .Where(te=> loadOnlyProcessedTickets? te.State==TicketState.Closed:te.State!=TicketState.Closed)
                 .Select(te => te.FromEntityToModel())
                 .ToListAsync(cancellationToken);
         }

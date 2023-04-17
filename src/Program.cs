@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using bbqueue.Infrastructure.Middleware;
 using bbqueue.Infrastructure.Exceptions;
 using bbqueue.Infrastructure.Jobs;
+using bbqueue.Controllers;
 
 namespace bbqueue
 {
@@ -61,7 +62,7 @@ namespace bbqueue
                 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
                 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
-
+                builder.Services.AddSignalR();
                 builder.Services.AddAuthorization();
                 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(
@@ -139,8 +140,10 @@ namespace bbqueue
 
                 app.UseAuthentication();
                 app.UseAuthorization();
+                app.UseDefaultFiles();
+                app.UseStaticFiles();
 
-      
+                app.MapHub<TicketsHub>("/dbrd");      
                 app.MapControllers();
                 app.Run();
             }

@@ -49,5 +49,10 @@ namespace bbqueue.Domain.Interfaces.Services
         /// <returns></returns>
         public Task CloseTicket(long ticketId, long userId, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Метод возвращающий список талонов в виде сериализованного в строку жсона
+        /// </summary>
+        /// <returns></returns>
+        public  Task<string> GetTicketsForOnlineQueueAsync();
     }
 }
