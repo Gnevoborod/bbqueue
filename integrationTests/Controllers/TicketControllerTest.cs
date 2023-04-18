@@ -1,21 +1,12 @@
 ﻿using bbqueue.Database;
 using IntegrationTests.BbqueueIntegrations;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using Microsoft.EntityFrameworkCore;
 using Shouldly;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
-using NLog;
-using System.Diagnostics;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
 namespace integrationTests.Controllers
 {
+   
     public class TicketControllerTest:IDisposable
     {
 
@@ -28,7 +19,6 @@ namespace integrationTests.Controllers
         {
             //Без вот этого костыля ниже - тесты падают, поскольку в соседних классах также идёт очистка базы после отработки всех тестов
             //Вероятно есть более элегантное решение, поисками которого я и займусь в ближайшем будущем.
-            await Task.Delay(1500);
             string jwt = await TestSettings.GetJwtForAdminAsync();
             HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
@@ -61,7 +51,6 @@ namespace integrationTests.Controllers
         [Fact]
         public async Task TakeTicketToWorkTestAsyn_TicketTook()
         {
-            await Task.Delay(1500);
             string jwt = await TestSettings.GetJwtForAdminAsync();
             HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
@@ -112,7 +101,6 @@ namespace integrationTests.Controllers
         [Fact]
         public async Task CloseTicketTestAsync()
         {
-            await Task.Delay(1500);
             string jwt = await TestSettings.GetJwtForAdminAsync();
             HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
@@ -176,8 +164,6 @@ namespace integrationTests.Controllers
         [Fact]
         public async Task DashboardTest()
         {
-            //await Task.Delay(2500);
-
             HubConnection connection = new HubConnectionBuilder()
                                             .WithUrl(TestSettings.EndpointAddress + "/dashboard")
                                             .Build();

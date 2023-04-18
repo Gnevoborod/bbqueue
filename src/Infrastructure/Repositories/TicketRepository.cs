@@ -120,13 +120,10 @@ namespace bbqueue.Infrastructure.Repositories
             {
                 throw new ApiException(ExceptionEvents.TicketUnableToTakeToWork);
             }
-            var query = await (from toe in queueContext.TicketOperationEntity
-                               join
-                               te in queueContext.TicketEntity
-                               on toe.TicketId equals te.Id
+            var query = await (from te in queueContext.TicketEntity
                                join
                                wte in queueContext.WindowTargetEntity
-                               on toe.TargetId equals wte.TargetId
+                               on te.TargetId equals wte.TargetId
                                where wte.WindowId == window.Id
                                && te.State == TicketState.Created || te.State == TicketState.Returned//вот тут посложнее логику надо сделать
                                orderby te.Created
