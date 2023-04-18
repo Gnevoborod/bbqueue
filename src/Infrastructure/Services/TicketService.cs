@@ -119,10 +119,10 @@ namespace bbqueue.Infrastructure.Services
             return JsonConvert.SerializeObject(ticketListDtos);
         }
 
-        private async Task RefreshOnlineQueueAsync()
+        public async Task RefreshOnlineQueueAsync()
         {
             var messageR = await GetTicketsForOnlineQueueAsync();
-            await ticketsHub.Clients.All.SendAsync(messageR);
+            await ticketsHub.Clients.All.SendAsync("Refresh",messageR);
         }
     }
 }

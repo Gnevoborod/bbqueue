@@ -17,16 +17,11 @@ namespace bbqueue.Controllers
             this.ticketService = ticketService;
             this.logger = logger;
         }
-
-        public async Task SendAsync()
+        
+        public override async Task OnConnectedAsync()
         {
-            var messageR = await ticketService.GetTicketsForOnlineQueueAsync();
-            await Clients.All.SendAsync(messageR);
+            await ticketService.RefreshOnlineQueueAsync();
         }
 
-        public string GetConnectionId()
-        {
-            return Context.ConnectionId;
-        }
     }
 }

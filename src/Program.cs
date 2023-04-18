@@ -143,7 +143,7 @@ namespace bbqueue
                 app.UseDefaultFiles();
                 app.UseStaticFiles();
 
-                app.MapHub<TicketsHub>("/dbrd");      
+                app.MapHub<TicketsHub>("/dashboard");      
                 app.MapControllers();
                 app.Run();
             }

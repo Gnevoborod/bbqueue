@@ -9,6 +9,10 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR.Client;
+using NLog;
+using System.Diagnostics;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
 namespace integrationTests.Controllers
 {
@@ -163,6 +167,87 @@ namespace integrationTests.Controllers
                 result.FirstOrDefault()?.State.ShouldBe(bbqueue.Domain.Models.TicketState.Closed);
             }
 
+        }
+
+        /// <summary>
+        /// Проверяем корректность работы дашборда интеграционным тестом
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task DashboardTest()
+        {
+            //await Task.Delay(2500);
+
+            HubConnection connection = new HubConnectionBuilder()
+                                            .WithUrl(TestSettings.EndpointAddress + "/dashboard")
+                                            .Build();
+            
+            
+            int callCounter = 0;
+            connection.On<string>("Refresh",  (message) => {
+                message.Length.ShouldBeGreaterThan(0);
+                callCounter++;
+            });
+            await connection.StartAsync();
+            connection.ConnectionId.ShouldNotBeNull();
+            connection.State.ShouldBe(HubConnectionState.Connected);
+
+
+            string jwt = await TestSettings.GetJwtForAdminAsync();
+            
+            HttpClient httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+            var client = new BBQueueClient(TestSettings.EndpointAddress, httpClient);
+
+            var window = await client.Add_windowAsync(new WindowCreateDto
+            {
+                Number = "П15",
+                Description = "Test"
+            });
+
+            window.WindowId.ShouldBeGreaterThan(0L);
+
+            var target = await client.Add_targetAsync(new TargetCreateDto
+            {
+                Name = "Test",
+                Description = "Test",
+                Prefix = "T"
+            });
+
+            target.TargetId.ShouldBeGreaterThan(0L);
+
+
+            await client.Add_target_windowAsync(new WindowTargetCreateDto
+            {
+                WindowId = window.WindowId,
+                TargetId = target.TargetId
+            });
+
+            await client.Employee_to_windowAsync(new EmployeeToWindowDto
+            {
+                WindowId = window.WindowId
+            });
+
+            var ticket = await client.TicketAsync(target.TargetId);
+            ticket.Id.ShouldBeGreaterThan(0L);
+
+            var ticketToWork = await client.NextCustomerAsync();
+            ticketToWork.Id.ShouldBeGreaterThan(0L);
+
+            await client.CloseAsync(new TicketClose
+            {
+                TicketId = ticketToWork.Id
+            });
+
+            //чтобы не перегружать тест логикой - просто считаем сколько раз нам прислали обновление информации по сигналу
+            callCounter.ShouldBe(4);
+            //Подключаемся к базе и смоттрим как там дела, так как метода который бы поставил нужную информацию нет
+            using (QueueContext queueContext = new QueueContext(true))
+            {
+                var result = queueContext.TicketEntity.ToList();
+                result.Count.ShouldBe(1);
+                result.FirstOrDefault()?.State.ShouldBe(bbqueue.Domain.Models.TicketState.Closed);
+            }
         }
         public async void Dispose()
         {

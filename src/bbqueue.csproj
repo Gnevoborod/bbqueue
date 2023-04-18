@@ -38,6 +38,7 @@
   <ItemGroup>
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.2.3" />
     <PackageReference Include="NLog" Version="5.*" />
+    <PackageReference Include="System.IO.Pipelines" Version="7.0.0" />
     <PackageReference Include="System.Text.Json" Version="7.0.2" />
   </ItemGroup>
   <ItemGroup>
