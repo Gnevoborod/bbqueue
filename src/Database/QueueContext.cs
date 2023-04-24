@@ -15,7 +15,6 @@ namespace bbqueue.Database
         public DbSet<GroupEntity> GroupEntity { get; set; } = default!;
         public DbSet<TargetEntity> TargetEntity { get; set; } = default!;
         public DbSet<WindowTargetEntity> WindowTargetEntity { get; set; } = default!;
-        public DbSet<EmployeeEntity> EmployeeEntity { get; set; } = default!;
         private static string? connectionString;
 
         private void SetConnectionString(bool IntegrationTests = false)

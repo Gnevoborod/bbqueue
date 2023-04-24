@@ -18,14 +18,6 @@ namespace bbqueue.Mapper
                     Number = windowTargetEntity.Window.Number,
                     Description = windowTargetEntity.Window.Description,
                     EmployeeId = windowTargetEntity.Window.EmployeeId,
-                    Employee = windowTargetEntity.Window.Employee != null ? new Employee
-                    {
-                        Id = windowTargetEntity.Window.Employee.Id,
-                        ExternalSystemIdentity = windowTargetEntity.Window.Employee.ExternalSystemIdentity,
-                        Name = windowTargetEntity.Window.Employee.Name,
-                        Active = windowTargetEntity.Window.Employee.Active,
-                        Role = windowTargetEntity.Window.Employee.Role
-                    } : null,
                     WindowWorkState = windowTargetEntity.Window.WindowWorkState
                 },
                 TargetId = windowTargetEntity.TargetId,
@@ -42,7 +34,7 @@ namespace bbqueue.Mapper
                         Name = windowTargetEntity.Target.GroupLink.Name,
                         Description = windowTargetEntity.Target.GroupLink.Description,
                         GroupLinkId = windowTargetEntity.Target.GroupLink.GroupLinkId,
-                        GroupLink =null /* Stop recursive mapping */
+                        GroupLink = default! /* Stop recursive mapping */
                     } : null
                 }
             };
@@ -62,14 +54,6 @@ namespace bbqueue.Mapper
                     Number = windowTarget.Window.Number,
                     Description = windowTarget.Window.Description,
                     EmployeeId = windowTarget.Window.EmployeeId,
-                    Employee = windowTarget.Window.Employee != null ? new EmployeeEntity
-                    {
-                        Id = windowTarget.Window.Employee.Id,
-                        ExternalSystemIdentity = windowTarget.Window.Employee.ExternalSystemIdentity,
-                        Name = windowTarget.Window.Employee.Name,
-                        Active = windowTarget.Window.Employee.Active,
-                        Role = windowTarget.Window.Employee.Role
-                    } : null,
                     WindowWorkState = windowTarget.Window.WindowWorkState
                 },
                 TargetId = windowTarget.TargetId,
@@ -86,8 +70,8 @@ namespace bbqueue.Mapper
                         Name = windowTarget.Target.GroupLink.Name,
                         Description = windowTarget.Target.GroupLink.Description,
                         GroupLinkId = windowTarget.Target.GroupLink.GroupLinkId,
-                        GroupLink = null! /* Stop recursive mapping */
-                    } : null!
+                        GroupLink = default! /* Stop recursive mapping */
+                    } : null
                 }
             };
         }

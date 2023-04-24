@@ -17,43 +17,10 @@ namespace bbqueue.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.2")
+                .HasAnnotation("ProductVersion", "7.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("bbqueue.Database.Entities.EmployeeEntity", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("employee_id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("boolean")
-                        .HasColumnName("active");
-
-                    b.Property<string>("ExternalSystemIdentity")
-                        .IsRequired()
-                        .HasMaxLength(16)
-                        .HasColumnType("character varying(16)")
-                        .HasColumnName("external_system_id");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
-
-                    b.Property<int>("Role")
-                        .HasColumnType("integer")
-                        .HasColumnName("role");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("employee");
-                });
 
             modelBuilder.Entity("bbqueue.Database.Entities.GroupEntity", b =>
                 {
@@ -223,8 +190,6 @@ namespace bbqueue.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId");
-
                     b.HasIndex("TicketId");
 
                     b.HasIndex("WindowId");
@@ -261,8 +226,6 @@ namespace bbqueue.Migrations
                         .HasColumnName("window_work_state");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
 
                     b.ToTable("window");
                 });
@@ -311,10 +274,6 @@ namespace bbqueue.Migrations
 
             modelBuilder.Entity("bbqueue.Database.Entities.TicketOperationEntity", b =>
                 {
-                    b.HasOne("bbqueue.Database.Entities.EmployeeEntity", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId");
-
                     b.HasOne("bbqueue.Database.Entities.TicketEntity", "Ticket")
                         .WithMany()
                         .HasForeignKey("TicketId")
@@ -325,20 +284,9 @@ namespace bbqueue.Migrations
                         .WithMany()
                         .HasForeignKey("WindowId");
 
-                    b.Navigation("Employee");
-
                     b.Navigation("Ticket");
 
                     b.Navigation("Window");
-                });
-
-            modelBuilder.Entity("bbqueue.Database.Entities.WindowEntity", b =>
-                {
-                    b.HasOne("bbqueue.Database.Entities.EmployeeEntity", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId");
-
-                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("bbqueue.Database.Entities.WindowTargetEntity", b =>

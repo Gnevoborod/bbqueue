@@ -28,9 +28,6 @@ namespace bbqueue.Database.Entities
         [Column("employee_id")]
         public long? EmployeeId { get; set; }
 
-        [ForeignKey(nameof(EmployeeId))]
-        public EmployeeEntity? Employee { get; set; }
-
         [Column("state")]
         public TicketState State { get; set; }
 

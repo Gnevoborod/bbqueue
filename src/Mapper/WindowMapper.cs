@@ -15,14 +15,6 @@ namespace bbqueue.Mapper
                 Number = windowEntity.Number,
                 Description = windowEntity.Description,
                 EmployeeId = windowEntity.EmployeeId,
-                Employee = windowEntity.Employee != null ? new Employee
-                {
-                    Id = windowEntity.Employee.Id,
-                    ExternalSystemIdentity = windowEntity.Employee.ExternalSystemIdentity,
-                    Name = windowEntity.Employee.Name,
-                    Active = windowEntity.Employee.Active,
-                    Role = windowEntity.Employee.Role
-                } : null,
                 WindowWorkState = windowEntity.WindowWorkState
             };
         }
@@ -37,14 +29,6 @@ namespace bbqueue.Mapper
                 Number = window.Number,
                 Description = window.Description,
                 EmployeeId = window.EmployeeId,
-                Employee = window.Employee != null ? new EmployeeEntity
-                {
-                    Id = window.Employee.Id,
-                    ExternalSystemIdentity = window.Employee.ExternalSystemIdentity,
-                    Name = window.Employee.Name,
-                    Active = window.Employee.Active,
-                    Role = window.Employee.Role
-                } : null,
                 WindowWorkState = window.WindowWorkState
             };
         }
