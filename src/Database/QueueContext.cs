@@ -1,6 +1,6 @@
 ﻿using bbqueue.Database.Entities;
-using bbqueue.Mapper;
 using Microsoft.EntityFrameworkCore;
+using NLog.Web;
 using System.Diagnostics;
 
 namespace bbqueue.Database
@@ -34,6 +34,12 @@ namespace bbqueue.Database
                 SetConnectionString();
             Database.EnsureCreated();
         }
+        public QueueContext(DbContextOptions options):base(options)
+        {
+            if (connectionString == null)
+                SetConnectionString();
+            Database.EnsureCreated();
+        }
         
         public QueueContext(bool IntegrationTests)
         {
@@ -46,7 +52,13 @@ namespace bbqueue.Database
             {
                 if (String.IsNullOrEmpty(connectionString))
                     throw new ArgumentNullException("connectionString");
-                optionsBuilder.UseNpgsql(connectionString);
+                optionsBuilder.UseNpgsql(connectionString)
+                    .EnableSensitiveDataLogging()
+                    .UseLoggerFactory(
+                        LoggerFactory.Create(
+                                builder => builder.AddNLogWeb()
+                                )
+                        );
             }
             catch(Exception ex)
             {

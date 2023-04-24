@@ -49,5 +49,16 @@ namespace bbqueue.Domain.Interfaces.Services
         /// <returns></returns>
         public Task CloseTicket(long ticketId, long userId, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Возвращает список талонов в виде сериализованного в строку жсона
+        /// </summary>
+        /// <returns></returns>
+        public Task<string> GetTicketsForOnlineQueueAsync();
+
+        /// <summary>
+        /// Формирует список талонов в виде жсона и отправляет этот список всем signalR клиентам
+        /// </summary>
+        /// <returns></returns>
+        public Task RefreshOnlineQueueAsync();
     }
 }

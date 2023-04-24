@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using bbqueue.Infrastructure.Extensions;
+using Microsoft.AspNetCore.SignalR;
 
 namespace bbqueue.Controllers
 {

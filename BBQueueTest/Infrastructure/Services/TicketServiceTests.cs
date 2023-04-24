@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using bbqueue.Infrastructure.Exceptions;
 using NSubstitute.ReceivedExtensions;
+using Microsoft.AspNetCore.SignalR;
+using bbqueue.Controllers;
 
 namespace BBQueueTest
 {
@@ -19,6 +21,7 @@ namespace BBQueueTest
         private ITicketService ticketService;
         private ITicketRepository ticketRepository;
         private IWindowRepository windowRepository;
+        private IHubContext<TicketsHub> ticketsHub;
 
         private QueueContext queueContext;
 
@@ -36,7 +39,8 @@ namespace BBQueueTest
 
             ticketRepository = Substitute.For<ITicketRepository>();
             windowRepository = Substitute.For<IWindowRepository>();
-            ticketService = new TicketService(ticketRepository, windowRepository);
+            ticketsHub = Substitute.For<IHubContext<TicketsHub>>();
+            ticketService = new TicketService(ticketRepository, windowRepository, ticketsHub);
         }
         [Theory]
         [InlineData(5)]

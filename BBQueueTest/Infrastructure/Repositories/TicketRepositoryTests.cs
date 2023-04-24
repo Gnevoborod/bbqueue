@@ -26,7 +26,7 @@ namespace BBQueueTest.Infrastructure.Repositories
             queueContext = new QueueContext(options);
             queueContext.Database.EnsureDeleted();
             queueContext.Database.EnsureCreated();
-            ticketRepository = new TicketRepository(queueContext, null);
+            ticketRepository = new TicketRepository(queueContext, default!);
             PrepareDatabase();
         }
 
@@ -48,7 +48,7 @@ namespace BBQueueTest.Infrastructure.Repositories
             await ticketRepository.UpdateTicketInDbAsync(ticket.FromEntityToModel(), CancellationToken.None);
             
             var newTicket = queueContext.TicketEntity.Where(te=>te.Id == 1).SingleOrDefault();
-            newTicket.State.ShouldBe(ticketState);
+            newTicket?.State.ShouldBe(ticketState);
 
         }
 

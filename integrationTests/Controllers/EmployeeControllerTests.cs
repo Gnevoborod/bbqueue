@@ -1,9 +1,11 @@
-using bbqueue.Controllers.Dtos.Employee;
 using IntegrationTests.BbqueueIntegrations;
-using Microsoft.AspNetCore.Http;
 using Shouldly;
 using System.Net.Http.Headers;
 
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
+[assembly: TestCaseOrderer(
+     ordererTypeName: "integrationTests.AlphabeticalOrderer",
+    ordererAssemblyName: "integrationTests")]
 namespace integrationTests.Controllers
 {
     public class EmployeeTests
