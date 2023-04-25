@@ -26,3 +26,6 @@
 /integrationTests/obj
 /EmployeeService/bin/Debug/net6.0
 /EmployeeService/obj
+/EmployeeService/bin/Release/net6.0
+/EmployeeService/Properties/PublishProfiles
+*.user

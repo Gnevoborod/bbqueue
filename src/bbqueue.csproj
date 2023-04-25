@@ -57,4 +57,9 @@
         <Options>/OperationGenerationMode:SingleClientFromOperationId</Options>
     </OpenApiReference>
   </ItemGroup>
+    <ItemGroup>
+        <OpenApiReference Include="swagger/swagger_empl.json" Namespace="IntegrationTests.BbqueueIntegrations.EmployeeService" ClassName="BBQueueEmployeeServiceClient">
+            <Options>/OperationGenerationMode:SingleClientFromOperationId</Options>
+        </OpenApiReference>
+    </ItemGroup>
 </Project>

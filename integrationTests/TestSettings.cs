@@ -10,10 +10,11 @@ namespace integrationTests
     internal class TestSettings
     {
         public const string EndpointAddress = "http://62.173.154.32:5005";
+        public const string EmployeeEndpointAddress = "http://62.173.154.32:5015";
         private static string JWT;
         public static async Task<string> GetJwtForEmployeeAsync(string employeeExtId)
         {
-            var client = new BBQueueClient(EndpointAddress, new HttpClient());
+            var client = new BBQueueEmployeeServiceClient(EmployeeEndpointAddress, new HttpClient());
 
             var employeeJWT = await client.JwtAsync(employeeExtId);
 
@@ -24,7 +25,7 @@ namespace integrationTests
         {
             if(JWT != null)
                return JWT; 
-            var client = new BBQueueClient(EndpointAddress, new HttpClient());
+            var client = new BBQueueEmployeeServiceClient(EmployeeEndpointAddress, new HttpClient());
 
             var employeeJWT = await client.JwtAsync("admin");
             JWT = employeeJWT.Token.ToString();
