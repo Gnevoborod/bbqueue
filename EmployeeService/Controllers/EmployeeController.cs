@@ -50,7 +50,7 @@ namespace EmployeeService.Controllers
         /// </summary>
         /// <param name="employeeRegistryDto">Структура содержащая информацию о пользователе</param>
         /// <returns></returns>
-        //[Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Manager")]
         [ProducesResponseType(200)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ProducesResponseType(typeof(ErrorDto), 401)]
