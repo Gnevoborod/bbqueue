@@ -16,8 +16,6 @@
 
         public long? EmployeeId { get; set; }
 
-        public Employee? Employee { get; set; }
-
         public TicketState State { get; set; }
 
         public DateTime Processed { get; set; }

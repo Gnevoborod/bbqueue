@@ -58,10 +58,6 @@ namespace bbqueue
 
                 builder.Services.AddScoped<IQueueService, QueueService>();
 
-                builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-                builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-
-                builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
                 builder.Services.AddSignalR();
                 builder.Services.AddAuthorization();
                 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

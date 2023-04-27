@@ -23,8 +23,8 @@ namespace integrationTests.Controllers
             HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
-            var client = new BBQueueClient(TestSettings.EndpointAddress, httpClient);
-
+            var client = new BBQueueEmployeeServiceClient(TestSettings.EmployeeEndpointAddress, httpClient);
+        
             var result = await client.EmployeeAsync(1);
 
             result.Name.ShouldBe("admin");

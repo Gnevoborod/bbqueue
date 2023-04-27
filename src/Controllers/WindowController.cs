@@ -2,6 +2,7 @@
 using bbqueue.Controllers.Dtos.Window;
 using bbqueue.Domain.Interfaces.Services;
 using bbqueue.Infrastructure.Extensions;
+using bbqueue.Infrastructure.Services;
 using bbqueue.Mapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -89,6 +90,26 @@ namespace bbqueue.Controllers
         {
             CancellationToken cancellationToken= HttpContext.RequestAborted;
             await windowService.AddTargetToWindowAsync(windowTargetCreateDto.WindowId, windowTargetCreateDto.TargetId, cancellationToken);
+            return Ok();
+        }
+
+
+        /// <summary>
+        /// Прикрепляет сотрудника к окну
+        /// </summary>
+        /// <param name="employeeToWindowDto">Структура содержит идентификатор окна для привязки сотрудника (а id сотрудника берём из JWT)</param>
+        /// <returns></returns>
+        [Authorize]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(ErrorDto), 401)]
+        [ProducesResponseType(typeof(ErrorDto), 404)]
+        [HttpPost("employee_to_window")]
+        public async Task<IActionResult> AddEmployeeToWindow([FromBody] EmployeeToWindowDto employeeToWindowDto)
+        {
+            CancellationToken cancellationToken = HttpContext.RequestAborted;
+            var userId = HttpContext.User.GetUserId();
+            await windowService.AddEmployeeToWindowAsync(userId, employeeToWindowDto.WindowId, cancellationToken);
             return Ok();
         }
     }

@@ -84,5 +84,28 @@ namespace bbqueue.Infrastructure.Repositories
             await queueContext.SaveChangesAsync(cancellationToken);
 
         }
+
+        public async Task AddEmployeeToWindowAsync(long employeeEntityId, long windowEntityId, CancellationToken cancellationToken)
+        {
+            //var window = await queueContext.WindowEntity.Include(a=>a.Employee).SingleOrDefaultAsync(w => w.Id == windowEntityId, cancellationToken);
+            var window = await queueContext.WindowEntity.Where(w => w.Id == windowEntityId).Select(w => w).SingleOrDefaultAsync(cancellationToken);
+            if (window == null)
+            {
+                throw new ApiException(ExceptionEvents.WindowNotExists);
+            }
+            //нашли окно - ищем есть ли другие окна с этим сотрудником. Один сотрудник - одно окно
+            var oldWindow = await queueContext.WindowEntity.Where(w => w.EmployeeId == employeeEntityId).Select(w => w).SingleOrDefaultAsync(cancellationToken);
+            if (oldWindow != null)
+            {
+                oldWindow.EmployeeId = null;
+            }
+            if (window.EmployeeId != null)
+            {
+                throw new ApiException(ExceptionEvents.WindowOccupied);
+            }
+            window.EmployeeId = employeeEntityId;
+            await queueContext.SaveChangesAsync(cancellationToken);
+
+        }
     }
 }

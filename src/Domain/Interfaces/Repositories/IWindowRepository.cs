@@ -45,5 +45,14 @@ namespace bbqueue.Domain.Interfaces.Repositories
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public Task AddTargetToWindowAsync(long WindowId, long TargetId, CancellationToken cancellationToken);
+        /// <summary>
+        /// Привязывает сотрудника к окну
+        /// </summary>
+        /// <param name="employeeEntityId"></param>
+        /// <param name="windowEntityId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public Task AddEmployeeToWindowAsync(long employeeEntityId, long windowEntityId, CancellationToken cancellationToken);
     }
 }

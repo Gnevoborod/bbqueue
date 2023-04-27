@@ -80,6 +80,7 @@ namespace integrationTests.Controllers
                 TargetId = target.TargetId
             });
 
+            
             await client.Employee_to_windowAsync(new EmployeeToWindowDto
             {
                 WindowId = window.WindowId
