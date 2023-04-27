@@ -14,6 +14,9 @@ using EmployeeService.Domain.Interfaces.Services;
 using EmployeeService.Domain.Interfaces.Repositories;
 
 using EmplService = EmployeeService.Infrastructure.Services.EmployeeService;
+using EmployeeService.Infrastructure.Exceptions;
+using EmployeeService.Infrastructure.Middleware;
+
 namespace EmployeeService
 {
     public class Program
@@ -35,7 +38,7 @@ namespace EmployeeService
             //builder.Services.AddScoped<QueueContext>();
             if (builder.Environment.IsProduction())
                 builder.WebHost.UseUrls("http://*:5015");
-            //builder.Services.AddMvc(options => options.Filters.Add(typeof(ApiExceptionFilter)));
+            builder.Services.AddMvc(options => options.Filters.Add(typeof(ApiExceptionFilter)));
             builder.Services.AddDbContext<QueueContext>(ServiceLifetime.Scoped);
             builder.Services.AddScoped<IEmployeeService, EmplService>();
             builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
@@ -105,7 +108,7 @@ namespace EmployeeService
             app.UseSwagger();
             app.UseSwaggerUI();
 
-           //app.UseMiddleware<RequestIdentityMiddleware>();
+            app.UseMiddleware<RequestIdentityMiddleware>();
 
             app.UseHttpsRedirection();
 
