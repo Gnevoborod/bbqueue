@@ -16,6 +16,9 @@ using EmployeeService.Domain.Interfaces.Repositories;
 using EmplService = EmployeeService.Infrastructure.Services.EmployeeService;
 using EmployeeService.Infrastructure.Exceptions;
 using EmployeeService.Infrastructure.Middleware;
+using EmployeeService.Infrastructure.Jobs;
+using MassTransit;
+using Infrastructure.AMQP.Messages;
 
 namespace EmployeeService
 {
@@ -39,10 +42,30 @@ namespace EmployeeService
             if (builder.Environment.IsProduction())
                 builder.WebHost.UseUrls("http://*:5015");
             builder.Services.AddMvc(options => options.Filters.Add(typeof(ApiExceptionFilter)));
+            builder.Services.AddMassTransit(
+                options =>
+                {
+                    var entryAssembly = Assembly.GetEntryAssembly();
+                    options.AddConsumers(entryAssembly);
+                    //options.AddSagaStateMachines(entryAssembly);
+                    //options.AddSagas(entryAssembly);
+                   // options.AddActivities(entryAssembly);
+                    options.UsingRabbitMq((context, config) =>
+                    {
+                        config.Host("localhost", "/", h =>
+                        {
+                            h.Username("guest");
+                            h.Password("guest");
+                        });
+                        config.ConfigureEndpoints(context);
+                        
+                    });
+                }
+                );
             builder.Services.AddDbContext<QueueContext>(ServiceLifetime.Scoped);
             builder.Services.AddScoped<IEmployeeService, EmplService>();
             builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-
+            builder.Services.AddHostedService<SecretKeyGeneratorHostedService>();
             builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
             builder.Services.AddAuthorization();
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
