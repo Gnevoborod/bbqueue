@@ -16,6 +16,8 @@ using bbqueue.Infrastructure.Middleware;
 using bbqueue.Infrastructure.Exceptions;
 using bbqueue.Infrastructure.Jobs;
 using bbqueue.Controllers;
+using MassTransit;
+using bbqueue.Infrastructure.AMQP.Consumers;
 
 namespace bbqueue
 {
@@ -55,7 +57,25 @@ namespace bbqueue
 
                 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
                 builder.Services.AddScoped<ITicketService, TicketService>();
-
+                builder.Services.AddMassTransit(
+                   options =>
+                   {
+                       var entryAssembly = Assembly.GetEntryAssembly();
+                       options.AddConsumers(entryAssembly);
+                       options.AddSagaStateMachines(entryAssembly);
+                       options.AddSagas(entryAssembly);
+                       options.AddActivities(entryAssembly);
+                       options.UsingRabbitMq((context, config) =>
+                       {
+                           config.Host("localhost", "/", h =>
+                           {
+                               h.Username("guest");
+                               h.Password("guest");
+                           });
+                           config.ConfigureEndpoints(context);
+                       });
+                   }
+                   );
                 builder.Services.AddScoped<IQueueService, QueueService>();
 
                 builder.Services.AddSignalR();
@@ -119,7 +139,6 @@ namespace bbqueue
 
                 });
 
-                
 
                 var app = builder.Build();
 

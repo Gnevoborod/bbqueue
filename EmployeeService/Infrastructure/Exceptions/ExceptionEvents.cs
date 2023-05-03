@@ -11,7 +11,7 @@
         public static readonly EventId EnumValidatorTypeNotEnum = new(351,"Используемый в ограничении тип - не enum");
         public static readonly EventId EnumValidatorValueNotInScope = new(352, "Значение не найдено среди допустимых:");
 
-
+        public static readonly EventId SecretKeyGeneratorErrorWhileExecuted = new(702, "Ошибка при работе автоматического задания по созданию нового секретного ключа");
         public static readonly EventId Default = new(0, "Unkonown error");
 
     }
